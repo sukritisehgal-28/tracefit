@@ -254,3 +254,26 @@ table.grid tr.diff td { background: var(--warn-wash); }
 .farrow.off::after { display: none; }
 .flowcard { margin-top: 16px; }
 @media (max-width: 760px) { .flow { grid-template-columns: minmax(0, 1fr); } .farrow.off { width: 0; height: 14px; border-top: 0; border-left: 2px dashed var(--muted); justify-self: center; } }
+
+/* How this list was made: the points that decided it, the weights as a web, and the whole process on request. */
+.flowhead { justify-content: space-between; align-items: center; }
+.btn.small { padding: 4px 10px; font-size: 12px; }
+.decided { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 8px 24px; align-items: start; }
+.decided .h { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.points { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--ink2); }
+.points b { color: var(--ink); font-weight: 600; }
+.web { margin: 0; text-align: center; }
+.web .radar { width: 100%; max-width: 250px; height: auto; }
+.process { margin: 0; padding: 12px 0 0 20px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px; font-size: 13px; color: var(--ink2); }
+.process > li > b { color: var(--ink); }
+.process ul { margin: 6px 0 0; padding-left: 18px; }
+.process .tablewrap { margin: 8px 0 6px; overflow-x: auto; }
+.grid.tight th, .grid.tight td { padding: 5px 10px; font-size: 12px; }
+.grid.tight td small { display: block; color: var(--muted); font-size: 11px; }
+.grid.tight td.num, .grid.tight th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.grid.tight td.zero { color: var(--muted); }
+.grid.tight td.warn { color: var(--warn-ink, var(--ink)); font-weight: 600; }
+.grid.tight td.bad { color: var(--bad-ink, var(--ink)); font-weight: 600; }
+.sameas b { color: var(--ink2); font-weight: 600; }
+.sameas .ask { display: block; margin-top: 2px; color: var(--ink2); }
+@media (max-width: 720px) { .decided { grid-template-columns: minmax(0, 1fr); } .web .radar { max-width: 230px; } }

@@ -254,6 +254,18 @@ function card(m, job, twin, rank) {
 
 // The cards of one list, with two kinds of divider: people who must not be contacted (listed last among the
 // matches), and runs of people whose result is the same on every rule.
+// The line above a run of people who are level on every rule: say so, say whether their documents are even
+// the same words, and name what is missing for all of them that would tell them apart. Nothing is invented.
+function sameAs(list, i) {
+  const run = [];
+  for (let k = i; k < list.length && list[k].same === list[i].same; k++) run.push(list[k]);
+  const m = list[i], sameDocs = m.docs != null && run.every((x) => x.docs === m.docs);
+  const ask = (m.apart || []).filter((d) => run.every((x) => (x.apart || []).some((y) => y.key === d.key))).map((d) => esc(d.text));
+  return `<div class="sameas"><b>${num(m.identical)} people have the same result on every rule</b>${sameDocs ? ", and their documents are word for word the same" : ""}.
+      Nothing on file tells them apart, so their order is arbitrary${sameDocs ? " and they may be one person imported more than once" : ""}.
+      ${ask.length ? `<span class="ask">To tell them apart, ask each for: ${ask.join(" · ")}.</span>` : ""}</div>`;
+}
+
 function cards(list, job) {
   let html = "", cut = false;
   const held = Object.entries(job.best_actions).filter(([st]) => !ACTIONABLE.includes(st)).reduce((a, [, k]) => a + k, 0);
@@ -264,14 +276,49 @@ function cards(list, job) {
       html += `<div class="sect">Must not be contacted <span>${num(held)}</span><small>They meet every required rule, and are listed last because a recruiter cannot act on them.</small></div>`;
     }
     const joinsAbove = m.same != null && above && above.same === m.same, joinsBelow = m.same != null && below && below.same === m.same;
-    if (joinsBelow && !joinsAbove) html += `<div class="sameas">${num(m.identical)} people have the same result on every rule. Their order is arbitrary.</div>`;
+    if (joinsBelow && !joinsAbove) html += sameAs(list, i);
     html += card(m, job, joinsAbove || joinsBelow, i + 1);
   });
   return html;
 }
 
-// How this list was made, in three numbers: everyone on file, who is on the list, and who a required rule
-// ruled out and why. The counts cover the whole list, not only the people on screen.
+// How the list was made, under the list: the three counts, the points that decided it, the weights as a
+// web, and (on request) every step from the sources to the next action.
+const ACTION_WORD = { ready: "can be contacted now", route: "go through the recruiter who owns the relationship", clarify: "need a question answered first",
+  blocked: "must not be contacted", closed: "are for a closed job", none: "need no action" };
+const LEVEL_WORD = { hard: "Required", from_job: "Required when the job asks for it", soft: "Scored, never rules anyone out" };
+const TIE_WORD = { action_readiness: "who can be acted on sooner", fewer_open_questions: "who has fewer open questions", most_recent_candidate_contact: "who was heard from more recently" };
+
+function weightsWeb(job, size = 230) {
+  const w = currentWeights(), dims = S.data.meta.dimensions, total = dims.reduce((a, d) => a + (w[d.name] || 0), 0) || 1;
+  const share = (d) => Math.round(((w[d.name] || 0) / total) * 100), top = Math.max(...dims.map(share), 1);
+  const desc = "Weights: " + dims.map((d) => `${d.label} ${share(d)}%`).join(", ");
+  return radar([{ name: "Weights", values: dims.map((d) => (share(d) / top) * 100) }], dims.map((d) => ({ label: `${d.label} ${share(d)}%` })), size, desc);
+}
+
+function processView(job) {
+  const p = job.process || { rules: [], gates: [] }, meta = S.data.meta, w = currentWeights();
+  const total = meta.dimensions.reduce((a, d) => a + (w[d.name] || 0), 0) || 1;
+  const used = p.rules.filter((r) => r.met + r.unknown + r.not_met > 0);
+  const cell = (n, cls) => `<td class="num ${n ? cls : "zero"}">${num(n)}</td>`;
+  const rules = used.map((r) => `<tr><td>${esc(r.label)}<small>${LEVEL_WORD[r.level] || "Required"}</small></td>${cell(r.met, "")}${cell(r.unknown, "warn")}${cell(r.not_met, "bad")}</tr>`).join("");
+  const unused = p.rules.filter((r) => !used.includes(r)).map((r) => r.label.toLowerCase());
+  const dims = meta.dimensions.map((d) => `<tr><td>${esc(d.label)}</td><td class="num">${Math.round(((w[d.name] || 0) / total) * 100)}%</td><td>${esc(d.means)}</td></tr>`).join("");
+  const acts = Object.entries(job.best_actions).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<li><b>${num(n)}</b> ${ACTION_WORD[k] || esc(k)}</li>`).join("");
+  const ties = (job.order.tie_breakers || []).map((t) => TIE_WORD[t] || t).join(", then ");
+  const st = job.stats || { people: 0, evaluated: 0 };
+  return `<ol class="process">
+      <li><b>Read.</b> ${num(meta.sources.length)} sources are read as they are: ${meta.sources.map((s) => esc(s.label)).join(", ")}. Every fact keeps its source, its date and the words it came from. ${num(st.people)} people are on file.</li>
+      <li><b>Check the required rules.</b> ${num(st.evaluated)} people are checked against each rule this job uses.
+        <div class="tablewrap"><table class="grid tight"><thead><tr><th>Rule</th><th class="num">Met</th><th class="num">No answer yet</th><th class="num">Not met</th></tr></thead><tbody>${rules}</tbody></table></div>
+        <span class="muted small">A rule not met means not a fit. No answer yet means needs an answer.${unused.length ? ` This job does not use: ${esc(unused.join(", "))}.` : ""}</span></li>
+      <li><b>Score.</b> Everyone on the list gets six marks out of 100, combined with the weights${S.weights ? " you set" : ""}.
+        <div class="tablewrap"><table class="grid tight"><thead><tr><th>Mark</th><th class="num">Weight</th><th>100 means</th></tr></thead><tbody>${dims}</tbody></table></div></li>
+      <li><b>Order.</b> Highest score first. Scores within ${num(job.order.tie_margin)} points are marked comparable${ties ? `; between them the order goes to ${esc(ties)}` : ""}. People level on everything are grouped and their order is arbitrary. Anyone who must not be contacted is listed last.</li>
+      <li><b>Next action.</b> Permission is checked separately from fit: is the job open, may the person be contacted, who owns the relationship. Of the ${num(job.groups.best)} on the list:<ul>${acts}</ul></li>
+    </ol>`;
+}
+
 function flowView(job) {
   const st = job.stats || { people: 0, evaluated: 0, excluded_by_profession: 0 };
   const g = job.groups, a = job.best_actions, r = job.reasons || {};
@@ -280,15 +327,34 @@ function flowView(job) {
   const aside = st.excluded_by_profession ? `<small>${num(st.excluded_by_profession)} in other professions were set aside first</small>` : "";
   const out = g.not_fit ? `<div class="fnode"><b>${num(g.not_fit)}</b><span>not a fit: a required rule is not met</span><small>${why("not_fit")}</small>
       <button class="linkish" data-act="filter" data-filter="not_fit">See them</button></div>` : "";
+  const used = ((job.process || {}).rules || []).filter((x) => x.level !== "soft" && x.met + x.unknown + x.not_met > 0).map((x) => x.label.toLowerCase());
+  const w = currentWeights(), dims = S.data.meta.dimensions, total = dims.reduce((s, d) => s + (w[d.name] || 0), 0) || 1;
+  const heavy = dims.slice().sort((x, y) => (w[y.name] || 0) - (w[x.name] || 0)).slice(0, 2).map((d) => `${d.label.toLowerCase()} ${Math.round(((w[d.name] || 0) / total) * 100)}%`);
+  const versions = job.requirements.filter((q) => q.status === "provisional" && q.other).map((q) =>
+    `<li><b>${esc(q.label)}:</b> using “${esc(q.text)}” from the newer note. ${esc(q.other.role)} still says “${esc(q.other.text)}”.</li>`).join("");
+  const points = [
+    used.length ? `<li><b>Who is on the list</b> is decided by the required rules, never by weights: ${esc(used.join(", "))}.</li>` : "",
+    job.need_answer ? `<li><b>${num(job.need_answer)} need an answer</b> because a required rule has no answer yet: ${why("clarify")}.</li>` : "",
+    g.not_fit ? `<li><b>${num(g.not_fit)} are not a fit</b> because a required rule is not met: ${why("not_fit")}.</li>` : "",
+    `<li><b>The order</b> is by score, the weighted average of six marks. Heaviest${S.weights ? " in your weights" : ""}: ${esc(heavy.join(", "))}.</li>`,
+    versions,
+    held ? `<li><b>${num(held)} must not be contacted</b> and ${held > 1 ? "are" : "is"} listed last, whatever the score.</li>` : "",
+    `<li>${job.openings ? `<b>${num(job.openings)} opening${job.openings > 1 ? "s" : ""}.</b>` : "<b>No source says how many people this job needs</b>, so the list is not cut off."}</li>`,
+  ].join("");
   return `<section class="card flowcard" aria-label="How this list was made">
-      <div class="flowhead"><b>How this list was made</b></div>
+      <div class="flowhead"><b>How this list was made</b>
+        <button class="btn plain small" data-act="process" aria-expanded="${S.process ? "true" : "false"}">${S.process ? "Hide the whole process" : "Show the whole process"}</button></div>
       <div class="flow">
         <div class="fnode"><b>${num(st.people)}</b><span>people on file, each checked against every rule</span>${aside}</div>
         <div class="farrow" aria-hidden="true"></div>
-        <div class="fnode win"><b>${num(g.best)}</b><span>on this list</span><small>${num(pass)} pass every required rule${job.need_answer ? ` · ${num(job.need_answer)} need an answer (${why("clarify")})` : ""}</small></div>
+        <div class="fnode win"><b>${num(g.best)}</b><span>on this list</span><small>${num(pass)} pass every required rule${job.need_answer ? ` · ${num(job.need_answer)} need an answer` : ""}</small></div>
         ${out ? '<div class="farrow off" aria-hidden="true"></div>' + out : ""}
       </div>
-      <div class="muted small">Ordered by score. ${held ? `${num(held)} must not be contacted and ${held > 1 ? "are" : "is"} listed last. ` : ""}${job.openings ? `${num(job.openings)} opening${job.openings > 1 ? "s" : ""}.` : "No source says how many people this job needs, so the list is not cut off."}</div>
+      <div class="decided">
+        <div><div class="h">What decided it</div><ul class="points">${points}</ul></div>
+        <figure class="web"><figcaption class="h">Weights${S.weights ? " (yours)" : ""}</figcaption>${weightsWeb(job)}</figure>
+      </div>
+      ${S.process ? processView(job) : ""}
     </section>`;
 }
 
@@ -321,8 +387,8 @@ function rankBar(job) {
       ${sliders}
       <div class="chiprow"><span class="muted small">Only show</span>${chips}${mine}</div>
       <div class="ownrow"><label for="own" class="muted small">Add your own</label>
-        <input id="own" type="text" maxlength="60" placeholder="e.g. wound care, pediatrics, Pine Valley University" autocomplete="off">
-        <select id="ownkind" aria-label="Where to look"><option value="text">said in their own words</option><option value="school">where they studied</option></select>
+        <input id="own" type="text" maxlength="60" placeholder="Type any skill or phrase, or any school or institution" autocomplete="off">
+        <select id="ownkind" aria-label="Where to look"><option value="text">said in their own words</option><option value="school">school or institution they studied at</option></select>
         <button class="btn plain" data-act="own-add">Add</button></div>
     </section>`;
 }
@@ -423,7 +489,7 @@ function backgroundView(b, name) {
 // Dimensions the job says nothing about are left off. Values are also listed beside it, so nothing relies on
 // reading the shape.
 const SERIES = ["var(--s1)", "var(--s2)", "var(--s3)"];
-function radar(people, labels, size = 230) {
+function radar(people, labels, size = 230, said = null) {
   const axes = labels.map((l, i) => ({ ...l, i })).filter((l) => people.some((p) => p.values[l.i] != null));
   if (axes.length < 3) return "";
   const c = size / 2, R = size / 2 - 42, n = axes.length;
@@ -437,7 +503,7 @@ function radar(people, labels, size = 230) {
     const range = highs.some((h, k) => h != null && h !== vals[k]) ? `<polygon points="${poly(highs)}" fill="none" stroke="${SERIES[j]}" stroke-width="1.5" stroke-dasharray="4 3"/>` : "";
     return `${range}<polygon points="${poly(vals)}" fill="${SERIES[j]}" fill-opacity="${people.length > 1 ? 0.12 : 0.22}" stroke="${SERIES[j]}" stroke-width="2"/>`;
   }).join("");
-  const desc = people.map((p) => `${p.name}: ` + axes.map((a) => `${a.label} ${p.values[a.i] ?? "unknown"}`).join(", ")).join(". ");
+  const desc = said || people.map((p) => `${p.name}: ` + axes.map((a) => `${a.label} ${p.values[a.i] ?? "unknown"}`).join(", ")).join(". ");
   return `<svg viewBox="0 0 ${size} ${size}" class="radar" role="img" aria-label="${esc(desc)}">${rings}${spokes}${shapes}${text}</svg>`;
 }
 
@@ -622,6 +688,7 @@ document.addEventListener("click", async (e) => {
   else if (act === "rule") { const r = el.dataset.rule; S.openRules.has(r) ? S.openRules.delete(r) : S.openRules.add(r); }
   else if (act === "na") S.showNA = true;
   else if (act === "everything") S.everything = !S.everything;
+  else if (act === "process") S.process = !S.process;
   else if (act === "close") { S.person = null; S.comparing = false; }
   else if (act === "compare-clear") S.compare.clear();
   else if (act === "toast-x") S.toasts.splice(Number(el.dataset.i), 1);

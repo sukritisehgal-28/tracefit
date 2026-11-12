@@ -27,6 +27,7 @@ python3 -m unittest discover -s tests
 | `python3 -m shortlist coverage` | Every rule ran for every pair; what the text reader could not read |
 | `python3 tests/scenario_base.py` | 102 synthetic situations, each passing or failing by name |
 | `python3 tests/test_rewording.py` | 124 reworded sentences: a "no" is never read as a "yes" |
+| `python3 tests/test_own_criteria.py` | 37 typed phrases and 22 institutions against synthetic résumés, with the known limits listed |
 | `python3 bench/benchmark.py --n 100000` | The synthetic scale benchmark |
 
 Add `--overlay feed_only` or `--overlay strict_pay` to any command to see another client's settings.
@@ -34,12 +35,12 @@ Add `--overlay feed_only` or `--overlay strict_pay` to any command to see anothe
 ## Five-minute demo
 
 1. **Home Health PT.** The banner says the account manager's note is ahead of the vendor feed; **See details** shows both versions and their sources. The list is one ranked list of the 12 people a recruiter could act on, top 10 first, then **Show next 2**.
-2. **The list.** Each card shows the score, one line on what sets the person apart, the one quote behind their best dimension, and the next action. R01, R02 and R03 have identical evidence, so they are grouped and their order is marked arbitrary. R08 **needs an answer** and sits ninth, where the score puts them, with what is missing. R11 passes everything but asked not to be contacted, so R11 is listed last.
+2. **The list.** Each card shows the score, one line on what sets the person apart, the one quote behind their best dimension, and the next action. R01, R02 and R03 differ in the supplied file only by id and email, so the page groups them, says their documents are word for word the same, marks their order arbitrary, and names what to ask each to tell them apart. R08 **needs an answer** and sits ninth, where the score puts them, with what is missing. R11 passes everything but asked not to be contacted, so R11 is listed last.
 3. **Open R04.** **Why this score** draws the six dimensions as a radar: R04 loses 30 points on evidence because "I have three years" is not supported by the dated history. Every rule below opens to its quote. **Show everything** opens it all.
-4. **Rank by.** Pick **Closest to our work** (setting at 40%) or **Within budget**, or move a slider: the list re-ranks. Tick **Can act now** and R11 leaves. Under **Add your own**, type `sports injury`: one person says it, and the card shows the sentence. Weights and filters never move anyone past a required rule.
+4. **Rank by.** Pick **Closest to our work** (setting at 40%) or **Within budget**, or move a slider: the list re-ranks. Tick **Can act now** and R11 leaves. Under **Add your own**, type any phrase (`sports injury`) or any school or institution: the list narrows to the people whose own documents say it, and the card shows the sentence. Weights and filters never move anyone past a required rule.
 5. **Compare** R04, R06 and R09: radars overlaid, rows that differ highlighted, plus what each lists on their résumé that no rule checks.
 6. **Demo → A new job arrives.** The outpatient job appears, already matched. Blair, an outpatient therapist since 2016, is the top match at 96, well clear of the rest, and goes through recruiter R2.
-7. **How this list was made**, under the list: 16 people on file, 12 on the list, 4 not a fit and which rule stopped them (**See them**).
+7. **How this list was made**, under the list: 16 people on file, 12 on the list, 4 not a fit (**See them**); the points that decided it; the weights drawn as a web. **Show the whole process** opens every step, from the sources to the next action, with the count on each rule.
 8. **Demo → A candidate sends an update.** Alex can now only start 8 December. One result changes; **View** opens it on the rule that changed, with the old message shown as replaced.
 9. **Demo → Settings profile → Vendor feed only.** With the account manager's note ignored, nobody qualifies for the home-health job. That is the client's first open question.
 
@@ -54,7 +55,7 @@ Add `--overlay feed_only` or `--overlay strict_pay` to any command to see anothe
 | `shortlist/rules.py`, `dimensions.py`, `matching.py` | The gates, the quality score, tiers, order, next action. |
 | `shortlist/pipeline.py`, `server.py`, `web/` | Replay, the running-service path, the page. |
 | `shortlist/audit.py`, `model_reader.py` | The checker; an optional guarded language-model reader (off). |
-| `tests/`, `bench/` | 168 tests, 102 scenarios, the rewording sweep; the synthetic benchmark. |
+| `tests/`, `bench/` | 184 tests, 102 scenarios, the rewording sweep; the synthetic benchmark. |
 
 ## What is real and what is simulated
 

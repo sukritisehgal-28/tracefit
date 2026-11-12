@@ -289,3 +289,57 @@ class HowTheListWasMade(unittest.TestCase):
 
     def test_the_number_of_openings_is_not_invented(self):
         self.assertTrue(all(j["openings"] is None for j in engine().state(0)["jobs"]))
+
+    def test_the_whole_process_counts_every_person_on_every_rule_the_job_uses(self):
+        job = next(j for j in engine().state(0)["jobs"] if j["key"] == "job:VMS-901")
+        rules = {r["name"]: r for r in job["process"]["rules"]}
+        for r in rules.values():
+            self.assertEqual(r["met"] + r["unknown"] + r["not_met"] + r["na"], 16, r["label"])
+        self.assertEqual((rules["profession"]["met"], rules["profession"]["not_met"]), (14, 2))
+        self.assertEqual(rules["shift_coverage"]["na"], 16)                      # a rule this job does not use
+        self.assertEqual({d["name"] for d in engine().state(0)["meta"]["dimensions"] if d["means"]},
+                         {"setting", "skills", "depth", "evidence", "readiness", "pay"})
+
+
+class PeopleLevelOnEverything(unittest.TestCase):
+    """R01, R02 and R03 differ in the supplied file only by id and email. The tool must not invent a difference:
+    it says they are level, says their documents are the same words, and names what to ask."""
+
+    def cards(self):
+        return {c["person"].split(":")[-1]: c for c in engine().cards(0, "job:VMS-901", "best", 0, 50)["cards"]}
+
+    def test_the_supplied_profiles_really_are_identical(self):
+        raw = json.loads((Path(config.ROOT) / "assessment-data" / "our_system_response.json").read_text())
+        strip = lambda p: json.dumps(p, sort_keys=True).replace(p["profile_id"], "X").replace(p["profile_id"].lower(), "x")   # noqa: E731
+        by_id = {p["profile_id"]: strip(p) for p in raw["profiles"]}
+        self.assertEqual(by_id["R01"], by_id["R02"])
+        self.assertEqual(by_id["R01"], by_id["R03"])
+        self.assertNotEqual(by_id["R01"], by_id["R10"])               # R10's documents are the same, but a recruiter owns R10
+
+    def test_they_are_grouped_and_nothing_separates_them(self):
+        c = self.cards()
+        self.assertEqual({c[k]["identical"] for k in ("R01", "R02", "R03")}, {3})
+        self.assertEqual(len({c[k]["same"] for k in ("R01", "R02", "R03")}), 1)
+        self.assertEqual(len({c[k]["docs"] for k in ("R01", "R02", "R03")}), 1)    # word for word the same documents
+        self.assertEqual(len({c[k]["score"] for k in ("R01", "R02", "R03")}), 1)
+
+    def test_the_card_names_what_to_ask_to_tell_them_apart(self):
+        asks = [d["key"] for d in self.cards()["R01"]["apart"]]
+        self.assertEqual(asks, ["home", "history", "license"])
+        self.assertIn("between 2022 and May 2025", self.cards()["R01"]["apart"][1]["text"])
+
+    def test_someone_who_is_not_level_with_anyone_carries_no_such_line(self):
+        self.assertIsNone(self.cards()["R04"]["apart"])
+
+    def test_a_person_whose_home_is_on_file_is_not_asked_for_it(self):
+        from shortlist.matching import open_details
+        w = engine().world(0)
+        keys = [d["key"] for d in open_details(w, w.jobs["job:VMS-901"], w.people["person:ats:C1"])]
+        self.assertNotIn("home", keys)
+
+    def test_the_data_problems_say_twelve_profiles_share_one_text(self):
+        notes = [i for i in engine().issues(0) if "word for word" in i["message"]]
+        self.assertEqual(len(notes), 1)
+        self.assertTrue(notes[0]["message"].startswith("12 people"))
+        self.assertIn("For 4 of them", notes[0]["message"])           # R01, R02, R03 and R10
+        self.assertEqual(notes[0]["severity"], "info")

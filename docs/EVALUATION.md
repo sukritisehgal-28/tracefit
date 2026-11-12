@@ -13,7 +13,8 @@ In each case a matcher that trusts structured fields and keywords gives a confid
 | Feed: two years and Homecare Homebase required. Later account-manager note: one year, trainable | Uses whichever it read last | Shows both with sources; uses the note, flags every result that relies on it, asks for confirmation before submitting |
 | Casey is "placed", but a message says the assignment is Monday to Wednesday and offers both weekend shifts | Excludes Casey | **Match** for the ED job, by the other-boards route, through recruiter R3 |
 | Drew has the preferred board, declined both dates, asked for no contact; an older field says contact allowed | Ranks Drew first | **Not a fit** for these dates and **do not contact**; the stale field shown as replaced |
-| R01, R02, R03 are identical | Orders them by accident | Grouped; the page says their order is arbitrary |
+| R01, R02, R03 differ only by id and email | Orders them by accident, or invents a difference | Grouped; order marked arbitrary; the page says their documents are the same words and what to ask to tell them apart |
+| Twelve profiles share one profile text | Twelve independent candidates | Kept as twelve (no email or reference links them) and reported once under data problems, to confirm before contacting each |
 | R04 says three years; the profile shows 18 months | Believes one | Passes on the note's one-year minimum but loses 30 evidence points, so ranks below R01; the claim becomes the question to ask |
 | R05 says they have not used Homecare Homebase; the profile lists it | Counts it | Uses the later denial; skills drop |
 | R11 asks for no contact; the restriction field is empty | Contactable | **Do not contact** until 15 Jan 2027, listed last |
@@ -27,7 +28,7 @@ In each case a matcher that trusts structured fields and keywords gives a confid
 
 ## Experiments
 
-Run everything with `python3 -m unittest discover -s tests`: 168 tests.
+Run everything with `python3 -m unittest discover -s tests`: 184 tests.
 
 1. **Three client profiles on the same data** (the bonus: comparing configurations). Home-health job at 18:00:
 
@@ -48,12 +49,14 @@ Run everything with `python3 -m unittest discover -s tests`: 168 tests.
 8. **124 reworded sentences** (`python3 tests/test_rewording.py`). A "no" or "unsure" must never be read as a "yes", and a request not to be contacted must never be missed. The first run found **57 unsafe readings and 10 of 11 contact requests missed**: the reader had worked like a keyword finder ("My Washington license lapsed" counted as a license). Now: 0 unsafe, 11 of 11 caught, 28 of 30 plain yes sentences still read, the sample unchanged.
 9. **The model reader's guard** against stand-in models that say yes to everything, invent quotes, quote true words about something else, disagree, or crash: no false yes, no contact request lifted, nobody's tier raised on the sample. This tests the guard, not a model.
 10. **The checker** (`python3 -m shortlist audit`) is clean on all 176 results in the sample, both overlays, all scenarios and with the lying model on; twelve planted mistakes are each caught by their own check.
-11. **Size.** Compact rows give exactly the list, totals and explanations of full ones; pages add up to the list; the first response is the same size for 1 person as for 300. Measuring at size found two defects sixteen people could not show: loading grew with the square of the records (now linear), and half of shortlist time was memory clean-up (now paused). Timings are in [ARCHITECTURE.md](ARCHITECTURE.md#scale-latency-and-cost).
+11. **A recruiter's own criteria** (`python3 tests/test_own_criteria.py`): 37 typed phrases and 22 institutions against synthetic résumés in layouts the sample does not use. Writing it found that the first version matched letters, not words ("art" matched "start"); it now matches whole words whatever their case, accents, hyphens or plural. Five cases are listed as known limits: a different word, an abbreviation or initials are not found.
+12. **Size.** Compact rows give exactly the list, totals and explanations of full ones; pages add up to the list; the first response is the same size for 1 person as for 300. Measuring at size found two defects sixteen people could not show: loading grew with the square of the records (now linear), and half of shortlist time was memory clean-up (now paused). Timings are in [ARCHITECTURE.md](ARCHITECTURE.md#scale-latency-and-cost).
 
 ## Limitations
 
 - **The text reader is pattern-based.** It leaves 76 clauses of the sample unread (headings, hedges, context); they stay visible and are counted. Experiment 8 shows unusual wording is left unread rather than misread, not that the reader understands it.
 - **Weights and thresholds are reasoned defaults, not calibrated.** The score ranks and explains; it is not a probability of placement. Calibration needs submission and placement outcomes.
+- **A typed criterion finds words, not meanings.** "Kids" does not find "pediatric". The card shows the sentence, so a recruiter sees what matched.
 - **Nothing is verified.** Licenses, certificates and schedules are what a candidate or a record says.
 - **Identity is cautious.** Two records of one person sharing no email or reference stay apart.
 - **Experience arithmetic is simple.** Overlapping roles are merged; part-time work and gaps inside a role are not modelled.

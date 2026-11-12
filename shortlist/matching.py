@@ -544,6 +544,9 @@ def card_dict(world, m: Match, override: tuple | None = None) -> dict:
         "standout": standout[:1].upper() + standout[1:], "typical": m.typical,
         "headline": who["headline"], "home": who["home"], "also": _also(world, p),
         "ref": who["ref"], "namesakes": who["namesakes"], "links": _links(world, p),
+        # for people level on every rule: what is missing that would separate them, and whether their documents differ
+        "apart": open_details(world, world.jobs[m.job], p) if m.identical > 1 else None,
+        "docs": documents_key(world, p) if m.identical > 1 else None,
     }
     if override:
         out.update(score=override[0], low=override[1], high=override[2], tier=override[3], tier_label=TIER_LABEL[override[3]],
@@ -557,6 +560,37 @@ def _key_dict(world, key):
     ev = world.evidence.get(key[0])
     return {"evidence": key[0], "quote": key[1], "source": ev.label if ev else key[0],
             "at": ev.observed_at.isoformat() if ev else None, "date_only": ev.date_only if ev else True}
+
+
+def open_details(world, job, p) -> list:
+    """What is not on file for this person and would tell them apart from someone level with them: each a
+    question a recruiter can ask. Nothing here changes a score, a tier or the order."""
+    from .resume import background
+    out = []
+    if p.fact("home") is None and not background(world, p)["header"].get("home"):
+        out.append({"key": "home", "text": "where they live"})
+    degrees = [f.value["year"] for f in p.keyed("education").values() if isinstance(f.value, dict) and f.value.get("year")]
+    spans = [f.value for f in p.keyed("experience").values() if isinstance(f.value, dict) and f.value.get("years_documented")]
+    if not spans:
+        out.append({"key": "history", "text": "a dated work history"})
+    elif degrees:
+        longest = max(spans, key=lambda v: v["years_documented"])
+        started = world.today.year + world.today.timetuple().tm_yday / 365.25 - longest["years_documented"]
+        if started - (max(degrees) + 1) >= 0.5:           # more than half a year after the degree year is unaccounted for
+            out.append({"key": "history", "text": f"what they did between {max(degrees)} and {longest.get('since') or int(started)}"})
+    if job.reqs_of("req.license") and not any(isinstance(f.value, dict) and (f.value.get("number") or f.value.get("expires"))
+                                               for f in p.keyed("license").values()):
+        out.append({"key": "license", "text": "their license number and expiry date"})
+    return out
+
+
+def documents_key(world, p) -> int | None:
+    """One number for everything the person wrote or sent, so two people with word-for-word the same documents
+    can be recognised. None when they have no documents of their own."""
+    from .resume import OWN_WORDS
+    texts = sorted(" ".join(world.evidence[i].text.lower().split()) for i in p.evidence_ids
+                   if world.evidence[i].kind in OWN_WORDS and world.evidence[i].text)
+    return zlib.crc32("\n".join(texts).encode("utf-8")) if texts else None
 
 
 def _links(world, p) -> list:

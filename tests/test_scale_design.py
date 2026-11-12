@@ -99,12 +99,12 @@ class Paging(unittest.TestCase):
         self.assertEqual(sl.page("best", 10_000, 25)[0], [])
 
     def test_the_first_response_holds_no_people_and_does_not_grow_with_them(self):
-        few = build([cand()], [job()])
+        few = build([cand(), cand("C2")], [job()])       # two, so both responses carry the one note on identical résumés
         many = build([cand(f"C{i}") for i in range(1, 301)], [job()])
         a, b = (json.dumps(e.state(0), default=str) for e in (few, many))
         self.assertNotIn('"results"', b)
         self.assertNotIn("C150", b, "no person appears until a list is asked for")
-        self.assertLess(abs(len(b) - len(a)), 200, "300 people and 1 person give a first response of the same size")
+        self.assertLess(abs(len(b) - len(a)), 200, "300 people and 2 people give a first response of the same size")
         page = many.cards(0, "job:VMS-1", "best", 0, 25)
         self.assertEqual((len(page["cards"]), page["total"]), (25, 300))
         self.assertNotIn("results", page["cards"][0])

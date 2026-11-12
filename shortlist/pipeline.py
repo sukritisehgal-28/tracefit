@@ -22,7 +22,7 @@ from pathlib import Path
 
 from . import config as configuration
 from .extract import RULES as READING_RULES
-from .matching import (found_for, GROUPS, TIER_LABEL, TIER_ORDER, Shortlist, card_dict, evidence_dict, job_dict, match_dict,
+from .matching import (documents_key, found_for, short_ref, GROUPS, TIER_LABEL, TIER_ORDER, Shortlist, card_dict, evidence_dict, job_dict, match_dict,
                        person_dict)
 from .model import Issue
 from .rules import GATES, NOT_MET, OUTCOME_WORD, RULES, check_config
@@ -149,8 +149,49 @@ def job_summary(world, job, cfg: dict, sl: Shortlist | None) -> dict:
                    "tie_margin": sc.get("tie_margin", 0)}
     jd["weights"] = dimensions.weights_of(sl.ctx.dims_cfg) if sl else {}
     jd["skills"] = [{"key": k, "label": world.lex.label(k)} for k in job.reqs_of("req.skill")]
+    outcomes = sl.stats["outcomes"] if sl else {}
+    jd["process"] = {                                     # every step behind the list, for "Show the whole process"
+        "rules": [{"name": name, "label": rc.get("label", name), "level": rc.get("level", "hard"),
+                   **{k: outcomes.get(name, {}).get(k, 0) for k in ("met", "unknown", "not_met", "na")}}
+                  for name, rc in rules_cfg.items()],
+        "gates": [{"name": name, "label": gc_.get("label", name), "counts": dict(outcomes.get(name, {}))}
+                  for name, gc_ in (sl.ctx.gates_cfg.items() if sl else ())],
+    }
     jd["openings"] = None          # no source in the packet states how many people a job needs (HANDOFF.md, question 9)
     return jd
+
+
+def same_documents(world) -> list:
+    """People whose résumé or profile is word for word the same as someone else's. It may be a template, or one
+    person imported more than once: the tool keeps them apart (it joins people only on an explicit reference or
+    an email) and says so, so a recruiter does not contact one person several times."""
+    stamp = (len(world.people), len(world.evidence))
+    cached = world.__dict__.get("_same_documents")
+    if cached and cached[0] == stamp:
+        return cached[1]
+    by_text: dict = {}
+    for p in world.people.values():
+        for i in p.evidence_ids:
+            ev = world.evidence[i]
+            if ev.kind in ("resume", "profile") and ev.text and len(ev.text) >= 80:
+                by_text.setdefault(" ".join(ev.text.lower().split()), set()).add(p.key)
+    groups = sorted((g for g in by_text.values() if len(g) > 1), key=lambda g: (-len(g), sorted(g)))
+    out = []
+    for g in groups[:5]:
+        every = {}
+        for key in g:
+            every.setdefault(documents_key(world, world.people[key]), []).append(key)
+        twins = max(every.values(), key=len)
+        refs = sorted(short_ref(world.people[k]) for k in twins)
+        named = ", ".join(refs[:4]) + (f" and {len(refs) - 4} more" if len(refs) > 4 else "")
+        extra = f" For {len(twins)} of them ({named}) every document is identical." if len(twins) > 1 else ""
+        out.append(Issue("info", "all sources", f"{len(g)} people",         # a fixed size, however many people share the text
+                         f"{len(g)} people have a résumé or profile that is word for word the same.{extra} They are kept as separate "
+                         "people because no reference or email links them. Confirm they are different people before contacting each."))
+    if len(groups) > 5:
+        out.append(Issue("info", "all sources", f"{len(groups) - 5} more groups", "More groups of people share one résumé or profile text."))
+    world.__dict__["_same_documents"] = (stamp, out)
+    return out
 
 
 def _job_evidence_ids(jd: dict) -> list:
@@ -271,7 +312,8 @@ class Engine:
     def issues(self, step: int) -> list[dict]:
         """Data problems the tool worked around, most serious first. Matching carries on regardless."""
         order = {"error": 0, "warning": 1, "info": 2}
-        found = self.load_issues + self.world(step).issues
+        w = self.world(step)
+        found = self.load_issues + w.issues + same_documents(w)
         return [asdict(i) for i in sorted(found, key=lambda i: order.get(i.severity, 3))]
 
     # ----------------------------------------------------------- notifications
@@ -315,7 +357,7 @@ class Engine:
                 "sinks": [{"name": s["name"], "adapter": s["adapter"], "path": s["path"]} for s in self.cfg["sinks"]],
                 "tiers": TIER_LABEL, "rule_count": len(RULES) + len(GATES), "people": len(w.people), "page_size": PAGE_SIZE,
                 "top_n": int(self.cfg.get("matching", {}).get("top_n", 10)),
-                "dimensions": [{"name": k, "label": dimensions.LABELS[k]} for k in dimensions.ORDER],
+                "dimensions": [{"name": k, "label": dimensions.LABELS[k], "means": dimensions.MEANS[k]} for k in dimensions.ORDER],
                 "presets": [{"name": n, "label": p.get("label", n), "weights": dimensions.weights_of(p)}
                             for n, p in self.cfg.get("presets", {}).items()],
             },

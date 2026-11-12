@@ -14,6 +14,7 @@ paragraph, as short extracts and imported profiles are written.
 from __future__ import annotations
 
 import re
+import unicodedata
 from functools import lru_cache
 
 from .extract import ABSENT, BOARD, EDUCATION, LICENSE, RANGE, SINCE
@@ -261,6 +262,41 @@ def unrecognised(world) -> list[tuple[str, int]]:
 
 
 OWN_WORDS = ("resume", "profile", "candidate_message", "candidate_statement")
+ABBREVIATIONS = {"univ": "university", "inst": "institute", "coll": "college", "dept": "department", "hosp": "hospital"}
+
+
+def fold(text: str) -> str:
+    """Text as a recruiter would compare it: case, accents, hyphens and punctuation do not matter, "&" is "and",
+    and a few common abbreviations are spelled out. "St. Mary's" and "st marys" fold to the same words."""
+    t = "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c)).lower()
+    t = re.sub(r"['’`]", "", t).replace("&", " and ")
+    words = re.sub(r"[^\w+#]+", " ", t).split()
+    return " ".join(ABBREVIATIONS.get(w, w) for w in words)
+
+
+def _word(w: str) -> str:
+    """One typed word, also matching its plain singular or plural: injury/injuries, nurse/nurses, visit/visits."""
+    if len(w) <= 3:
+        return re.escape(w) + "s?"
+    if w.endswith("ies"):
+        return re.escape(w[:-3]) + "(?:y|ies)"
+    if w.endswith("y") and w[-2] not in "aeiou":
+        return re.escape(w[:-1]) + "(?:y|ies)"
+    if w.endswith("es") and len(w) > 4:
+        return re.escape(w[:-2]) + "(?:e|s|es)?"
+    if w.endswith("s") and not w.endswith(("ss", "us", "is")):
+        return re.escape(w[:-1]) + "(?:s|es)?"
+    return re.escape(w) + "(?:s|es)?"
+
+
+def phrase_pattern(phrase: str):
+    """A pattern that finds a typed phrase in folded text: whole words only ("art" is not in "start"), in the
+    order typed, singular or plural, with or without the space ("home health" finds "homehealth"). None when
+    the phrase is too short to mean anything."""
+    words = fold(phrase).split()
+    if not words or len("".join(words)) < 2:
+        return None
+    return re.compile(r"(?<!\w)" + " ?".join(_word(w) for w in words) + r"(?!\w)")
 
 
 def mention(world, person, phrase: str):
@@ -269,24 +305,27 @@ def mention(world, person, phrase: str):
     Returns (clause, evidence) for the newest clause that holds the phrase and carries no negation or doubt:
     "no wound care experience" is not a mention of wound care. None when there is none, or when a later
     statement of theirs denies or doubts it: the newest word wins, as it does in the rules. Only the candidate's
-    résumés, profiles and own messages are searched, never a note about them.
+    résumés, profiles and own messages are searched, never a note about them. Words are matched whole, whatever
+    their case, hyphens or plural; a different word for the same thing is not found.
     """
     from .extract import AMBITION, MAY, NEGATION, UNSURE, clauses
 
     def plain(clause: str) -> bool:        # any negation at all rules a clause out, even one the reader understands
         return not (NEGATION.search(clause) or UNSURE.search(clause) or MAY.search(clause) or AMBITION.search(clause)
                     or clause.rstrip().endswith("?"))
-    needle = " ".join(phrase.lower().split())
-    if len(needle) < 2:
+    needle = phrase_pattern(phrase)
+    if needle is None:
         return None
     said = denied = None                  # the newest plain mention, and the newest sentence that takes it back
     for eid in person.evidence_ids:
         ev = world.evidence[eid]
-        if ev.kind not in OWN_WORDS or not ev.text or needle not in " ".join(ev.text.lower().split()):
+        if ev.kind not in OWN_WORDS or not ev.text or not needle.search(fold(ev.text)):
             continue
-        for s, e in clauses(ev.text):
-            clause = ev.text[s:e].strip(" \t•")
-            if needle not in " ".join(clause.lower().split()):
+        units = [ev.text[s:e].strip(" \t•") for s, e in clauses(ev.text)]
+        if not any(needle.search(fold(u)) for u in units):       # the phrase straddles a clause break ("St. Mary's")
+            units = [line.strip(" \t•") for line in ev.text.splitlines()]
+        for clause in units:
+            if not needle.search(fold(clause)):
                 continue
             if plain(clause):
                 if said is None or ev.observed_at > said[1].observed_at:
@@ -299,9 +338,9 @@ def mention(world, person, phrase: str):
 
 
 def studied_at(world, person, phrase: str):
-    """The education line on the person's résumés that names this school or degree, as {text, source}; None
-    when there is none."""
-    needle = " ".join(phrase.lower().split())
-    if len(needle) < 2:
+    """The education or training line on the person's résumés that names this institution (or degree), as
+    {text, source}; None when there is none. Any institution can be typed; nothing is looked up in a list."""
+    needle = phrase_pattern(phrase)
+    if needle is None:
         return None
-    return next((item for item in background(world, person)["education"] if needle in item["text"].lower()), None)
+    return next((item for item in background(world, person)["education"] if needle.search(fold(item["text"]))), None)

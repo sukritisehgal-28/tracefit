@@ -27,6 +27,12 @@ LABELS = {"setting": "Setting", "skills": "Skills", "depth": "Depth", "evidence"
           "readiness": "Readiness", "pay": "Pay"}
 DEFAULT_WEIGHTS = {"setting": 25, "skills": 20, "depth": 15, "evidence": 15, "readiness": 15, "pay": 10}
 PENALTY = {"disputed": 30, "unread_update": 30, "stale": 15}
+MEANS = {"setting": "Dated experience in the job's care setting",
+         "skills": "Every skill and tool the job asks for",
+         "depth": "Documented years at twice the minimum",
+         "evidence": "Nothing contradicts or outdates the facts used",
+         "readiness": "Start, schedule and shifts met, and a recent reply",
+         "pay": "Asks at or below the approved rate"}
 
 
 def weights_of(dims_cfg: dict, override: dict | None = None) -> dict:
