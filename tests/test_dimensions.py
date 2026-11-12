@@ -118,7 +118,7 @@ class RecruiterWeightsAndFilters(unittest.TestCase):
 
     def test_weights_never_move_anyone_between_lists(self):
         e = engine()
-        for group in ("best", "clarify", "not_fit"):
+        for group in ("best", "not_fit"):
             plain = {c["person"] for c in e.cards(0, "job:" + HOME_HEALTH, group, 0, 200)["cards"]}
             tilted = {c["person"] for c in e.cards(0, "job:" + HOME_HEALTH, group, 0, 200, {"setting": 0, "skills": 0, "pay": 50})["cards"]}
             self.assertEqual(plain, tilted, group)
@@ -135,6 +135,65 @@ class RecruiterWeightsAndFilters(unittest.TestCase):
     def test_presets_are_offered_to_the_page(self):
         presets = engine().state(0)["meta"]["presets"]
         self.assertTrue({"experience", "soonest", "budget"} <= {p["name"] for p in presets})
+
+
+class OneList(unittest.TestCase):
+    """People who need an answer are on the same list, placed by score; a failed required rule keeps someone off it."""
+
+    def test_someone_who_needs_an_answer_sits_where_their_score_puts_them(self):
+        rows = [m for m in engine().matches(0)["job:" + HOME_HEALTH][0] if m.tier != "not_fit"]
+        names = [m.person.split(":")[-1] for m in rows]
+        r08 = names.index("R08")                                   # needs an answer on the start date, scores 87
+        self.assertEqual(rows[r08].tier, "clarify")
+        self.assertLess(r08, names.index("R05"))                   # above R05, who passes everything but scores 81
+        self.assertGreater(r08, names.index("R01"))
+        open_scores = [m.score for m in rows if m.action["status"] != "blocked"]
+        self.assertEqual(open_scores, sorted(open_scores, reverse=True))
+
+    def test_the_page_has_one_list_and_the_people_ruled_out(self):
+        from shortlist.matching import GROUPS
+        self.assertEqual(list(GROUPS), ["best", "not_fit"])
+        payload = engine().cards(0, "job:" + HOME_HEALTH, "best", 0, 10)
+        self.assertEqual((len(payload["cards"]), payload["total"]), (10, 12))         # the top ten of twelve
+        self.assertEqual(len(engine().cards(0, "job:" + HOME_HEALTH, "best", 10, 10)["cards"]), 2)   # "show next 10"
+
+    def test_no_card_says_strong_match(self):
+        labels = {c["tier_label"] for c in engine().cards(0, "job:" + HOME_HEALTH, "best", 0, 50)["cards"]}
+        self.assertEqual(labels, {"Match", "Needs an answer"})
+
+
+class RecruitersOwnCriteria(unittest.TestCase):
+    """What a recruiter types into "Add your own". SYNTHETIC where a test builds its own people."""
+
+    def names(self, filters):
+        return [c["person"].split(":")[-1] for c in engine().cards(0, "job:" + HOME_HEALTH, "best", 0, 50, None, filters)["cards"]]
+
+    def test_a_typed_phrase_finds_who_says_it_and_shows_the_words(self):
+        payload = engine().cards(0, "job:" + HOME_HEALTH, "best", 0, 50, None, ["text:sports injury"])
+        self.assertEqual([c["person"] for c in payload["cards"]], ["person:ats:C2"])
+        self.assertIn("sports injury", payload["cards"][0]["found"][0]["quote"].lower())
+
+    def test_a_sentence_that_says_it_is_missing_does_not_count(self):
+        self.assertNotIn("C2", self.names(["text:OASIS"]))         # "No home-health, OASIS ... detail supplied"
+
+    def test_a_later_denial_beats_an_earlier_mention(self):
+        self.assertNotIn("R05", self.names(["text:Homecare Homebase"]))   # the profile lists it; R05 later says not used
+        self.assertIn("R01", self.names(["text:Homecare Homebase"]))
+
+    def test_a_school_filter_reads_the_education_on_the_resume(self):
+        self.assertEqual(len(self.names(["school:Pine Valley"])), 12)
+        self.assertEqual(self.names(["school:Stanford"]), [])
+
+    def test_a_school_filter_shows_the_education_line_it_matched(self):
+        payload = engine().cards(0, "job:" + HOME_HEALTH, "best", 0, 50, None, ["school:Pine Valley"])
+        for card in payload["cards"]:
+            self.assertIn("pine valley", card["found"][0]["quote"].lower())
+            self.assertTrue(card["found"][0]["source"])
+
+    def test_the_closest_to_our_work_preset_puts_setting_at_forty(self):
+        preset = next(p for p in engine().state(0)["meta"]["presets"] if p["name"] == "closest")
+        self.assertEqual(preset["weights"]["setting"], 40)
+        self.assertEqual(preset["label"], "Closest to our work")
 
 
 class WorkedExample(unittest.TestCase):

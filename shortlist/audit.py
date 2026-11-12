@@ -158,8 +158,8 @@ def check_list(job, rows) -> list[dict]:
     for above, m in zip(rows, rows[1:]):
         if GROUP_OF[m.tier] < GROUP_OF[above.tier]:
             out.append(_finding(job.key, m.person, "list", f"listed below {above.person} although its tier group comes first"))
-        same_place = GROUP_OF[m.tier] == GROUP_OF[above.tier] and m.tier == above.tier and \
-            (m.action["status"] in ("blocked",)) == (above.action["status"] in ("blocked",))
+        held = lambda x: GROUP_OF[x.tier] == 0 and x.action["status"] not in ("ready", "route", "clarify")   # noqa: E731
+        same_place = GROUP_OF[m.tier] == GROUP_OF[above.tier] and held(m) == held(above)
         if same_place and m.score > above.score:
             out.append(_finding(job.key, m.person, "list", f"scores {m.score} but is listed below a score of {above.score}"))
     return out

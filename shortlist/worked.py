@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from .dimensions import LABELS, ORDER, weights_of
 from .config import for_division
+from .matching import TIER_LABEL
 
 JOB, STEP = "job:VMS-901", 0
 PEOPLE = [("person:our_system:R01", "the clean top match"), ("person:our_system:R04", "a claim the records do not support"),
@@ -31,6 +32,7 @@ def render(engine) -> str:
     total = sum(w.values())
     rows = engine.shortlist(STEP, JOB).ranked()
     place = {m.person: i + 1 for i, m in enumerate(rows)}
+    on_list = sum(1 for m in rows if m.tier != "not_fit")
     out = [
         "# Worked evaluation: four candidates for the home-health job",
         "",
@@ -47,7 +49,8 @@ def render(engine) -> str:
         "",
         "## Stage 1: the gates",
         "",
-        "Required rules. Failing one means *not a fit*; an unknown answer means *needs an answer*. No score can make up for either.",
+        "Required rules. Failing one means *not a fit*, and the person is off the list whatever else they offer. An unknown answer "
+        "means *needs an answer*: the person stays on the list, flagged with what is missing, at the place their score gives them.",
         "",
         "| Rule | " + " | ".join(names) + " |",
         "|---|" + "---|" * len(ms),
@@ -58,7 +61,8 @@ def render(engine) -> str:
         out.append(f"| {r.label} | " + " | ".join(f"{MARK[m.results[i].outcome]}: {_cell(m.results[i].shows, 48)}" for m in ms) + " |")
     out.append("| **Result** | " + " | ".join(f"**{ {'strong': 'passes', 'possible': 'passes', 'clarify': 'needs an answer', 'not_fit': 'not a fit'}[m.tier] }**" for m in ms) + " |")
     out += ["", "## Stage 2: the quality score",
-            "", "Only for people who pass. Six dimensions, 0 to 100, weighted as configured for this division.", "",
+            "", "For everyone on the list. Six dimensions, 0 to 100, weighted as configured for this division. An unknown answer counts "
+            "as half and widens the range.", "",
             "| Dimension (weight) | " + " | ".join(names) + " |", "|---|" + "---|" * len(ms)]
     for k in ORDER:
         cells = []
@@ -67,8 +71,8 @@ def render(engine) -> str:
             cells.append("–" if d is None else (f"**{round(d[0])}**" + (f" ({round(d[1])}–{round(d[2])})" if d[1] != d[2] else "") + f": {_cell(d[3], 52)}"))
         out.append(f"| {LABELS[k]} ({round(100 * w[k] / total)}%) | " + " | ".join(cells) + " |")
     out.append("| **Score** | " + " | ".join(f"**{m.score}**" + (f" ({m.low}–{m.high})" if m.low != m.high else "") for m in ms) + " |")
-    out.append("| **Tier** | " + " | ".join({"strong": "Strong match", "possible": "Possible match", "clarify": "Needs an answer", "not_fit": "Not a fit"}[m.tier] for m in ms) + " |")
-    out.append("| **Place in the list** | " + " | ".join(f"{place[m.person]} of {len(rows)}" for m in ms) + " |")
+    out.append("| **Tier** | " + " | ".join(TIER_LABEL[m.tier] for m in ms) + " |")
+    out.append("| **Place in the list** | " + " | ".join(f"{place[m.person]} of {on_list}" for m in ms) + " |")
     out += ["", "## Permission and the next action", "", "| | " + " | ".join(names) + " |", "|---|" + "---|" * len(ms)]
     for i, g in enumerate(ms[0].gates):
         out.append(f"| {g.label} | " + " | ".join(f"{MARK[m.gates[i].outcome]}: {_cell(m.gates[i].shows, 44)}" for m in ms) + " |")
@@ -80,6 +84,7 @@ def render(engine) -> str:
         out.append(f"- **{m.name}** ({m.score}): {_cell(m.action['label'], 90)}.{ask}")
     out += ["", "Under the earlier scoring, which counted rules met, R01 and R04 both scored 100 and could not be told apart. "
             "The quality score now puts R04 lower for a claim its records do not support, and R06 lower for asking above the "
-            "rate, and every point traces to a quote the page shows on click. Blair passes every rule the records can answer, "
-            "but two required answers are missing, so no score can put Blair ahead of people who pass.", ""]
+            "rate, and every point traces to a quote the page shows on click. Blair needs two answers, so half of Blair's "
+            "score is unknown and Blair sits low on the list; someone who needs an answer but scores high would sit near the "
+            "top, where the missing answer is worth chasing.", ""]
     return "\n".join(out)

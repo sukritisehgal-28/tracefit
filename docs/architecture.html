@@ -99,7 +99,7 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
     <span><b>5</b> sources, <b>3</b> destinations</span>
     <span><b>10</b> fit rules, <b>4</b> permission rules</span>
     <span><b>6</b> quality dimensions</span>
-    <span><b>156</b> tests, <b>102</b> scenarios</span>
+    <span><b>168</b> tests, <b>102</b> scenarios</span>
     <span>timed at <b>20,000</b> and <b>100,000</b> synthetic people</span>
   </div>
   <div class="key">
@@ -198,7 +198,7 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
         <line class="d-arrow" x1="590" y1="160" x2="628" y2="160" marker-end="url(#a2)"/>
         <rect class="d-box" x="630" y="125" width="120" height="70" rx="6"/><text class="d-t" x="644" y="149">Score 0 to 100</text><text class="d-s" x="644" y="168">plus a range for</text><text class="d-s" x="644" y="183">unknown answers</text>
         <line class="d-arrow" x1="750" y1="160" x2="778" y2="160" marker-end="url(#a2)"/>
-        <rect class="d-box" x="780" y="105" width="140" height="110" rx="6"/><text class="d-t" x="794" y="129">Tier</text><text class="d-s" x="794" y="149">Strong: 80 or more</text><text class="d-s" x="794" y="165">even if every unknown</text><text class="d-s" x="794" y="181">is a no</text><text class="d-s" x="794" y="201">Possible: otherwise</text>
+        <rect class="d-box" x="780" y="105" width="140" height="110" rx="6"/><text class="d-t" x="794" y="129">Tier</text><text class="d-s" x="794" y="149">Match: 80 or more</text><text class="d-s" x="794" y="165">even if every unknown</text><text class="d-s" x="794" y="181">is a no</text><text class="d-s" x="794" y="201">Possible: otherwise</text>
         <line class="d-arrow" x1="850" y1="215" x2="850" y2="242" marker-end="url(#a2)"/>
         <rect class="d-box" x="630" y="244" width="290" height="56" rx="6"/><text class="d-t" x="644" y="267">Next action, from permission rules</text><text class="d-s" x="644" y="286">reach out · send to owner · ask first · do not contact</text>
       </svg>
@@ -222,11 +222,12 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
   <div class="tablewrap"><table>
     <thead><tr><th>Part of the page</th><th>What it answers</th></tr></thead>
     <tbody>
-      <tr><td class="name">How this list was made</td><td>Every step for this job, with counts: people on file, checked, passing every gate, can be acted on now. Who left at each step, and which rule stopped them.</td></tr>
-      <tr><td class="name">Rank by</td><td>Presets ("Experience first", "Can start soonest", "Within budget"), six weight sliders, and filters such as "Can act now" or "Has OASIS". The whole list re-ranks on the server.</td></tr>
-      <tr><td class="name">A card</td><td>Rank, tier, score and range, one block per rule, the line that sets this person apart, the one quote behind their best dimension, the next action, and what else their résumé lists. Two people with one name show which record each is.</td></tr>
+      <tr><td class="name">The list</td><td>One ranked list per job: everyone who passes every required rule, and everyone a required rule still has a question for, in score order. The top 10 first, then a button for the next 10. A person who needs an answer sits where their score puts them, marked with what is missing. Anyone who must not be contacted is last.</td></tr>
+      <tr><td class="name">Rank by</td><td>Presets ("Closest to our work", "Experience first", "Can start soonest", "Within budget"), six weight sliders, and filters such as "Can act now" or "Has OASIS". A recruiter can also type their own criterion, a phrase or a school: the list narrows to the people whose own documents say it, and each card shows the sentence. The whole list re-ranks on the server.</td></tr>
+      <tr><td class="name">A card</td><td>Rank, score and range, one block per rule, the line that sets this person apart, the one quote behind their best dimension, the next action, and what else their résumé lists. Two people with one name show which record each is.</td></tr>
       <tr><td class="name">The person panel</td><td>Why this score, as a radar and plain words; place in the list; background read from the résumé; every rule with its quote; permission; everything on file. <b>Show everything</b> opens it all.</td></tr>
       <tr><td class="name">Compare</td><td>Two or three people side by side: radars overlaid, rules row by row with sources, differences highlighted.</td></tr>
+      <tr><td class="name">How this list was made</td><td>Under the list: people on file, people on the list, and people a required rule ruled out, with the rule that stopped them and a link to see them.</td></tr>
       <tr><td class="name">Demo and settings</td><td>Replay of the 18:00 snapshot, the 18:05 new job and the 18:10 update; switching between client profiles.</td></tr>
     </tbody>
   </table></div>
@@ -246,7 +247,7 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
       <tr><td class="name">Requirement changes from notes</td><td>Use and flag, ignore until the feed agrees, or trust; and whose notes count</td></tr>
       <tr><td class="name">Freshness windows</td><td>Availability older than 30 days is flagged (14 for locums)</td></tr>
       <tr><td class="name">Who may say what</td><td>A recruiter's note may record availability, never a skill</td></tr>
-      <tr><td class="name">Thresholds and display</td><td>Strong at 80, unknown counts half, comparable within 3 points, open each list on its top 10</td></tr>
+      <tr><td class="name">Thresholds and display</td><td>Match at 80, unknown counts half, comparable within 3 points, open each list on its top 10</td></tr>
       <tr><td class="name">Vocabulary</td><td>Professions, settings, skills, certificates: a new division is configuration</td></tr>
     </tbody>
   </table></div>
@@ -299,7 +300,7 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
       <tr><td class="name">A candidate changes</td><td>Re-read their text, re-resolve them, re-check them against open jobs, replace their one row in each list.</td><td>Open jobs in their profession</td><td class="num">0.2 ms</td><td class="num">1.6 ms</td></tr>
       <tr><td class="name">A job's requirements change</td><td>Rebuild that job's list, compare with the old one, report only the people who moved.</td><td>People in that profession</td><td class="num" colspan="2">as a new job</td></tr>
       <tr><td class="name">A job closes</td><td>Withdraw its list.</td><td>Nothing</td><td class="num" colspan="2">not timed</td></tr>
-      <tr><td class="name">A recruiter opens a list</td><td>Read 25 rows.</td><td>The 25 rows</td><td class="num">2.3 ms</td><td class="num">3.5 ms</td></tr>
+      <tr><td class="name">A recruiter opens a list</td><td>Read one screenful (10 on the page; timed at 25).</td><td>The rows shown</td><td class="num">2.3 ms</td><td class="num">3.5 ms</td></tr>
       <tr><td class="name">A recruiter moves a weight or a filter</td><td>Re-score one list from stored dimensions, serve the first screenful. No text is re-read.</td><td>The rows in that list</td><td class="num">2.7 ms</td><td class="num">6.5 ms</td></tr>
       <tr><td class="name">A recruiter opens a person</td><td>Rebuild one explanation, with only the evidence it cites.</td><td>One person, one job</td><td class="num">0.5 ms</td><td class="num">0.9 ms</td></tr>
       <tr><td class="name">Settings change</td><td>Rebuild every open list. <span class="plan">Today this is a restart.</span></td><td>Open jobs × their professions</td><td class="num" colspan="2">not measured</td></tr>

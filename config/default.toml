@@ -141,6 +141,15 @@ pay = 10              # the candidate's ask against the approved rate
 target_employers = []
 
 # Ready-made weightings a recruiter can pick on the page, for example to compare how a client would rank.
+[presets.closest]
+label = "Closest to our work"          # experience in the same setting, and at the employers the client names, counts most
+setting = 40
+skills = 20
+depth = 15
+evidence = 10
+readiness = 10
+pay = 5
+
 [presets.experience]
 label = "Experience first"
 setting = 30

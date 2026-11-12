@@ -22,7 +22,7 @@ from pathlib import Path
 
 from . import config as configuration
 from .extract import RULES as READING_RULES
-from .matching import (GROUPS, TIER_LABEL, TIER_ORDER, Shortlist, card_dict, evidence_dict, job_dict, match_dict,
+from .matching import (found_for, GROUPS, TIER_LABEL, TIER_ORDER, Shortlist, card_dict, evidence_dict, job_dict, match_dict,
                        person_dict)
 from .model import Issue
 from .rules import GATES, NOT_MET, OUTCOME_WORD, RULES, check_config
@@ -109,7 +109,8 @@ def cards_payload(world, sl: Shortlist, group: str, offset: int = 0, limit: int 
     page = view[offset:offset + limit]
     tiers = {t: sum(1 for x in view if x[4] == t) for t in GROUPS[group]}
     return {"job": sl.job.key, "group": group, "offset": offset, "limit": limit, "total": len(view), "tiers": tiers,
-            "cards": [card_dict(world, x[0], x[1:]) for x in page], "reweighted": True}
+            "cards": [dict(card_dict(world, x[0], x[1:] if weights else None), found=found_for(world, x[0], filters)) for x in page],
+            "reweighted": bool(weights)}
 
 
 def detail_payload(world, sl: Shortlist, person_key: str) -> dict | None:
@@ -131,6 +132,7 @@ def job_summary(world, job, cfg: dict, sl: Shortlist | None) -> dict:
     tiers = sl.stats["tiers"] if sl else {t: 0 for t in TIER_ORDER}
     jd["counts"] = dict(tiers)
     jd["groups"] = {g: sum(tiers[t] for t in members) for g, members in GROUPS.items()}
+    jd["need_answer"] = tiers["clarify"]
     actions: dict[str, int] = {}
     for t in GROUPS["best"]:
         for status, n in (sl.stats["actions"][t] if sl else {}).items():

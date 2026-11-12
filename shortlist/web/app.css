@@ -241,3 +241,16 @@ table.grid tr.diff td { background: var(--warn-wash); }
 .legend2 { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
 .legend2 i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 @media (max-width: 560px) { .scorebox { grid-template-columns: minmax(0, 1fr); } .radar { margin: 0 auto; } }
+
+/* ---- one list, ten at a time; the recruiter's own criteria */
+.listhead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; margin: 16px 2px 4px; font-size: 14px; }
+.ownrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ownrow input, .ownrow select { font: inherit; font-size: 13px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--ink); }
+.ownrow input { flex: 1 1 220px; min-width: 0; }
+.ownrow input:focus-visible, .ownrow select:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.keyev a { color: var(--blue); text-decoration: underline; }
+.flow { grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1.4fr) 18px minmax(0, 1.4fr); }
+.farrow.off { background: none; border-top: 2px dashed var(--muted); height: 0; }
+.farrow.off::after { display: none; }
+.flowcard { margin-top: 16px; }
+@media (max-width: 760px) { .flow { grid-template-columns: minmax(0, 1fr); } .farrow.off { width: 0; height: 14px; border-top: 0; border-left: 2px dashed var(--muted); justify-self: center; } }

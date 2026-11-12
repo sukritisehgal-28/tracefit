@@ -96,6 +96,26 @@ class NameFromTheResume(unittest.TestCase):
         self.assertEqual(len(eng.world(0).people), 2)
 
 
+class Links(unittest.TestCase):
+    """Links a candidate puts on a résumé are shown, never followed. SYNTHETIC."""
+
+    CV = HEADED + "\n\nPORTFOLIO\nCase studies: https://example.invalid/jordan/home-health-outcomes. Talk: http://example.invalid/talk?id=7"
+
+    def test_links_are_read_from_the_resume(self):
+        self.assertEqual(parse(self.CV)["links"], ["https://example.invalid/jordan/home-health-outcomes", "http://example.invalid/talk?id=7"])
+
+    def test_links_reach_the_card_and_the_background(self):
+        from shortlist.matching import card_dict
+        eng = build([cand(cv=self.CV)], HH())
+        w = eng.world(0)
+        self.assertEqual(len(background(w, w.people["person:ats:C1"])["links"]), 2)
+        self.assertEqual(card_dict(w, eng.matches(0)["job:" + J][0][0])["links"][0], "https://example.invalid/jordan/home-health-outcomes")
+
+    def test_the_sample_has_no_links(self):
+        w = engine().world(0)
+        self.assertTrue(all(not background(w, p)["links"] for p in w.people.values()))
+
+
 class SameName(unittest.TestCase):
     """Two different people with one name must be told apart on the page, and never joined. SYNTHETIC."""
 

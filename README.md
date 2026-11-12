@@ -33,14 +33,15 @@ Add `--overlay feed_only` or `--overlay strict_pay` to any command to see anothe
 
 ## Five-minute demo
 
-1. **Home Health PT.** The banner says the account manager's note is ahead of the vendor feed; **See details** shows both versions and their sources. **How this list was made** shows every step: 16 people, 10 pass every required rule, 2 need an answer, 4 are not a fit, and which rule stopped each.
-2. **The list.** Each card shows the tier, the score, one line on what sets the person apart, the one quote behind their best dimension, and the next action. R01, R02 and R03 have identical evidence, so they are grouped and their order is marked arbitrary. R11 is a strong fit who asked not to be contacted, so R11 is listed last.
+1. **Home Health PT.** The banner says the account manager's note is ahead of the vendor feed; **See details** shows both versions and their sources. The list is one ranked list of the 12 people a recruiter could act on, top 10 first, then **Show next 2**.
+2. **The list.** Each card shows the score, one line on what sets the person apart, the one quote behind their best dimension, and the next action. R01, R02 and R03 have identical evidence, so they are grouped and their order is marked arbitrary. R08 **needs an answer** and sits ninth, where the score puts them, with what is missing. R11 passes everything but asked not to be contacted, so R11 is listed last.
 3. **Open R04.** **Why this score** draws the six dimensions as a radar: R04 loses 30 points on evidence because "I have three years" is not supported by the dated history. Every rule below opens to its quote. **Show everything** opens it all.
-4. **Rank by.** Pick **Within budget** and R06, who asks 2% over the rate, drops. Tick **Can act now** and R11 leaves the list. Nobody moves between Matches, Needs an answer and Not a fit: weights order people, required rules decide who qualifies.
+4. **Rank by.** Pick **Closest to our work** (setting at 40%) or **Within budget**, or move a slider: the list re-ranks. Tick **Can act now** and R11 leaves. Under **Add your own**, type `sports injury`: one person says it, and the card shows the sentence. Weights and filters never move anyone past a required rule.
 5. **Compare** R04, R06 and R09: radars overlaid, rows that differ highlighted, plus what each lists on their résumé that no rule checks.
-6. **Demo → A new job arrives.** The outpatient job appears, already matched. Blair, an outpatient therapist since 2016, is the one strong match, and goes through recruiter R2.
-7. **Demo → A candidate sends an update.** Alex can now only start 8 December. One result changes; **View** opens it on the rule that changed, with the old message shown as replaced.
-8. **Demo → Settings profile → Vendor feed only.** With the account manager's note ignored, nobody qualifies for the home-health job. That is the client's first open question.
+6. **Demo → A new job arrives.** The outpatient job appears, already matched. Blair, an outpatient therapist since 2016, is the top match at 96, well clear of the rest, and goes through recruiter R2.
+7. **How this list was made**, under the list: 16 people on file, 12 on the list, 4 not a fit and which rule stopped them (**See them**).
+8. **Demo → A candidate sends an update.** Alex can now only start 8 December. One result changes; **View** opens it on the rule that changed, with the old message shown as replaced.
+9. **Demo → Settings profile → Vendor feed only.** With the account manager's note ignored, nobody qualifies for the home-health job. That is the client's first open question.
 
 ## What is in it
 
@@ -53,14 +54,14 @@ Add `--overlay feed_only` or `--overlay strict_pay` to any command to see anothe
 | `shortlist/rules.py`, `dimensions.py`, `matching.py` | The gates, the quality score, tiers, order, next action. |
 | `shortlist/pipeline.py`, `server.py`, `web/` | Replay, the running-service path, the page. |
 | `shortlist/audit.py`, `model_reader.py` | The checker; an optional guarded language-model reader (off). |
-| `tests/`, `bench/` | 156 tests, 102 scenarios, the rewording sweep; the synthetic benchmark. |
+| `tests/`, `bench/` | 168 tests, 102 scenarios, the rewording sweep; the synthetic benchmark. |
 
 ## What is real and what is simulated
 
 | Part | Status |
 |---|---|
 | Five supplied sources, text reading, resolution, gates, quality score, replay, recruiter page, checker | Implemented, on the supplied data |
-| Recruiter weights, presets and filters; source precedence; résumé background | Implemented |
+| Recruiter weights, presets, filters and typed criteria (a phrase, a school); source precedence; résumé background and links | Implemented |
 | Working at size: a screenful at a time, explanations on demand, events applied one at a time | Implemented; speed measured on **synthetic** data |
 | Destinations (JSON, CSV, notifications) | **Simulated**: local files only |
 | Language-model reader | Built behind a guard, **off, never run against a real model**; tested only with made-up stand-ins |

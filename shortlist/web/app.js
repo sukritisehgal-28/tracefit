@@ -17,7 +17,6 @@ const S = { step: 0, overlay: "", data: null, job: null, filter: "best", details
             weights: null,      // the recruiter's own weights for this job, or null for the configured ones
             preset: "",         // the preset those weights came from, if any
             flt: new Set(),     // the recruiter's filters for this job
-            rankOpen: false,
             everything: false };  // "Show everything" in the person panel
 
 const $ = (sel) => document.querySelector(sel);
@@ -47,8 +46,9 @@ const KIND = {
   candidate_statement: "candidate statement", recruiter_note: "recruiter note", ops_note: "operations note",
   job_feed: "vendor feed", job_record: "job record", job_note: "job note",
 };
-const FILTERS = [["best", "Matches"], ["clarify", "Needs an answer"], ["not_fit", "Not a fit"]];
-const groupOf = (tier) => (tier === "strong" || tier === "possible" ? "best" : tier);
+// One list per job. People who need an answer are on it, placed by score. People a required rule rules out
+// are kept off it and reachable from "How this list was made".
+const groupOf = (tier) => (tier === "not_fit" ? "not_fit" : "best");
 
 const ev = (id) => S.evidence[id];
 const num = (n) => Number(n).toLocaleString("en-US");
@@ -62,14 +62,13 @@ const NAME_TAG = { id: ["no name on file", "The sources hold an id and an email 
                    resume: ["name taken from résumé", "No source states this person's name. It is read from the top of their résumé"],
                    email: ["name taken from email", "No source states this person's name. It is read from their email address and may be wrong"] };
 const nameTag = (basis) => (NAME_TAG[basis] ? `<span class="tag" title="${esc(NAME_TAG[basis][1])}">${NAME_TAG[basis][0]}</span>` : "");
-const badge = (m) => `<span class="badge ${m.tier}"><span class="i" aria-hidden="true">${TIER_ICON[m.tier]}</span>${esc(m.tier_label)}</span>`;
+// The only label a card carries is the one a recruiter must act on: an answer is missing.
+const badge = (m) => (m.tier === "clarify" ? `<span class="badge clarify"><span class="i" aria-hidden="true">?</span>Needs an answer</span>` : "");
 
 function countsText(j) {
-  const c = j.counts, parts = [];
-  if (c.strong) parts.push(`${c.strong} strong match${c.strong > 1 ? "es" : ""}`);
-  if (c.possible) parts.push(`${c.possible} possible`);
-  if (c.clarify) parts.push(`${c.clarify} need${c.clarify > 1 ? "" : "s"} an answer`);
-  return parts.join(" · ") || "No matches yet";
+  const n = j.groups.best, ask = j.need_answer;
+  if (!n) return "Nobody on the list yet";
+  return `${num(n)} on the list` + (ask ? ` · ${num(ask)} need${ask > 1 ? "" : "s"} an answer` : "");
 }
 
 function nextLine(m) {                       // the single next step shown on a card
@@ -146,9 +145,8 @@ async function showList(more) {
   if (have && !more) return;
   const extra = {};
   if (S.weights) extra.w = Object.entries(S.weights).map(([k, v]) => `${k}:${v}`).join(",");
-  if (S.flt.size) extra.f = [...S.flt].join(",");
-  const first = !have && S.filter === "best" ? S.data.meta.top_n : S.data.meta.page_size;      // the top of the list first
-  const page = await api("cards", { job: S.job, group: S.filter, offset: have ? have.items.length : 0, limit: first, ...extra });
+  if (S.flt.size) extra.f = [...S.flt].join("|");
+  const page = await api("cards", { job: S.job, group: S.filter, offset: have ? have.items.length : 0, limit: S.data.meta.top_n, ...extra });   // ten at a time
   S.lists[S.filter] = { items: (have ? have.items : []).concat(page.cards), total: page.total, tiers: page.tiers };
 }
 
@@ -243,6 +241,8 @@ function card(m, job, twin, rank) {
         <div class="head">${esc([m.headline, m.home].filter(Boolean).join(" · "))}</div>
         ${watch}${good}${watch || good ? "" : `<div class="why">${esc(m.summary.split(". ")[0])}</div>`}
         ${m.key && m.tier !== "not_fit" ? `<div class="keyev"><span class="q">“${esc(m.key.quote.length > 110 ? m.key.quote.slice(0, 108) + "…" : m.key.quote)}”</span> <span class="muted">${esc(m.key.source)}</span></div>` : ""}
+        ${(m.found || []).map((f) => `<div class="keyev"><b>“${esc(f.phrase)}”</b> <span class="q">“${esc(f.quote.length > 110 ? f.quote.slice(0, 108) + "…" : f.quote)}”</span> <span class="muted">${esc(f.source)}</span></div>`).join("")}
+        ${(m.links || []).length ? `<div class="keyev" data-stop="1">${m.links.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u.replace(/^https?:\/\//, "").slice(0, 48))}</a>`).join(" · ")}</div>` : ""}
         ${m.also && m.also.length ? `<div class="also">Also on résumé: ${esc(m.also.slice(0, 3).join(" · "))}${m.also.length > 3 ? ` +${m.also.length - 3}` : ""}</div>` : ""}
         <div class="do ${m.action.status}"><span class="i" aria-hidden="true">${icon}</span>${esc(text)}</div>
       </div>
@@ -270,35 +270,25 @@ function cards(list, job) {
   return html;
 }
 
-// How this list was made: every stage a person passes, with how many reach it and why the rest stopped.
-// The counts cover the whole list, not only the people on screen. A stage's branch opens that group.
-const BREAKER_WORDS = { action_readiness: "can be acted on sooner", fewer_open_questions: "fewer open questions",
-                        most_recent_candidate_contact: "heard from more recently" };
+// How this list was made, in three numbers: everyone on file, who is on the list, and who a required rule
+// ruled out and why. The counts cover the whole list, not only the people on screen.
 function flowView(job) {
   const st = job.stats || { people: 0, evaluated: 0, excluded_by_profession: 0 };
   const g = job.groups, a = job.best_actions, r = job.reasons || {};
-  const go = (a.ready || 0) + (a.route || 0), held = (a.blocked || 0) + (a.none || 0);
   const why = (t) => Object.entries(r[t] || {}).sort((x, y) => y[1] - x[1]).map(([k, n]) => `${esc(k.toLowerCase())} ${num(n)}`).join(" · ");
-  const node = (n, label, more = "", cls = "") => `<div class="fnode ${cls}"><b>${num(n)}</b><span>${label}</span>${more}</div>`;
-  const out = (n, label, filter, detail) => (n ? `<button class="fout ${filter}" data-act="filter" data-filter="${filter}"><b>${num(n)}</b> ${label}${detail ? `<small>${detail}</small>` : ""}</button>` : "");
-  const set = st.excluded_by_profession ? `<small>${num(st.excluded_by_profession)} in other professions set aside</small>` : "";
-  const order = ["score, highest first"].concat(job.order.tie_breakers.map((b) => BREAKER_WORDS[b] || b));
-  const steps = order.map((t, i) => `<li><span>${i + 1}</span>${esc(t)}</li>`).join("");
+  const pass = g.best - job.need_answer, held = (a.blocked || 0) + (a.none || 0);
+  const aside = st.excluded_by_profession ? `<small>${num(st.excluded_by_profession)} in other professions were set aside first</small>` : "";
+  const out = g.not_fit ? `<div class="fnode"><b>${num(g.not_fit)}</b><span>not a fit: a required rule is not met</span><small>${why("not_fit")}</small>
+      <button class="linkish" data-act="filter" data-filter="not_fit">See them</button></div>` : "";
   return `<section class="card flowcard" aria-label="How this list was made">
-      <div class="flowhead"><b>How this list was made</b><span class="muted small">Every person on file went through these steps for this job.</span></div>
+      <div class="flowhead"><b>How this list was made</b></div>
       <div class="flow">
-        ${node(st.people, "people on file")}
+        <div class="fnode"><b>${num(st.people)}</b><span>people on file, each checked against every rule</span>${aside}</div>
         <div class="farrow" aria-hidden="true"></div>
-        ${node(st.evaluated, "checked against every rule", set)}
-        <div class="farrow" aria-hidden="true"></div>
-        ${node(g.best, "meet every required rule", out(g.clarify, "need an answer", "clarify", why("clarify")) + out(g.not_fit, "not a fit", "not_fit", why("not_fit")))}
-        <div class="farrow" aria-hidden="true"></div>
-        ${node(go, "can be acted on now", (a.route ? `<small>${num(a.route)} through the recruiter who owns them</small>` : "")
-          + out(held, "must not be contacted", "best", "listed last"), "win")}
+        <div class="fnode win"><b>${num(g.best)}</b><span>on this list</span><small>${num(pass)} pass every required rule${job.need_answer ? ` · ${num(job.need_answer)} need an answer (${why("clarify")})` : ""}</small></div>
+        ${out ? '<div class="farrow off" aria-hidden="true"></div>' + out : ""}
       </div>
-      <div class="orderline"><span class="muted small">Then in order of</span><ol class="orderrules">${steps}</ol>
-        <span class="muted small">Scores within ${num(job.order.tie_margin)} points are marked comparable. People still level are grouped, and their order is arbitrary.</span></div>
-      <div class="muted small openings">${job.openings ? `${num(job.openings)} opening${job.openings > 1 ? "s" : ""}.` : "No source says how many people this job needs, so the list is not cut off. Ask the account manager."}</div>
+      <div class="muted small">Ordered by score. ${held ? `${num(held)} must not be contacted and ${held > 1 ? "are" : "is"} listed last. ` : ""}${job.openings ? `${num(job.openings)} opening${job.openings > 1 ? "s" : ""}.` : "No source says how many people this job needs, so the list is not cut off."}</div>
     </section>`;
 }
 
@@ -308,23 +298,32 @@ function flowView(job) {
 const currentWeights = () => ({ ...(S.weights || currentJob().weights) });
 const FILTER_CHIPS = (job) => [["act_now", "Can act now"], ["recent:30", "Replied in the last 30 days"], ["no_questions", "Nothing to ask the candidate"],
   ["min:evidence:80", "Evidence holds up"]].concat(job.skills.map((s) => [`skill:${s.key}`, `Has ${s.label}`]));
+const OWN_LABEL = { text: (v) => `Says “${v}”`, school: (v) => `Studied at “${v}”` };
 function rankBar(job) {
   const w = currentWeights(), total = Object.values(w).reduce((a, b) => a + b, 0) || 1;
   const options = [`<option value="">As configured for this job</option>`].concat(S.data.meta.presets.map((p) =>
     `<option value="${esc(p.name)}" ${S.preset === p.name ? "selected" : ""}>${esc(p.label)}</option>`)).join("");
   const own = S.weights && !S.preset ? '<span class="tag">your weights</span>' : "";
-  const sliders = !S.rankOpen ? "" : `<div class="sliders">${S.data.meta.dimensions.map((d) => `
+  const sliders = `<div class="sliders">${S.data.meta.dimensions.map((d) => `
       <label class="slider"><span>${esc(d.label)}</span>
         <input type="range" min="0" max="50" step="5" value="${w[d.name]}" data-dim="${d.name}" id="w-${d.name}" aria-label="Weight for ${esc(d.label)}">
         <b data-share="${d.name}">${Math.round((100 * w[d.name]) / total)}%</b></label>`).join("")}
-      <div class="muted small">Weights change the order inside each list and the score shown. They never move anyone past a required rule.</div></div>`;
+      <div class="muted small">Weights change the order and the score shown. They never move anyone past a required rule.</div></div>`;
   const chips = FILTER_CHIPS(job).map(([f, label]) => `<button class="chipbtn ${S.flt.has(f) ? "on" : ""}" data-act="flt" data-f="${esc(f)}" aria-pressed="${S.flt.has(f)}">${esc(label)}</button>`).join("");
+  // Criteria the recruiter typed. Each is a chip; clicking it removes it.
+  const mine = [...S.flt].filter((f) => OWN_LABEL[f.split(":")[0]]).map((f) => {
+    const [kind, ...rest] = f.split(":");
+    return `<button class="chipbtn on" data-act="flt" data-f="${esc(f)}" aria-pressed="true" title="Remove">${esc(OWN_LABEL[kind](rest.join(":")))} ✕</button>`;
+  }).join("");
   const reset = S.weights || S.flt.size ? `<button class="linkish" data-act="rank-reset">Reset</button>` : "";
   return `<section class="card rankbar">
-      <div class="rankrow"><b>Rank by</b><select id="preset" aria-label="Ranking preset">${options}</select>${own}
-        <button class="linkish" data-act="rank-open" aria-expanded="${S.rankOpen}">${S.rankOpen ? "Hide weights" : "Adjust weights"}</button>${reset}</div>
+      <div class="rankrow"><b>Rank by</b><select id="preset" aria-label="Ranking preset">${options}</select>${own}${reset}</div>
       ${sliders}
-      <div class="chiprow"><span class="muted small">Only show</span>${chips}</div>
+      <div class="chiprow"><span class="muted small">Only show</span>${chips}${mine}</div>
+      <div class="ownrow"><label for="own" class="muted small">Add your own</label>
+        <input id="own" type="text" maxlength="60" placeholder="e.g. wound care, pediatrics, Pine Valley University" autocomplete="off">
+        <select id="ownkind" aria-label="Where to look"><option value="text">said in their own words</option><option value="school">where they studied</option></select>
+        <button class="btn plain" data-act="own-add">Add</button></div>
     </section>`;
 }
 
@@ -354,25 +353,22 @@ function jobView(job) {
       <button class="linkish" data-act="page" data-page="plumbing">See what happened</button></div>` : "";
   if (!open) return health + head + `<div class="card empty" style="margin-top:16px">This job is ${esc(job.status)}. Nobody is recommended for it.</div>`;
   const totals = job.groups;
-  const pills = FILTERS.map(([k, label]) => `<button class="pill ${S.filter === k ? "on" : ""}" data-act="filter" data-filter="${k}">${label} ${num(totals[k])}</button>`).join("");
   const shown = S.lists[S.filter] || { items: [], total: totals[S.filter] };
   const list = shown.items;
-  const empty = S.filter === "best" && totals.clarify
-    ? `No one meets every required rule yet. ${num(totals.clarify)} ${totals.clarify > 1 ? "people need" : "person needs"} an answer first. <button class="linkish" data-act="filter" data-filter="clarify">Show them</button>`
-    : "Nobody here.";
-  const by = (st) => job.best_actions[st] || 0;       // counted over the whole list, not only the people on screen
-  const parts = [[by("ready"), "can be contacted now"], [by("route"), by("route") === 1 ? "goes through another recruiter" : "go through another recruiter"],
-                 [by("blocked"), "must not be contacted"]].filter(([n]) => n).map(([n, t]) => `${num(n)} ${t}`);
   const legend = `<span class="legend"><i class="met"></i>met <i class="caution"></i>met, to check <i class="unknown"></i>unknown <i class="not_met"></i>not met</span>`;
-  const lead = S.filter === "best" ? "Meet every required rule. Best fit first; anyone who must not be contacted is last."
-    : S.filter === "clarify" ? "A required rule cannot be answered from what is on file. Missing information is a question, not a rejection."
-    : "A required rule is not met as posted. They stay visible, with the reason.";
-  const note = shown.total ? `<div class="muted small listnote"><span>${lead}</span>${legend}</div>` : "";
-  const aside = job.stats && job.stats.excluded_by_profession ? `<div class="muted small" style="margin:0 2px 8px">${num(job.stats.evaluated)} people in this profession were checked against every rule. ${num(job.stats.excluded_by_profession)} in other professions were set aside.</div>` : "";
-  const more = list.length < shown.total ? `<div class="morerow"><button class="btn plain" data-act="more">Show ${num(Math.min(S.data.meta.page_size, shown.total - list.length))} more</button>
-      <span class="muted small">${S.filter === "best" && list.length === S.data.meta.top_n ? `The top ${num(list.length)}` : `Showing ${num(list.length)}`} of ${num(shown.total)}, best first</span></div>` : "";
-  const narrowed = S.flt.size && shown.total !== totals[S.filter] ? `<div class="muted small" style="margin:0 2px 8px">${num(shown.total)} of ${num(totals[S.filter])} pass your filters.</div>` : "";
-  return health + head + flowView(job) + rankBar(job) + `<div class="pills">${pills}</div>${aside}${note}${narrowed}<section class="card">${list.length ? cards(list, job) + more : `<div class="empty">${empty}</div>`}</section>`;
+  const title = S.filter === "not_fit"
+    ? `<b>Not a fit · ${num(totals.not_fit)}</b> <button class="linkish" data-act="filter" data-filter="best">Back to the list</button>`
+    : `<b>${num(totals.best)} ${totals.best === 1 ? "person" : "people"}</b>${job.need_answer ? ` · ${num(job.need_answer)} need${job.need_answer > 1 ? "" : "s"} an answer` : ""}`;
+  const lead = S.filter === "not_fit" ? "A required rule is not met as posted. Each card says which."
+    : "Best fit first. Someone who needs an answer sits where their score puts them, with what is missing.";
+  const note = `<div class="listhead"><span>${title}</span>${legend}</div><div class="muted small" style="margin:0 2px 8px">${lead}</div>`;
+  const left = shown.total - list.length;
+  const more = left > 0 ? `<div class="morerow"><button class="btn plain" data-act="more">Show next ${num(Math.min(S.data.meta.top_n, left))}</button>
+      <span class="muted small">Showing the top ${num(list.length)} of ${num(shown.total)}</span></div>` : "";
+  const narrowed = S.flt.size && shown.total !== totals[S.filter] ? `<div class="muted small" style="margin:0 2px 8px">${num(shown.total)} of ${num(totals[S.filter])} pass what you asked for.</div>` : "";
+  const empty = S.flt.size ? "Nobody on the list passes everything you asked for." : "Nobody on the list yet.";
+  return health + head + rankBar(job) + note + narrowed
+    + `<section class="card">${list.length ? cards(list, job) + more : `<div class="empty">${empty}</div>`}</section>` + flowView(job);
 }
 
 // ------------------------------------------------------------ person drawer
@@ -412,6 +408,7 @@ function backgroundView(b, name) {
   const src = b.sources.map((s) => `${esc(s.label)}, ${when(s.at, true)}`).join(" · ");
   return `<h3>Background</h3>
     <div class="bg">${head}
+      ${sec("Links", (b.links || []).length ? `<ul>${b.links.map((l) => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.url.replace(/^https?:\/\//, ""))}</a> <span class="muted small">· ${esc(l.source)}</span></li>`).join("")}</ul>` : "")}
       ${sec("Experience", roles ? `<ul class="roles">${roles}</ul>` : "")}
       ${sec("Skills", b.skills.length ? `<div class="chips">${b.skills.map(chip).join("")}</div>` : "")}
       ${sec("Education", b.education.length ? `<ul>${list(b.education)}</ul>` : "")}
@@ -471,7 +468,7 @@ function drawer() {
         <div><h1>${esc(m.name)}${nameTag(p.name_basis)}</h1>
           <div class="muted">${esc([p.headline, p.home].filter(Boolean).join(" · "))}</div>
           <div class="muted small">${esc(p.records.join(" · "))}${p.other_names.length ? ` · also recorded as ${esc(p.other_names.join(", "))}` : ""}${p.namesakes ? ` · ${num(p.namesakes)} other ${p.namesakes > 1 ? "people share" : "person shares"} this name; no record links them` : ""}</div></div></div>
-      <div style="margin-top:12px">${badge(m)} <span class="muted small">for ${esc(job.title)} · Score ${m.score}.${range}</span></div>
+      <div style="margin-top:12px">${badge(m)} <span class="muted small">${m.tier === "not_fit" ? "Not a fit for" : `Score ${m.score} for`} ${esc(job.title)}.${m.tier === "not_fit" ? "" : range}</span></div>
       <div class="next ${m.action.status}"><b>${esc(m.action.label)}</b>${steps}</div>
       <div class="everything"><button class="linkish" data-act="everything" aria-pressed="${S.everything}">${S.everything ? "Show less" : "Show everything"}</button></div>
       ${m.tier === "not_fit" ? "" : scoreView(m)}
@@ -587,6 +584,11 @@ const FETCHING = {
   async job(el) { closeAll(); S.page = "jobs"; S.job = el.dataset.key; S.filter = "best"; S.details = false; S.lists = {}; S.compare.clear();
     S.weights = null; S.preset = ""; S.flt.clear(); await showList(); },
   async flt(el) { const f = el.dataset.f; S.flt.has(f) ? S.flt.delete(f) : S.flt.add(f); S.lists = {}; await showList(); },
+  async "own-add"() {                    // a criterion the recruiter typed: "said in their own words" or "where they studied"
+    const box = $("#own"), value = (box ? box.value : "").replace(/[|]/g, " ").trim();
+    if (value.length < 2) return;
+    S.flt.add(`${$("#ownkind").value}:${value}`); S.lists = {}; await showList();
+  },
   async "rank-reset"() { S.weights = null; S.preset = ""; S.flt.clear(); S.lists = {}; await showList(); },
   async filter(el) { S.filter = el.dataset.filter; await showList(); },
   async more() { await showList(true); },
@@ -619,7 +621,6 @@ document.addEventListener("click", async (e) => {
   else if (act === "details") S.details = !S.details;
   else if (act === "rule") { const r = el.dataset.rule; S.openRules.has(r) ? S.openRules.delete(r) : S.openRules.add(r); }
   else if (act === "na") S.showNA = true;
-  else if (act === "rank-open") S.rankOpen = !S.rankOpen;
   else if (act === "everything") S.everything = !S.everything;
   else if (act === "close") { S.person = null; S.comparing = false; }
   else if (act === "compare-clear") S.compare.clear();
@@ -665,6 +666,7 @@ document.addEventListener("change", async (e) => {
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && (S.person || S.comparing || S.pop)) { closeAll(); render(); }
   if (e.key === "Enter" && e.target.classList.contains("cand")) e.target.click();
+  if (e.key === "Enter" && e.target.id === "own") { e.preventDefault(); const b = document.querySelector('[data-act="own-add"]'); if (b) b.click(); }
 });
 
 load(false);

@@ -9,37 +9,38 @@ In each case a matcher that trusts structured fields and keywords gives a confid
 | Situation in the data | Field-and-keyword matcher | Tracefit |
 |---|---|---|
 | Blair fits every structured field; the résumé is outpatient only and home health was asked about, unanswered | Ranks Blair first | **Needs an answer** on home health and OASIS (unknown, not failed); goes through recruiter R2 |
-| Alex's March record says Oregon only, no travel; a November message and the résumé say otherwise | Excludes Alex | **Strong match**, the old record shown as replaced |
+| Alex's March record says Oregon only, no travel; a November message and the résumé say otherwise | Excludes Alex | **Match** (93), the old record shown as replaced |
 | Feed: two years and Homecare Homebase required. Later account-manager note: one year, trainable | Uses whichever it read last | Shows both with sources; uses the note, flags every result that relies on it, asks for confirmation before submitting |
-| Casey is "placed", but a message says the assignment is Monday to Wednesday and offers both weekend shifts | Excludes Casey | **Strong match** for the ED job, by the other-boards route, through recruiter R3 |
+| Casey is "placed", but a message says the assignment is Monday to Wednesday and offers both weekend shifts | Excludes Casey | **Match** for the ED job, by the other-boards route, through recruiter R3 |
 | Drew has the preferred board, declined both dates, asked for no contact; an older field says contact allowed | Ranks Drew first | **Not a fit** for these dates and **do not contact**; the stale field shown as replaced |
 | R01, R02, R03 are identical | Orders them by accident | Grouped; the page says their order is arbitrary |
 | R04 says three years; the profile shows 18 months | Believes one | Passes on the note's one-year minimum but loses 30 evidence points, so ranks below R01; the claim becomes the question to ask |
 | R05 says they have not used Homecare Homebase; the profile lists it | Counts it | Uses the later denial; skills drop |
 | R11 asks for no contact; the restriction field is empty | Contactable | **Do not contact** until 15 Jan 2027, listed last |
+| R08 scores 87 but one answer is missing | Dropped, or shown as a full match | Ninth of twelve, marked **Needs an answer**, with the question to ask |
 | "No home-health, OASIS, or Homecare Homebase detail supplied" | Three skills found | Three unanswered questions |
 | Full résumés repeat the extracts; notes repeat messages | Two or three sources | One source, repeats linked |
-| 18:05: a new outpatient job | — | Matched at once: Blair is the one strong match (96) |
+| 18:05: a new outpatient job | — | Matched at once: Blair is first at 96; everyone else is 75 or under |
 | 18:10: Alex can only start 8 December | — | One result changes; the banner names the rule, the message, and the note that no exception is confirmed |
 
 [WORKED_EXAMPLE.md](WORKED_EXAMPLE.md) takes four of these people through both stages, rule by rule and dimension by dimension.
 
 ## Experiments
 
-Run everything with `python3 -m unittest discover -s tests`: 156 tests.
+Run everything with `python3 -m unittest discover -s tests`: 168 tests.
 
 1. **Three client profiles on the same data** (the bonus: comparing configurations). Home-health job at 18:00:
 
-   | Profile | Strong | Needs an answer | Not a fit | What changed |
+   | Profile | Pass every required rule | Need an answer | Not a fit | What changed |
    |---|---|---|---|---|
    | Default: use the account manager's note, flagged | 10 | 2 | 4 | — |
    | Vendor feed only | 0 | 2 | 14 | Nobody has two documented years; R05 fails on Homecare Homebase |
    | Strict pay, no credit for unknowns | 8 | 3 | 5 | R06 is out ($50 over); R09 (no pay given) needs an answer |
 
-   On the page, a recruiter can also re-rank with presets or their own weights, live: changing weights reorders people inside each list and never moves anyone past a gate (tested).
+   On the page, a recruiter can also re-rank with presets or their own weights, live: changing weights reorders the list and never moves anyone past a gate (tested). A typed criterion finds who says it and shows the sentence; "no … detail supplied" does not count as a mention (tested).
 
 2. **Every rule is touched.** Every rule runs for every pair; every outcome each rule can return is reached by a synthetic case; every one of the 55 text rules fires on the data or a case.
-3. **The quality score separates people the old score tied.** Under the default weights the ten strong matches score between 81 and 93, each difference traceable to one dimension; the score is checked to be exactly the weighted average of its dimensions.
+3. **The quality score separates people the old score tied.** Under the default weights the ten people who pass every required rule score between 81 and 93, each difference traceable to one dimension; the score is checked to be exactly the weighted average of its dimensions.
 4. **Updates equal a rebuild.** Applying events one at a time gives the same rows, order, totals and messages as rebuilding from scratch, on the sample and all 102 scenarios; after a candidate update every other row is untouched.
 5. **Sources and destinations are independent.** Matching imports no adapter; a synthetic fifth source and a new destination added at run time change nobody else's result.
 6. **Deterministic.** Two runs give byte-identical output; moving the reference date changes experience arithmetic and ends Drew's no-contact period, as it should.

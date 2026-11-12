@@ -66,7 +66,7 @@ A required rule not met means **not a fit**. One that cannot be answered means *
 | Readiness | 15 | Start, schedule and shifts met, replied in the last week | Unmet availability; no recent reply |
 | Pay | 10 | Asks at or below the approved rate | 10 points for each 1% above |
 
-The score is the weighted average of the dimensions that apply. An unknown answer counts as half and widens the **range**: the score if every unknown turned out no, and if every one turned out yes. **Strong match** means every gate passes and the score holds at or above 80 even if every unknown turns out no; otherwise **possible match**.
+The score is the weighted average of the dimensions that apply. An unknown answer counts as half and widens the **range**: the score if every unknown turned out no, and if every one turned out yes. Internally a person is a **match** when every gate passes and the score holds at or above 80 even if every unknown turns out no, and a **possible match** otherwise. The page shows the score and the rule blocks rather than these words; the only badge is **Needs an answer**.
 
 Every point traces to a rule result and its quote, so the person panel shows each dimension as a radar and a line of plain words. [WORKED_EXAMPLE.md](WORKED_EXAMPLE.md) walks four real candidates through both stages; under the old count-the-rules score two of them, R01 and R04, tied at 100.
 
@@ -74,7 +74,9 @@ Every point traces to a rule result and its quote, so the person panel shows eac
 
 ### Similarly qualified candidates
 
-A list is ordered by tier; then anyone who must not be contacted goes last, under their own heading; then score; then three operational tie-breakers (can be acted on sooner, fewer open questions, heard from more recently). People still level are **grouped**: three of the sample's profiles have identical evidence, and the page says their order is arbitrary rather than invent a difference. Scores within 3 points are marked comparable. **Compare** puts two or three people side by side, rule by rule, with sources, dates and overlaid radars. No tie-breaker uses a personal attribute.
+Each job has **one list**: everyone who passes every required rule, plus everyone a required rule still has a question for. It is ordered by score, so a person who needs an answer sits where their score puts them, marked with what is missing; high in the list the question is worth asking, low in the list it rarely matters. Anyone who must not be contacted goes last, under their own heading. People a required rule rules out are kept off the list and counted under it. Ties go to three operational tie-breakers (can be acted on sooner, fewer open questions, heard from more recently). People still level are **grouped**: three of the sample's profiles have identical evidence, and the page says their order is arbitrary rather than invent a difference. Scores within 3 points are marked comparable. **Compare** puts two or three people side by side, rule by rule, with sources, dates and overlaid radars. No tie-breaker uses a personal attribute.
+
+**A recruiter's own criteria.** Beyond the weights, a recruiter can type a phrase ("wound care") or a school. The list narrows to the people whose own résumé, profile or messages say it, and each card shows the sentence and its source. A sentence that says it is missing ("no wound care experience") does not count, and a later denial beats an earlier mention. This filters; it never changes a score or a required rule. Links found on a résumé are shown as written and never fetched.
 
 ## What a client can configure
 
@@ -84,7 +86,8 @@ Everything below is in `config/default.toml`, with per-division overrides and wh
 |---|---|
 | Which rules are gates | `[rules.pay] level = "hard"` makes pay a ceiling (the `strict_pay` overlay) |
 | Dimension weights, per division | Locums weigh readiness 30 and pay 5 |
-| Presets on the page | "Experience first", "Can start soonest", "Within budget" |
+| Presets on the page | "Closest to our work" (setting at 40), "Experience first", "Can start soonest", "Within budget" |
+| How many people a list opens on | `[matching] top_n = 10`; the page then offers the next 10 |
 | Target employers | Experience at agencies the client names counts as full setting experience |
 | Source precedence, per fact | `"req.start" = ["vms", "ats"]`: the vendor feed is the authority on start dates |
 | Requirement changes from notes | `provisional` (use and flag), `feed_only`, `trusted`; and whose notes count |
@@ -115,7 +118,7 @@ sequenceDiagram
   O->>L: 18:10 Alex can only start 8 December
   L->>L: re-read and re-resolve Alex only
   L->>S: replace Alex's row in each open job, nobody else's
-  L-->>P: Alex for VMS-901: Strong match to Not a fit (start date)
+  L-->>P: Alex for VMS-901: Match to Not a fit (start date)
 ```
 
 A job whose requirements change is rebuilt and only the people who moved are reported; a job that closes withdraws its list; a reopened job is announced as reopened. An event delivered twice is applied once; events out of order are applied by their own dates. A test checks that applying events one at a time gives exactly the rows, totals and messages of rebuilding from scratch, on the sample and all 102 scenarios.
@@ -132,7 +135,7 @@ Each piece of work is tied to what changed, not to the size of the database:
 | Show a screenful; open one person | 25 rows; one person | On each view |
 | A recruiter's own weights or filters | One list | On each change |
 
-A shortlist is one compact row per person per job (tier, score, dimensions, next action, the line on the card); the full explanation is rebuilt when someone opens that person, and a test checks it cannot differ. The page asks for 25 people at a time. A destination gets the top 200 per job and the totals.
+A shortlist is one compact row per person per job (tier, score, dimensions, next action, the line on the card); the full explanation is rebuilt when someone opens that person, and a test checks it cannot differ. The page asks for 10 people at a time, then the next 10 (the benchmark times a screenful of 25). A destination gets the top 200 per job and the totals.
 
 **Measured** on synthetic people, one process, in memory, on an 8 GB laptop. Before the 100,000 run the laptop had about 5 GB of swap in use by other apps, so its worst cases include waiting on the disk; the 20,000 run peaks at 355 MB and is the cleaner measurement.
 

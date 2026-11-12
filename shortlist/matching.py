@@ -38,14 +38,17 @@ from .rules import BLOCKED, CONFIRM, MET, NA, NOT_MET, ROUTE, UNKNOWN, Ctx, Resu
 from .timeutil import WEEKDAY_NAMES, fmt_date, fmt_pay, fmt_years
 
 TIER_ORDER = ["strong", "possible", "clarify", "not_fit"]
-TIER_LABEL = {"strong": "Strong match", "possible": "Possible match", "clarify": "Needs an answer", "not_fit": "Not a fit"}
-GROUPS = {"best": ("strong", "possible"), "clarify": ("clarify",), "not_fit": ("not_fit",)}     # the three lists a recruiter sees
+TIER_LABEL = {"strong": "Match", "possible": "Possible match", "clarify": "Needs an answer", "not_fit": "Not a fit"}
+# One list a recruiter works from, and the people a required rule rules out. Someone who needs an answer is on
+# the list at the place their score gives them: near the top, the missing answer is worth chasing; lower down
+# it hardly matters. "best" is the name of that one list.
+GROUPS = {"best": ("strong", "possible", "clarify"), "not_fit": ("not_fit",)}
 ACTION_RANK = {"ready": 0, "route": 1, "clarify": 2, "blocked": 3, "none": 4, "closed": 5}
 BREAKER_LABEL = {"action_readiness": "The person above can be acted on sooner.",
                  "fewer_open_questions": "The person above has fewer open questions.",
                  "most_recent_candidate_contact": "The person above was heard from more recently."}
 ACTIONABLE = ("ready", "route", "clarify")
-GROUP_OF = {tier: i for i, members in enumerate((("strong", "possible"), ("clarify",), ("not_fit",))) for tier in members}
+GROUP_OF = {tier: i for i, members in enumerate(GROUPS.values()) for tier in members}
 JOB_LEVEL_QUESTIONS = ("Ask the account manager", "Confirm the requirement change")    # questions about the job, not the person
 
 
@@ -229,7 +232,7 @@ def rank(matches: list[Match], scoring: dict) -> None:
         # people are not listed first everywhere, as they would be in alphabetical order.
         return zlib.crc32(f"{m.job}|{m.person}".encode())
 
-    matches.sort(key=lambda m: (GROUP_OF[m.tier], lead(m), TIER_ORDER.index(m.tier), -m.score, *breaker_values(m), arbitrary(m), m.person))
+    matches.sort(key=lambda m: (GROUP_OF[m.tier], lead(m), -m.score, *breaker_values(m), arbitrary(m), m.person))
     _standouts(matches)
     margin = scoring.get("tie_margin", 0)
     for m in matches:
@@ -274,6 +277,8 @@ def _passes(world, m: Match, filters, today) -> bool:
         no_questions   nothing left to ask the candidate (questions about the job itself do not count)
         skill:KEY      the person has the skill on record, for example skill:oasis
         min:DIM:N      the quality dimension DIM is at least N, for example min:depth:50
+        text:PHRASE    a criterion the recruiter typed: the person's own documents say it, without negation or doubt
+        school:PHRASE  the education on their résumé names this school or degree
     """
     for f in filters or ():
         kind, _, rest = f.partition(":")
@@ -288,6 +293,14 @@ def _passes(world, m: Match, filters, today) -> bool:
         if kind == "skill":
             fact = world.people[m.person].fact("skill", rest)
             if fact is None or fact.state != "pos":
+                return False
+        if kind == "text":
+            from .resume import mention
+            if mention(world, world.people[m.person], rest) is None:
+                return False
+        if kind == "school":
+            from .resume import studied_at
+            if not studied_at(world, world.people[m.person], rest):
                 return False
         if kind == "min":
             name, _, n = rest.partition(":")
@@ -424,7 +437,7 @@ class Shortlist:
                 tier = "strong" if lo >= threshold else "possible"
             out.append((m, s, lo, hi, tier))
         out.sort(key=lambda x: (GROUP_OF[x[4]], int(x[0].action["status"] not in ACTIONABLE and GROUP_OF[x[4]] == 0),
-                                TIER_ORDER.index(x[4]), -x[1], ACTION_RANK[x[0].action["status"]], x[0].open_questions,
+                                -x[1], ACTION_RANK[x[0].action["status"]], x[0].open_questions,
                                 -x[0].last_heard, zlib.crc32(f"{x[0].job}|{x[0].person}".encode()), x[0].person))
         return out
 
@@ -530,7 +543,7 @@ def card_dict(world, m: Match, override: tuple | None = None) -> dict:
         "flags": list(m.flags), "band": m.band, "band_size": m.band_size, "identical": m.identical, "decided_by": m.decided_by,
         "standout": standout[:1].upper() + standout[1:], "typical": m.typical,
         "headline": who["headline"], "home": who["home"], "also": _also(world, p),
-        "ref": who["ref"], "namesakes": who["namesakes"],
+        "ref": who["ref"], "namesakes": who["namesakes"], "links": _links(world, p),
     }
     if override:
         out.update(score=override[0], low=override[1], high=override[2], tier=override[3], tier_label=TIER_LABEL[override[3]],
@@ -544,6 +557,29 @@ def _key_dict(world, key):
     ev = world.evidence.get(key[0])
     return {"evidence": key[0], "quote": key[1], "source": ev.label if ev else key[0],
             "at": ev.observed_at.isoformat() if ev else None, "date_only": ev.date_only if ev else True}
+
+
+def _links(world, p) -> list:
+    from .resume import background
+    return [x["url"] for x in background(world, p)["links"]][:3]
+
+
+def found_for(world, m: Match, filters) -> list:
+    """For each criterion the recruiter typed, the words in this person's own documents that meet it."""
+    from .resume import mention
+    out = []
+    for f in filters or ():
+        kind, _, rest = f.partition(":")
+        if kind == "text":
+            hit = mention(world, world.people[m.person], rest)
+            if hit:
+                out.append({"phrase": rest, "quote": hit[0], "source": hit[1].label})
+        if kind == "school":
+            from .resume import studied_at
+            line = studied_at(world, world.people[m.person], rest)
+            if line:
+                out.append({"phrase": rest, "quote": line["text"], "source": line["source"]})
+    return out
 
 
 def _also(world, p) -> list:

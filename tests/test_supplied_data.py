@@ -277,9 +277,10 @@ class HowTheListWasMade(unittest.TestCase):
         job = next(j for j in engine().state(0)["jobs"] if j["key"] == "job:VMS-901")
         g, a = job["groups"], job["best_actions"]
         self.assertEqual((job["stats"]["people"], job["stats"]["evaluated"]), (16, 16))
-        self.assertEqual(g["best"] + g["clarify"] + g["not_fit"], job["stats"]["evaluated"])
+        self.assertEqual(g["best"] + g["not_fit"], job["stats"]["evaluated"])
+        self.assertEqual((g["best"], job["need_answer"], g["not_fit"]), (12, 2, 4))     # one list: 10 pass, 2 need an answer
         self.assertEqual(sum(a.values()), g["best"])
-        self.assertEqual((a.get("ready", 0) + a.get("route", 0), a.get("blocked", 0)), (9, 1))
+        self.assertEqual((a.get("ready", 0) + a.get("route", 0), a.get("clarify", 0), a.get("blocked", 0)), (10, 1, 1))
 
     def test_the_reasons_name_the_rule_that_holds_each_person_back(self):
         job = next(j for j in engine().state(0)["jobs"] if j["key"] == "job:VMS-901")

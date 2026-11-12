@@ -3,7 +3,7 @@
 GET  /                                      the page
 GET  /api/state?step=&overlay=              the jobs with their totals, and what changed. No people.
 GET  /api/cards?job=&group=&offset=&limit=  one screenful of one job's list (best | clarify | not_fit)
-     &w=setting:25,pay:0  &f=act_now,recent:30  the recruiter's own weights and filters (optional)
+     &w=setting:25,pay:0  &f=act_now|text:wound care|school:Pine Valley  the recruiter's own weights and filters (optional)
 GET  /api/detail?job=&person=               one person's full rule-by-rule explanation, with its evidence
 GET  /api/coverage                          proof that every rule ran, and the outcomes seen
 POST /api/publish                           write the shortlists to the configured (simulated) destinations
@@ -93,7 +93,7 @@ class Handler(BaseHTTPRequestHandler):
                     weights[name] = float(value)
                 except ValueError:
                     return {"error": f"The weight {part!r} could not be read."}, 400
-            filters = [f for f in self.q.get("f", "").split(",") if f]
+            filters = [f.strip() for f in self.q.get("f", "").split("|") if f.strip()][:12]      # "|" so a typed phrase may hold commas
             return engine.cards(step, job, self.q["group"], self._int("offset", 0, 10**9), self._int("limit", PAGE_SIZE, 200),
                                 weights or None, filters), 200
         if path == "/api/detail":

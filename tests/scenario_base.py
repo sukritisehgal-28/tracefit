@@ -406,7 +406,7 @@ SCENARIOS = [
     S("E05", "Events listed out of order are replayed in time order",
       lambda: build([cand()], HH(start="x") if False else HH(), updates=[update("EV-B", "18:20", "C1", "I can start December 1 after all."),
                                                                          update("EV-A", "18:10", "C1", "I cannot start until December 8.")]),
-      [("steps", 3), ("change", 1, "Not a fit"), ("change", 2, "Strong match"), ("match", J, "C1", {"tier": "strong"})]),
+      [("steps", 3), ("change", 1, "Not a fit"), ("change", 2, "→ Match"), ("match", J, "C1", {"tier": "strong"})]),
     S("E06", "An update about someone no source knows",
       lambda: build([cand()], HH(), updates=[update("EV-X", "18:10", "C404", MSG)]),
       [("issue", "warning", "no source holds a record"), ("people", 2), ("match", J, "C1", {"tier": "strong"})]),

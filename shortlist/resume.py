@@ -27,6 +27,7 @@ SECTIONS = (                                   # first match wins; checked again
     ("summary", ("summary", "profile", "about", "objective")),
 )
 BULLET = re.compile(r"^\s*[•\-*·▪]\s+")
+URL = re.compile(r"\bhttps?://[^\s<>()\"']+[^\s<>()\"'.,;:!?]", re.I)
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 PHONE = re.compile(r"\+?\(?\d[\d\s().-]{7,}\d")
 PLACE = re.compile(rf"\b(?P<city>[A-Z][a-z]+(?:\s[A-Z][a-z]+)?),\s*(?P<state>{STATE_RE}|[A-Z]{{2}})\b")
@@ -93,7 +94,8 @@ def _header(lines: list[str]) -> dict:
 def parse(text: str) -> dict:
     """Sections of one document: header, experience (roles), education, skills, credentials, summary, other,
     and what the document itself says it does not state. Items are kept as written."""
-    out = {"header": {}, "experience": [], "education": [], "skills": [], "credentials": [], "summary": [], "other": [], "not_stated": []}
+    out = {"header": {}, "experience": [], "education": [], "skills": [], "credentials": [], "summary": [], "other": [], "not_stated": [],
+           "links": list(dict.fromkeys(URL.findall(text)))}
     lines = [l.rstrip() for l in text.splitlines()]
     headed = sum(1 for l in lines if l.strip() and _heading(l)) >= 2
     if not headed:
@@ -222,13 +224,16 @@ def background(world, person) -> dict:
     def item(text: str, ev) -> dict:
         return {"text": text, "checked": understood(text), "source": ev.label}
 
-    out = {"header": {}, "experience": [], "skills": [], "education": [], "credentials": [], "summary": [], "not_stated": [],
+    out = {"header": {}, "experience": [], "skills": [], "education": [], "credentials": [], "summary": [], "not_stated": [], "links": [],
            "sources": [{"label": e.label, "at": e.observed_at.isoformat(), "kind": e.kind} for e in docs]}
     seen: set = set()
     for ev in docs:
         parsed = parse(ev.text)
         for k, v in parsed["header"].items():
             out["header"].setdefault(k, v)
+        for url in parsed["links"]:
+            if url not in [x["url"] for x in out["links"]]:
+                out["links"].append({"url": url, "source": ev.label})
         for role in parsed["experience"]:
             key = ("role", role["title"].lower())
             if key not in seen:
@@ -253,3 +258,50 @@ def unrecognised(world) -> list[tuple[str, int]]:
         for t in terms:
             counts[t] = counts.get(t, 0) + 1
     return sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+
+
+OWN_WORDS = ("resume", "profile", "candidate_message", "candidate_statement")
+
+
+def mention(world, person, phrase: str):
+    """Where the person's own documents say this phrase, for a criterion a recruiter typed in.
+
+    Returns (clause, evidence) for the newest clause that holds the phrase and carries no negation or doubt:
+    "no wound care experience" is not a mention of wound care. None when there is none, or when a later
+    statement of theirs denies or doubts it: the newest word wins, as it does in the rules. Only the candidate's
+    résumés, profiles and own messages are searched, never a note about them.
+    """
+    from .extract import AMBITION, MAY, NEGATION, UNSURE, clauses
+
+    def plain(clause: str) -> bool:        # any negation at all rules a clause out, even one the reader understands
+        return not (NEGATION.search(clause) or UNSURE.search(clause) or MAY.search(clause) or AMBITION.search(clause)
+                    or clause.rstrip().endswith("?"))
+    needle = " ".join(phrase.lower().split())
+    if len(needle) < 2:
+        return None
+    said = denied = None                  # the newest plain mention, and the newest sentence that takes it back
+    for eid in person.evidence_ids:
+        ev = world.evidence[eid]
+        if ev.kind not in OWN_WORDS or not ev.text or needle not in " ".join(ev.text.lower().split()):
+            continue
+        for s, e in clauses(ev.text):
+            clause = ev.text[s:e].strip(" \t•")
+            if needle not in " ".join(clause.lower().split()):
+                continue
+            if plain(clause):
+                if said is None or ev.observed_at > said[1].observed_at:
+                    said = (clause, ev)
+            elif denied is None or ev.observed_at > denied.observed_at:
+                denied = ev
+    if said is None or (denied is not None and denied.observed_at >= said[1].observed_at):
+        return None                       # never said plainly, or a later statement of theirs denies or doubts it
+    return said
+
+
+def studied_at(world, person, phrase: str):
+    """The education line on the person's résumés that names this school or degree, as {text, source}; None
+    when there is none."""
+    needle = " ".join(phrase.lower().split())
+    if len(needle) < 2:
+        return None
+    return next((item for item in background(world, person)["education"] if needle in item["text"].lower()), None)
