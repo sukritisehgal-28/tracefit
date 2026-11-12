@@ -1,4 +1,4 @@
-/* Shortlist: a plain job-board layout. Jobs on the left, people on the right, detail on click. */
+/* Tracefit: a plain job-board layout. Jobs on the left, people on the right, detail on click. */
 :root {
   --bg: #f3f2ef; --card: #ffffff; --ink: #1b1b1b; --ink2: #4a4a4a; --muted: #6e6e6e;
   --line: #e2e0dc; --blue: #1b63c6; --blue-wash: #eaf2fd;

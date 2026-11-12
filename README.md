@@ -1,6 +1,6 @@
-# Shortlist
+# Tracefit
 
-Candidate–job matching for recruiters. When a job arrives, Shortlist checks every person against it in two stages: **can they do this job** (required rules, pass or fail), then **how good a fit are they** (a score out of 100 from six named dimensions). Every result shows the quote and source behind it, what is still unknown, and what the recruiter is allowed to do next. It recommends. It contacts nobody and submits nothing.
+Candidate–job matching for recruiters. When a job arrives, Tracefit checks every person against it in two stages: **can they do this job** (required rules, pass or fail), then **how good a fit are they** (a score out of 100 from six named dimensions). Every result shows the quote and source behind it, what is still unknown, and what the recruiter is allowed to do next. It recommends. It contacts nobody and submits nothing.
 
 ## Run it
 
@@ -11,6 +11,8 @@ python3 -m shortlist
 ```
 
 Then open http://127.0.0.1:8765.
+
+The product is Tracefit; its code package and commands are named `shortlist`, after the list of people it builds for each job.
 
 ```bash
 python3 -m unittest discover -s tests

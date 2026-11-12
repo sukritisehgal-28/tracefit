@@ -139,7 +139,7 @@ class Handler(BaseHTTPRequestHandler):
 
 def serve(port: int = 8765) -> None:
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"Shortlist is running at http://127.0.0.1:{port}  (Ctrl+C to stop)")
+    print(f"Tracefit is running at http://127.0.0.1:{port}  (Ctrl+C to stop)")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

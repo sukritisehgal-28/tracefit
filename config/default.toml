@@ -1,4 +1,4 @@
-# Shortlist — default configuration.
+# Tracefit — default configuration.
 # Everything a client is likely to want changed lives here, not in code.
 # Overlays in config/overlays/*.toml are merged on top of this file.
 

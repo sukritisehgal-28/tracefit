@@ -2,7 +2,7 @@
 
 ## The idea
 
-The same person and the same job are described differently, at different times, by sources of different authority, and much of what matters is in free text. So Shortlist keeps every fact with its source, date and exact words, decides what is currently believed without throwing the rest away, and then asks two separate questions about each person: **can they do this job**, and **how good a fit are they**. A recruiter sees the answer, the quote behind it, what is still unknown, and what they may do next.
+The same person and the same job are described differently, at different times, by sources of different authority, and much of what matters is in free text. So Tracefit keeps every fact with its source, date and exact words, decides what is currently believed without throwing the rest away, and then asks two separate questions about each person: **can they do this job**, and **how good a fit are they**. A recruiter sees the answer, the quote behind it, what is still unknown, and what they may do next.
 
 ```mermaid
 flowchart LR
@@ -68,7 +68,7 @@ A required rule not met means **not a fit**. One that cannot be answered means *
 
 The score is the weighted average of the dimensions that apply. An unknown answer counts as half and widens the **range**: the score if every unknown turned out no, and if every one turned out yes. **Strong match** means every gate passes and the score holds at or above 80 even if every unknown turns out no; otherwise **possible match**.
 
-Every point traces to a rule result and its quote, so the person panel shows each dimension as a radar and a line of plain words. [WORKED_EXAMPLE.md](WORKED_EXAMPLE.md) walks four real candidates through both stages; under the old count-the-rules score three of them tied at 100.
+Every point traces to a rule result and its quote, so the person panel shows each dimension as a radar and a line of plain words. [WORKED_EXAMPLE.md](WORKED_EXAMPLE.md) walks four real candidates through both stages; under the old count-the-rules score two of them, R01 and R04, tied at 100.
 
 **Why rules and not a similarity model.** The recruiter must be able to check every result; the policies (which version of a requirement applies, whether pay is a ceiling, who may be contacted) are the client's decisions and must be visible and changeable; and the same input must give the same output with no paid service. The cost is that facts must first be read out of text. That limit is measured, not hidden ([EVALUATION.md](EVALUATION.md), experiment 8).
 

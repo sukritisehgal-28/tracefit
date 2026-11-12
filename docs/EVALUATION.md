@@ -6,7 +6,7 @@ The packet has 16 people and 4 jobs and says it is not an answer key, so this ma
 
 In each case a matcher that trusts structured fields and keywords gives a confident wrong answer. Default settings, 18:00 snapshot, unless a time is given.
 
-| Situation in the data | Field-and-keyword matcher | Shortlist |
+| Situation in the data | Field-and-keyword matcher | Tracefit |
 |---|---|---|
 | Blair fits every structured field; the résumé is outpatient only and home health was asked about, unanswered | Ranks Blair first | **Needs an answer** on home health and OASIS (unknown, not failed); goes through recruiter R2 |
 | Alex's March record says Oregon only, no travel; a November message and the résumé say otherwise | Excludes Alex | **Strong match**, the old record shown as replaced |
