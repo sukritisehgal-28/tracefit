@@ -1,0 +1,180 @@
+{
+  "synthetic": true,
+  "packet_version": "1.0",
+  "reference_date": "2026-11-07",
+  "snapshot_at": "2026-11-07T18:00:00Z",
+  "client_id": "agency-demo-01",
+  "description": "Optional richer source material for the FDE assessment. All people, organizations and statements are fictional. No production records or independently verified credentials are included.",
+  "usage": [
+    "Use alongside the four existing JSON files; do not replace them.",
+    "Candidate IDs C1-C4, profile IDs R01-R12 and job references match the original packet.",
+    "Full resumes are expanded renditions of the original extracts, not independent corroborating evidence or later candidate updates. rendition_of identifies the original source.",
+    "New notes preserve unresolved gaps and conflicts. A note repeating a candidate message is not independent verification; related_source_ids identify that lineage.",
+    "All supplemental records belong to the 18:00 snapshot. Replay EV-JOB-904 at 18:05 and EV-C1-NEW at 18:10 from the original files only after loading that snapshot.",
+    "Missing details remain unspecified. This packet supplies neither expected rankings nor a required matching architecture.",
+    "Discovery notes are fictional exercise context, not verbatim customer statements or universal business policy."
+  ],
+  "resume_documents": [
+    {
+      "document_id": "C1-CV-FULL",
+      "candidate_id": "C1",
+      "rendition_of": "C1-CV",
+      "received_at": "2026-10-30",
+      "text": "Alex Sample | Physical Therapist\nPortland, Oregon | c1@example.invalid\n\nPROFESSIONAL SUMMARY\nPhysical therapist currently working in home health. My current work includes independent home visits and start-of-care documentation.\n\nPROFESSIONAL EXPERIENCE\nEvergreen Visiting Care — Home-health Physical Therapist\nMay 2025–present\n• Conduct independent physical-therapy visits in patients' homes.\n• Complete OASIS start-of-care documentation.\n• Use Homecare Homebase for clinical documentation.\n\nEDUCATION\nDoctor of Physical Therapy, Pine Valley University, Washington — 2022.\n\nLICENSE\nWashington physical-therapy license — active, as reported by the candidate. License number and expiry date are not included in this résumé.\n\nADDITIONAL INFORMATION\nEmployment between graduation and May 2025 is not listed. Current availability, location preferences and pay expectations are not supplied in this document; see separately dated candidate communications.\n"
+    },
+    {
+      "document_id": "C2-CV-FULL",
+      "candidate_id": "C2",
+      "rendition_of": "C2-CV",
+      "received_at": "2026-11-01",
+      "text": "Blair Sample\nPhysical Therapist | Spokane, Washington | c2@example.invalid\n\nEXPERIENCE\nSummit University Hospital — Outpatient Physical Therapist\n2016–present\nMy work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries. I work in the hospital's outpatient physical-therapy setting.\n\nEDUCATION\nPine Valley University, Washington\nDoctor of Physical Therapy, 2016\n\nLICENSURE\nI report an active Washington PT license. A license number and expiry date are not supplied in this résumé.\n\nSKILLS DESCRIBED\nOutpatient rehabilitation; orthopedic rehabilitation; sports injury recovery.\n\nThis résumé does not describe home-health assignments, OASIS documentation or Homecare Homebase use. Those topics have not been answered in this document. It does not supply a current availability or compensation statement.\n"
+    },
+    {
+      "document_id": "C3-CV-FULL",
+      "candidate_id": "C3",
+      "rendition_of": "C3-CV",
+      "received_at": "2026-10-28",
+      "text": "Casey Sample — Physician\nColumbus, Ohio | c3@example.invalid\n\nCURRENT PRACTICE\nPrairie Regional Hospital\nEmergency-department attending, 2019–present\nClinical practice in the emergency-department setting.\n\nPOSTGRADUATE TRAINING\nRiver County Medical Center\nFamily-medicine residency, completed 2018.\n\nCERTIFICATIONS AND LICENSE — CANDIDATE REPORTED\nFamily-medicine board certification.\nActive Ohio physician license.\nATLS, ACLS, PALS and BLS.\n\nCredential identifiers, expiry dates and independent verification records are not attached. Medical-school details, residency start date and work between residency completion and 2019 are not listed.\n\nThis document describes professional history. It does not list the schedule of my current placement or commit me to any additional shifts. Please consult my separately dated communications for availability and compensation expectations.\n"
+    },
+    {
+      "document_id": "C4-CV-FULL",
+      "candidate_id": "C4",
+      "rendition_of": "C4-CV",
+      "received_at": "2026-11-01",
+      "text": "Drew Sample | Emergency Medicine Physician\nColumbus, Ohio | c4@example.invalid\n\nTRAINING\nEmergency-medicine residency at Lakeview Medical Center, completed 2017.\n\nWORK HISTORY\nEmergency-department attending — 2017–present.\nThe employer name and individual assignment dates are not included in the supplied résumé.\n\nPROFESSIONAL CREDENTIALS\nABEM certification, as reported by the candidate.\nActive Ohio physician license, as reported by the candidate.\nCredential numbers, expiry dates and verification records are not supplied.\n\nPROFILE\nEmergency-department practice since completion of residency. Home location: Columbus, Ohio.\n\nNo availability, pay expectation or permission to contact is stated in this document. Current work preferences must be read from separately dated records.\n"
+    }
+  ],
+  "notes": [
+    {
+      "source_id": "C1-NOTE-02",
+      "candidate_id": "C1",
+      "recorded_at": "2026-11-06T17:00:00Z",
+      "author_role": "recruiter",
+      "kind": "recruiter_note",
+      "related_source_ids": [
+        "C1-MSG",
+        "C1-CV"
+      ],
+      "body": "Alex's latest message mentions Spokane, December 1 and $2,400 for forty hours. The older Oregon-only preference is still visible in the ATS. I have not updated those structured fields. The résumé on file describes home-health work; the old ATS skills list is shorter."
+    },
+    {
+      "source_id": "C2-NOTE-02",
+      "candidate_id": "C2",
+      "recorded_at": "2026-11-06T15:00:00Z",
+      "author_role": "recruiter",
+      "kind": "recruiter_note",
+      "related_source_ids": [
+        "C2-NOTE",
+        "C2-CV"
+      ],
+      "body": "I asked Blair to describe any home visits, start-of-care documentation and Homecare Homebase use. No response to those questions is recorded yet. The résumé describes outpatient work. My earlier positive impression of the hospital and school was not a verification of those specific skills."
+    },
+    {
+      "source_id": "C3-NOTE-02",
+      "candidate_id": "C3",
+      "recorded_at": "2026-11-06T18:00:00Z",
+      "author_role": "recruiter",
+      "kind": "recruiter_note",
+      "related_source_ids": [
+        "C3-MSG",
+        "C3-OPS"
+      ],
+      "body": "Casey says the current assignment runs Monday through Wednesday and offers the two Dayton day shifts. R3 owns the placement. I have not independently checked the placement schedule or approved any additional-work outreach."
+    },
+    {
+      "source_id": "C4-NOTE-02",
+      "candidate_id": "C4",
+      "recorded_at": "2026-11-06T18:30:00Z",
+      "author_role": "recruiter",
+      "kind": "recruiter_note",
+      "related_source_ids": [
+        "C4-MSG",
+        "C4-OPS"
+      ],
+      "body": "Drew's latest message declines both December dates and asks for no job contact until January 15. The older contact_allowed field still says true. I have not changed that field yet. No new availability confirmation was received."
+    },
+    {
+      "source_id": "J1-NOTE-02",
+      "ats_job_id": "J1",
+      "requisition_ref": "VMS-901",
+      "recorded_at": "2026-11-06T13:00:00Z",
+      "author_role": "account_manager",
+      "kind": "job_note",
+      "related_source_ids": [
+        "J1-AM"
+      ],
+      "body": "My November 5 note reflects the facility conversation: one year of home-health experience is acceptable; OASIS is still needed for start-of-care visits; Homecare Homebase can be trained. The feed has not yet been edited. The $2,450 figure is candidate pay for forty hours, not the facility bill rate. I have no confirmed exception to the December 1 start."
+    },
+    {
+      "source_id": "J2-NOTE-01",
+      "ats_job_id": "J2",
+      "requisition_ref": "VMS-902",
+      "recorded_at": "2026-11-06T14:00:00Z",
+      "author_role": "account_manager",
+      "kind": "job_note",
+      "body": "The request is for both December 5 and December 6, 07:00–19:00 in Dayton local time. I have not confirmed whether the facility would accept someone for only one day. The posting allows consideration of other boards with ATLS, ACLS, PALS and BLS; no individual candidate has been approved by the facility."
+    },
+    {
+      "source_id": "R04-NOTE-01",
+      "profile_id": "R04",
+      "recorded_at": "2026-11-07T12:30:00Z",
+      "author_role": "recruiter",
+      "kind": "recruiter_note",
+      "related_source_ids": [
+        "R04-BASE",
+        "R04-UPDATE"
+      ],
+      "body": "The candidate's update says three years of home-health work. The profile names one employer from May 2025. I asked for earlier employer names and dates; they are not recorded yet. I have not corrected the profile's history."
+    },
+    {
+      "source_id": "R05-NOTE-01",
+      "profile_id": "R05",
+      "recorded_at": "2026-11-07T12:35:00Z",
+      "author_role": "recruiter",
+      "kind": "recruiter_note",
+      "related_source_ids": [
+        "R05-BASE",
+        "R05-UPDATE"
+      ],
+      "body": "The candidate says they have not used Homecare Homebase, although the imported profile lists it. The update also says two years in home health. I have asked for a dated work-history breakdown; no reply is recorded yet."
+    }
+  ],
+  "discovery_notes": [
+    {
+      "source_id": "DISC-01",
+      "recorded_at": "2026-11-07",
+      "speaker_role": "therapy_recruiter",
+      "text": "I use notes to understand the actual setting. A physical-therapist label alone does not tell me whether somebody has done home visits or outpatient work."
+    },
+    {
+      "source_id": "DISC-02",
+      "recorded_at": "2026-11-07",
+      "speaker_role": "account_manager",
+      "text": "A facility sometimes clarifies a requirement before the vendor feed is updated. We need to agree who can approve those changes and how the recruiter sees the source."
+    },
+    {
+      "source_id": "DISC-03",
+      "recorded_at": "2026-11-07",
+      "speaker_role": "locums_recruiter",
+      "text": "Placed does not tell me which days are occupied. I need the shift dates, times and the candidate's current response before discussing additional work."
+    },
+    {
+      "source_id": "DISC-04",
+      "recorded_at": "2026-11-07",
+      "speaker_role": "recruiter",
+      "text": "Show me what you used from the résumé, notes and messages. When two sources disagree, I want to inspect them and understand what needs a follow-up."
+    },
+    {
+      "source_id": "DISC-05",
+      "recorded_at": "2026-11-07",
+      "speaker_role": "operations_lead",
+      "text": "Recommendations may need to go to the recruiter who owns the relationship. Finding a match does not settle permission to contact or submit someone."
+    },
+    {
+      "source_id": "DISC-06",
+      "recorded_at": "2026-11-07",
+      "speaker_role": "client_lead",
+      "text": "Different divisions may prioritize different things. We have not agreed the configuration controls, score thresholds, source-precedence rules or freshness windows. Ask which decisions matter for your proposed workflow."
+    }
+  ]
+}

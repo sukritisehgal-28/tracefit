@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shortlist</title>
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <button class="logo" data-act="home">Shortlist</button>
+    <div class="nav-right">
+      <button class="navlink" data-act="pop" data-pop="activity">Activity <span id="activity-n" class="count"></span></button>
+      <button class="navlink" data-act="pop" data-pop="more">More</button>
+      <button class="btn outline" data-act="pop" data-pop="demo">Demo</button>
+    </div>
+  </div>
+</header>
+<div id="pop"></div>
+<div id="toast" aria-live="polite"></div>
+
+<div class="page">
+  <aside id="jobs" aria-label="Jobs"></aside>
+  <main id="main"></main>
+</div>
+
+<div id="drawer"></div>
+<div id="comparebar"></div>
+<div id="modal"></div>
+<script src="/app.js"></script>
+</body>
+</html>

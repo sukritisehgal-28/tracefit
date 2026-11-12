@@ -1,0 +1,218 @@
+{
+  "synthetic": true,
+  "source": "fictional_ats",
+  "exported_at": "2026-11-07T18:00:00Z",
+  "client_id": "agency-demo-01",
+  "description": "Fictional response format for this assessment; not a real vendor API or production schema.",
+  "data": {
+    "candidates": [
+      {
+        "id": "C1",
+        "first_name": "Alex",
+        "last_name": "Sample",
+        "email": "c1@example.invalid",
+        "updated_at": "2026-03-01",
+        "profession": "Physical Therapist",
+        "specialty": null,
+        "address": {
+          "city": "Portland",
+          "state": "OR"
+        },
+        "skills": [
+          "outpatient rehabilitation"
+        ],
+        "preferences": {
+          "states": [
+            "OR"
+          ],
+          "travel": false
+        },
+        "available_from": null,
+        "expected_pay": null,
+        "status": "lead",
+        "source_text": "Physical therapist; home Portland, Oregon; preferred state Oregon; willing_to_travel=false; skills: outpatient rehabilitation; availability and pay expectations empty.",
+        "documents": [
+          {
+            "id": "C1-CV",
+            "type": "resume_text",
+            "received_at": "2026-10-30",
+            "text": "DPT, Pine Valley University, Washington, completed 2022. Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase. Candidate reports active Washington PT license."
+          }
+        ],
+        "operations": {
+          "source_id": "C1-OPS",
+          "recorded_at": "2026-11-06",
+          "text": "Unassigned; no recorded contact restriction; no current placement recorded."
+        }
+      },
+      {
+        "id": "C2",
+        "first_name": "Blair",
+        "last_name": "Sample",
+        "email": "c2@example.invalid",
+        "updated_at": "2026-11-01",
+        "profession": "Physical Therapist",
+        "specialty": null,
+        "address": {
+          "city": "Spokane",
+          "state": "WA"
+        },
+        "skills": [
+          "outpatient rehabilitation"
+        ],
+        "preferences": {
+          "states": [
+            "WA"
+          ],
+          "shifts": [
+            "weekdays"
+          ],
+          "hours_per_week": 40,
+          "duration_weeks": 13
+        },
+        "available_from": "2026-12-01",
+        "expected_pay": {
+          "amount": 2400,
+          "currency": "USD",
+          "period": "week",
+          "hours": 40
+        },
+        "status": "lead",
+        "source_text": "Physical therapist; home Spokane; prefers Washington; available December 1 for thirteen weeks; weekdays, forty hours; expects USD 2,400/week. Skills: outpatient rehabilitation.",
+        "documents": [
+          {
+            "id": "C2-CV",
+            "type": "resume_text",
+            "received_at": "2026-11-01",
+            "text": "DPT, Pine Valley University, Washington, completed 2016. Summit University Hospital outpatient PT, 2016 to present. Orthopedic rehabilitation and sports injury recovery. Candidate reports active Washington PT license. No home-health, OASIS, or Homecare Homebase detail supplied."
+          }
+        ],
+        "operations": {
+          "source_id": "C2-OPS",
+          "recorded_at": "2026-11-04",
+          "text": "Assigned recruiter R2; candidate requested that opportunities go through R2."
+        }
+      },
+      {
+        "id": "C3",
+        "first_name": "Casey",
+        "last_name": "Sample",
+        "email": "c3@example.invalid",
+        "updated_at": "2026-06-01",
+        "profession": "Physician",
+        "specialty": "Emergency Medicine",
+        "address": {
+          "city": "Columbus",
+          "state": "OH"
+        },
+        "skills": [],
+        "preferences": {
+          "states": [
+            "OH"
+          ]
+        },
+        "available_from": null,
+        "expected_pay": null,
+        "status": "placed",
+        "assignment_end": "2026-12-31",
+        "source_text": "Physician; emergency medicine; home Columbus, Ohio; preferred state Ohio; availability empty; status placed; assignment end 2026-12-31.",
+        "documents": [
+          {
+            "id": "C3-CV",
+            "type": "resume_text",
+            "received_at": "2026-10-28",
+            "text": "Family-medicine residency at River County Medical Center, completed 2018. Emergency-department attending at Prairie Regional Hospital, 2019 to present. Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS."
+          }
+        ],
+        "operations": {
+          "source_id": "C3-OPS",
+          "recorded_at": "2026-11-06",
+          "text": "Recruiter R3 owns the current placement. Additional-work requests must go through R3; no authorization for automated candidate outreach recorded."
+        }
+      },
+      {
+        "id": "C4",
+        "first_name": "Drew",
+        "last_name": "Sample",
+        "email": "c4@example.invalid",
+        "updated_at": "2026-11-01",
+        "profession": "Physician",
+        "specialty": "Emergency Medicine",
+        "address": {
+          "city": "Columbus",
+          "state": "OH"
+        },
+        "skills": [
+          "emergency-department practice"
+        ],
+        "preferences": {
+          "states": [
+            "OH"
+          ]
+        },
+        "available_from": null,
+        "expected_pay": null,
+        "status": "lead",
+        "source_text": "Physician; emergency medicine; home Columbus; prefers Ohio; skills include emergency-department practice; availability empty.",
+        "documents": [
+          {
+            "id": "C4-CV",
+            "type": "resume_text",
+            "received_at": "2026-11-01",
+            "text": "Emergency-medicine residency at Lakeview Medical Center, completed 2017. Emergency-department attending, 2017 to present. Candidate reports ABEM certification and active Ohio license."
+          }
+        ],
+        "operations": {
+          "source_id": "C4-OPS",
+          "recorded_at": "2026-10-15",
+          "text": "Unassigned; contact_allowed=true; no placement recorded."
+        }
+      }
+    ],
+    "jobs": [
+      {
+        "id": "J1",
+        "external_requisition": "VMS-901",
+        "updated_at": "2026-10-25",
+        "title": "Physical Therapist",
+        "status": "open",
+        "location": {
+          "city": "Spokane",
+          "state": "WA"
+        },
+        "start_date": "2026-12-01",
+        "duration_weeks": 13,
+        "shift": "weekdays",
+        "hours_per_week": 40,
+        "minimum_experience_years": 2,
+        "requirements": [
+          "Washington PT license",
+          "OASIS",
+          "Homecare Homebase"
+        ],
+        "candidate_pay": {
+          "amount": 2450,
+          "currency": "USD",
+          "basis": "weekly",
+          "hours": 40
+        },
+        "description": "Open physical therapist role; Spokane, Washington; home health; start 2026-12-01; 13 weeks; weekdays, 40 hours/week; approved candidate pay USD 2,450/week for 40 hours. Structured minimum experience: 2 years. Description: independent home visits and start-of-care documentation. Requirements: Washington PT license, OASIS, Homecare Homebase."
+      },
+      {
+        "id": "J2",
+        "external_requisition": "VMS-902",
+        "updated_at": "2026-11-02",
+        "title": "Emergency Medicine Physician",
+        "status": "open",
+        "location": {
+          "city": "Dayton",
+          "state": "OH"
+        },
+        "description": "Open emergency-medicine locums physician role; fictional facility in Dayton, Ohio; December 5–6, 2026, 07:00–19:00 each day; approved candidate pay USD 240/hour. Requires relevant emergency-department experience and Ohio license before start. ABEM/AOBEM preferred. Other boards considered with ATLS, ACLS, PALS and BLS."
+      }
+    ]
+  },
+  "pagination": {
+    "next_cursor": null
+  }
+}

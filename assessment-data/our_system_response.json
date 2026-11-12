@@ -1,0 +1,369 @@
+{
+  "synthetic": true,
+  "source": "fictional_our_system",
+  "exported_at": "2026-11-07T18:00:00Z",
+  "client_id": "agency-demo-01",
+  "description": "Fictional response format for this assessment; not a real vendor API or production schema.",
+  "profiles": [
+    {
+      "profile_id": "R01",
+      "contact": {
+        "email": "r01@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R01-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R01-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R02",
+      "contact": {
+        "email": "r02@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R02-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R02-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R03",
+      "contact": {
+        "email": "r03@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R03-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R03-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R04",
+      "contact": {
+        "email": "r04@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R04-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R04-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        },
+        {
+          "id": "R04-UPDATE",
+          "observed_at": "2026-11-07T12:00:00Z",
+          "kind": "candidate_statement",
+          "text": "I have three years of home-health work, including OASIS and Homecare Homebase."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R05",
+      "contact": {
+        "email": "r05@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R05-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R05-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        },
+        {
+          "id": "R05-UPDATE",
+          "observed_at": "2026-11-07T12:00:00Z",
+          "kind": "candidate_statement",
+          "text": "I have two years of home-health work and OASIS experience. I have not used Homecare Homebase."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R06",
+      "contact": {
+        "email": "r06@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R06-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R06-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        },
+        {
+          "id": "R06-UPDATE",
+          "observed_at": "2026-11-07T12:00:00Z",
+          "kind": "candidate_statement",
+          "text": "My minimum is now $2,500 per week for forty hours."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R07",
+      "contact": {
+        "email": "r07@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R07-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R07-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        },
+        {
+          "id": "R07-UPDATE",
+          "observed_at": "2026-11-07T12:00:00Z",
+          "kind": "candidate_statement",
+          "text": "I can start December 8, not December 1."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R08",
+      "contact": {
+        "email": "r08@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R08-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R08-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane and need $2,400/week for forty hours."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R09",
+      "contact": {
+        "email": "r09@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R09-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R09-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R10",
+      "contact": {
+        "email": "r10@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R10-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R10-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        }
+      ],
+      "workflow": {
+        "owner": "R10",
+        "placement": null,
+        "contact_restriction": "Opportunity recommendations must go through recruiter R10."
+      }
+    },
+    {
+      "profile_id": "R11",
+      "contact": {
+        "email": "r11@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R11-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R11-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        },
+        {
+          "id": "R11-UPDATE",
+          "observed_at": "2026-11-07T12:00:00Z",
+          "kind": "candidate_statement",
+          "text": "Please do not contact me about jobs until January 15, 2027."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    },
+    {
+      "profile_id": "R12",
+      "contact": {
+        "email": "r12@example.invalid"
+      },
+      "profession": "Physical Therapist",
+      "evidence": [
+        {
+          "id": "R12-BASE",
+          "observed_at": "2026-11-06T12:00:00Z",
+          "kind": "profile",
+          "text": "DPT completed in 2022 at fictional Pine Valley University, Washington. Home-health physical therapist at fictional Evergreen Visiting Care since May 2025. Independent home visits, OASIS start-of-care documentation and Homecare Homebase. Reports active Washington PT license."
+        },
+        {
+          "id": "R12-PREF",
+          "observed_at": "2026-11-06T12:01:00Z",
+          "kind": "candidate_statement",
+          "text": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours."
+        },
+        {
+          "id": "R12-UPDATE",
+          "observed_at": "2026-11-07T12:00:00Z",
+          "kind": "candidate_statement",
+          "text": "Spokane is no longer a location I would consider."
+        }
+      ],
+      "workflow": {
+        "owner": null,
+        "placement": null,
+        "contact_restriction": null
+      }
+    }
+  ],
+  "updates": [
+    {
+      "event_id": "EV-C1-NEW",
+      "occurred_at": "2026-11-07T18:10:00Z",
+      "subject": {
+        "external_source": "fictional_ats",
+        "external_id": "C1"
+      },
+      "kind": "candidate_message",
+      "text": "My start date has changed. I cannot start until December 8."
+    }
+  ]
+}

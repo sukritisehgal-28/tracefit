@@ -1,0 +1,364 @@
+<meta charset="utf-8">
+<title>Shortlist Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column, like an engineering sheet. Three drawings carry the mechanism; tables carry the detail.
+   Solid line = runs today. Dashed amber line = designed, not built. That encoding is used in every figure and table. */
+:root {
+  --bg: #f5f7fa; --surface: #ffffff; --ink: #18212d; --muted: #586577; --line: #d3dae4;
+  --accent: #1d5bb8; --plan: #a85a06; --zone: #eef2f7;
+  --text: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --head: "IBM Plex Sans Condensed", "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141b; --surface: #171e28; --ink: #e5eaf1; --muted: #9ba8b8; --line: #2d3746;
+    --accent: #78aefc; --plan: #eea552; --zone: #131a23; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141b; --surface: #171e28; --ink: #e5eaf1; --muted: #9ba8b8; --line: #2d3746;
+  --accent: #78aefc; --plan: #eea552; --zone: #131a23; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--text); }
+.page {
+  max-width: 940px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 56px;
+}
+header, section { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+h1 { font: 600 38px/1.1 var(--head); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h2 { font: 600 25px/1.2 var(--head); margin: 0; text-wrap: balance; }
+h3 { font: 600 15px/1.3 var(--text); margin: 8px 0 0; }
+p, ul, ol { margin: 0; max-width: 68ch; }
+ul, ol { padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.kicker { font: 500 12px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 18px; line-height: 1.55; }
+code { font: 400 0.88em var(--mono); background: var(--zone); padding: 1px 5px; border-radius: 4px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 28px; font: 400 13px/1.4 var(--mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+.facts b { color: var(--ink); font-weight: 500; }
+.key { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 14px; color: var(--muted); }
+.key span { display: inline-flex; align-items: center; gap: 8px; }
+.key i { display: inline-block; width: 26px; height: 14px; border: 1.5px solid var(--ink); border-radius: 3px; background: var(--surface); }
+.key i.plan { border: 1.5px dashed var(--plan); }
+
+figure { margin: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.draw { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.draw svg { display: block; width: 100%; height: auto; font-family: var(--text); }
+.draw svg.w640 { min-width: 640px; } .draw svg.w860 { min-width: 860px; }
+figcaption { font-size: 14px; color: var(--muted); max-width: 72ch; }
+.d-box { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
+.d-plan { fill: var(--surface); stroke: var(--plan); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.d-zone { fill: var(--zone); stroke: var(--line); stroke-width: 1; }
+.d-arrow { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+.d-tie { stroke: var(--muted); stroke-width: 1; fill: none; }
+.d-head { fill: var(--ink); }
+.d-t { fill: var(--ink); font-size: 13px; font-weight: 600; }
+.d-s { fill: var(--muted); font-size: 11px; }
+.d-l { fill: var(--ink); font-size: 11px; }
+.d-m { fill: var(--muted); font-size: 10.5px; font-family: var(--mono); }
+.d-n { fill: var(--accent); font-size: 13px; font-weight: 600; }
+.d-k { fill: var(--muted); font-size: 10.5px; font-family: var(--mono); letter-spacing: 0.06em; }
+.d-p { fill: var(--plan); font-size: 11px; }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; line-height: 1.45; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font: 500 11.5px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.name { font-weight: 600; white-space: nowrap; }
+td .plan, li .plan { color: var(--plan); font-weight: 500; }
+td code { white-space: nowrap; }
+.note { border-left: 3px solid var(--plan); padding: 2px 0 2px 14px; color: var(--muted); font-size: 15px; }
+.steps { counter-reset: s; list-style: none; padding: 0; gap: 12px; max-width: 72ch; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 0 8px; }
+.steps li::before { content: counter(s); font: 500 14px/1.7 var(--mono); color: var(--accent); }
+.steps b { font-weight: 600; }
+footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; max-width: 72ch; }
+@media (max-width: 520px) { h1 { font-size: 30px; } h2 { font-size: 22px; } .lede { font-size: 17px; } .page { gap: 44px; } }
+</style>
+
+<div class="page">
+
+<header>
+  <div class="kicker">Candidate and job matching for recruiters</div>
+  <h1>Shortlist architecture</h1>
+  <p class="lede">The same person and the same job are described differently, at different times, by sources of different authority. So every fact is stored with its source, date and exact words. Explicit rules run over those facts. Each piece of work is tied to the thing that changed, never to the size of the database.</p>
+  <div class="facts">
+    <span><b>5</b> sources, <b>3</b> destinations</span>
+    <span><b>10</b> fit rules, <b>4</b> permission rules</span>
+    <span><b>156</b> tests, <b>102</b> scenarios</span>
+    <span>timed at <b>20,000</b> and <b>100,000</b> synthetic people</span>
+  </div>
+  <div class="key">
+    <span><i></i>runs today</span>
+    <span><i class="plan"></i>designed, not built</span>
+  </div>
+</header>
+
+<section>
+  <h2>How a record becomes a recommendation</h2>
+  <p>Five steps, always in this order. Each step has one job and hands a plain result to the next, so any step can be replaced without touching the others.</p>
+  <figure>
+    <div class="draw">
+      <svg class="w640" viewBox="0 0 760 632" role="img" aria-label="Records from five sources pass through five steps: translate, read, resolve, check, decide. The result goes to the recruiter page and to destinations. Configuration feeds every step, and the first three steps report data problems.">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="d-head"/></marker></defs>
+        <rect class="d-box" x="170" y="20" width="76" height="36" rx="5"/><text class="d-l" x="208" y="43" text-anchor="middle">ATS</text>
+        <rect class="d-box" x="256" y="20" width="76" height="36" rx="5"/><text class="d-l" x="294" y="43" text-anchor="middle">VMS feed</text>
+        <rect class="d-box" x="342" y="20" width="76" height="36" rx="5"/><text class="d-l" x="380" y="43" text-anchor="middle">Client DB</text>
+        <rect class="d-box" x="428" y="20" width="76" height="36" rx="5"/><text class="d-l" x="466" y="43" text-anchor="middle">Our system</text>
+        <rect class="d-box" x="514" y="20" width="76" height="36" rx="5"/><text class="d-l" x="552" y="43" text-anchor="middle">Supplement</text>
+        <line class="d-arrow" x1="380" y1="56" x2="380" y2="94" marker-end="url(#a1)"/><text class="d-s" x="392" y="80">records, as each source exports them</text>
+
+        <rect class="d-box" x="170" y="96" width="420" height="56" rx="6"/>
+        <text class="d-t" x="186" y="119"><tspan class="d-n">1</tspan>  Translate</text><text class="d-m" x="574" y="119" text-anchor="end">sources/</text>
+        <text class="d-s" x="186" y="139">One adapter per source. It decides nothing.</text>
+        <line class="d-arrow" x1="380" y1="152" x2="380" y2="186" marker-end="url(#a1)"/><text class="d-s" x="392" y="173">evidence and claims</text>
+
+        <rect class="d-box" x="170" y="188" width="420" height="56" rx="6"/>
+        <text class="d-t" x="186" y="211"><tspan class="d-n">2</tspan>  Read</text><text class="d-m" x="574" y="211" text-anchor="end">extract.py</text>
+        <text class="d-s" x="186" y="231">55 text rules. Every claim keeps the clause it came from.</text>
+        <line class="d-arrow" x1="380" y1="244" x2="380" y2="278" marker-end="url(#a1)"/><text class="d-s" x="392" y="265">claims with source, date, exact words</text>
+
+        <rect class="d-box" x="170" y="280" width="420" height="56" rx="6"/>
+        <text class="d-t" x="186" y="303"><tspan class="d-n">3</tspan>  Resolve</text><text class="d-m" x="574" y="303" text-anchor="end">world.py</text>
+        <text class="d-s" x="186" y="323">Who is who. Source precedence (newest by default) picks what counts.</text>
+        <line class="d-arrow" x1="380" y1="336" x2="380" y2="370" marker-end="url(#a1)"/><text class="d-s" x="392" y="357">people and jobs: current facts, with history</text>
+
+        <rect class="d-box" x="170" y="372" width="420" height="56" rx="6"/>
+        <text class="d-t" x="186" y="395"><tspan class="d-n">4</tspan>  Gates</text><text class="d-m" x="574" y="395" text-anchor="end">rules.py</text>
+        <text class="d-s" x="186" y="415">Required rules decide who qualifies. Unknown is a question.</text>
+        <line class="d-arrow" x1="380" y1="428" x2="380" y2="462" marker-end="url(#a1)"/><text class="d-s" x="392" y="449">met, not met or unknown, with evidence</text>
+
+        <rect class="d-box" x="170" y="464" width="420" height="56" rx="6"/>
+        <text class="d-t" x="186" y="487"><tspan class="d-n">5</tspan>  Score and decide</text><text class="d-m" x="574" y="487" text-anchor="end">matching.py</text>
+        <text class="d-s" x="186" y="507">Six weighted dimensions, range, tier, next action.</text>
+        <line class="d-arrow" x1="260" y1="520" x2="260" y2="554" marker-end="url(#a1)"/>
+        <line class="d-arrow" x1="500" y1="520" x2="500" y2="554" marker-end="url(#a1)"/>
+
+        <rect class="d-box" x="150" y="556" width="220" height="56" rx="6"/>
+        <text class="d-t" x="166" y="579">Recruiter page</text><text class="d-s" x="166" y="599">25 a screen, detail on open</text>
+        <rect class="d-box" x="390" y="556" width="220" height="56" rx="6"/>
+        <text class="d-t" x="406" y="579">Destinations</text><text class="d-s" x="406" y="599">top 200 per job, plus totals</text>
+
+        <rect class="d-zone" x="20" y="96" width="120" height="424" rx="6"/>
+        <text class="d-t" x="32" y="120">Configuration</text>
+        <text class="d-s" x="32" y="144">gates</text><text class="d-s" x="32" y="162">dimension weights</text><text class="d-s" x="32" y="180">thresholds</text>
+        <text class="d-s" x="32" y="198">vocabulary</text><text class="d-s" x="32" y="216">divisions</text><text class="d-s" x="32" y="234">reference date</text>
+        <text class="d-m" x="32" y="502">checked at start</text>
+        <line class="d-tie" x1="140" y1="124" x2="170" y2="124"/><line class="d-tie" x1="140" y1="216" x2="170" y2="216"/><line class="d-tie" x1="140" y1="308" x2="170" y2="308"/>
+        <line class="d-tie" x1="140" y1="400" x2="170" y2="400"/><line class="d-tie" x1="140" y1="492" x2="170" y2="492"/>
+
+        <rect class="d-zone" x="620" y="96" width="120" height="240" rx="6"/>
+        <text class="d-t" x="632" y="120">Reported</text>
+        <text class="d-s" x="632" y="144">bad records</text><text class="d-s" x="632" y="162">fallbacks used</text><text class="d-s" x="632" y="180">unread text</text><text class="d-s" x="632" y="198">disagreements</text>
+        <text class="d-m" x="632" y="318">never hidden</text>
+        <line class="d-arrow" x1="590" y1="124" x2="618" y2="124" marker-end="url(#a1)"/><line class="d-arrow" x1="590" y1="216" x2="618" y2="216" marker-end="url(#a1)"/><line class="d-arrow" x1="590" y1="308" x2="618" y2="308" marker-end="url(#a1)"/>
+      </svg>
+    </div>
+    <figcaption>Matching code never imports an adapter, and no adapter imports matching code. A test reads the imports to keep it that way. A sixth source is one adapter file and one block of configuration.</figcaption>
+  </figure>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>Part</th><th>What it does</th><th>Code</th><th>What it holds</th></tr></thead>
+    <tbody>
+      <tr><td class="name">Adapters</td><td>Turn one source's records into evidence and claims. A record that fails is undone and reported; the rest load.</td><td><code>sources/</code></td><td>Nothing</td></tr>
+      <tr><td class="name">Text reader</td><td>Turns free text into claims. Tells a skill described from a skill denied and a skill merely mentioned as missing.</td><td><code>extract.py</code></td><td>Nothing</td></tr>
+      <tr><td class="name">World</td><td>Links records into people and jobs on explicit references or identical email only. Picks the current fact and keeps the rest.</td><td><code>world.py</code></td><td>Evidence, claims, people, jobs</td></tr>
+      <tr><td class="name">Rule engine</td><td>Each rule returns met, not met, unknown or not applicable, with evidence on both sides and the question to ask.</td><td><code>rules.py</code></td><td>Nothing</td></tr>
+      <tr><td class="name">Shortlist</td><td>One row per person per job. Order, groups of similar people, running totals.</td><td><code>matching.py</code></td><td>Rows</td></tr>
+      <tr><td class="name">Engine, Live</td><td><code>Engine</code> replays the sample step by step for the demo. <code>Live</code> applies one event at a time, as a running service would.</td><td><code>pipeline.py</code></td><td>Open shortlists</td></tr>
+      <tr><td class="name">Server and page</td><td>Four read calls and one publish. The first response holds jobs and totals and no people.</td><td><code>server.py</code>, <code>web/</code></td><td>Nothing</td></tr>
+      <tr><td class="name">Destinations</td><td>Receive a plain payload: job, people, tier, score, next action, questions. They never see rules or sources.</td><td><code>sinks/</code></td><td>Nothing</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>What is kept, and what is computed</h2>
+  <p>This split is what makes the rest of the design safe. Only two things are the record. Everything a recruiter sees is computed from them and can be thrown away.</p>
+  <figure>
+    <div class="draw">
+      <svg class="w640" viewBox="0 0 760 290" role="img" aria-label="Evidence and claims are kept as received and never overwritten. People, jobs, shortlist rows and explanations are computed from them and can be rebuilt at any time.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="d-head"/></marker></defs>
+        <rect class="d-zone" x="20" y="20" width="310" height="250" rx="8"/>
+        <text class="d-k" x="36" y="46">KEPT AS RECEIVED</text>
+        <rect class="d-box" x="36" y="70" width="110" height="64" rx="6"/>
+        <text class="d-t" x="50" y="94">Evidence</text><text class="d-s" x="50" y="112">record, résumé,</text><text class="d-s" x="50" y="126">note, message</text>
+        <line class="d-arrow" x1="146" y1="102" x2="204" y2="102" marker-end="url(#a2)"/><text class="d-s" x="176" y="94" text-anchor="middle">1 to many</text>
+        <rect class="d-box" x="206" y="70" width="110" height="64" rx="6"/>
+        <text class="d-t" x="220" y="94">Claim</text><text class="d-s" x="220" y="112">one fact, with</text><text class="d-s" x="220" y="126">quote and date</text>
+        <text class="d-m" x="36" y="190">evidence: source, kind, date, author</text>
+        <text class="d-m" x="36" y="208">claim: attr, value, polarity, quote, basis</text>
+        <text class="d-s" x="36" y="244">Never overwritten. Only added to.</text>
+
+        <rect class="d-zone" x="400" y="20" width="340" height="250" rx="8"/>
+        <text class="d-k" x="416" y="46">COMPUTED</text>
+        <line class="d-arrow" x1="316" y1="102" x2="414" y2="102" marker-end="url(#a2)"/><text class="d-s" x="365" y="94" text-anchor="middle">resolve</text>
+        <rect class="d-box" x="416" y="70" width="124" height="64" rx="6"/>
+        <text class="d-t" x="430" y="94">Person, Job</text><text class="d-s" x="430" y="112">current facts,</text><text class="d-s" x="430" y="126">older ones kept</text>
+        <line class="d-arrow" x1="540" y1="102" x2="598" y2="102" marker-end="url(#a2)"/><text class="d-s" x="570" y="94" text-anchor="middle">rules</text>
+        <rect class="d-box" x="600" y="70" width="124" height="64" rx="6"/>
+        <text class="d-t" x="614" y="94">Shortlist row</text><text class="d-s" x="614" y="112">tier, score,</text><text class="d-s" x="614" y="126">next action</text>
+        <line class="d-arrow" x1="662" y1="134" x2="662" y2="184" marker-end="url(#a2)"/><text class="d-s" x="670" y="163">on open</text>
+        <rect class="d-box" x="600" y="186" width="124" height="64" rx="6"/>
+        <text class="d-t" x="614" y="210">Explanation</text><text class="d-s" x="614" y="228">every rule, with</text><text class="d-s" x="614" y="242">its evidence</text>
+        <text class="d-m" x="416" y="208">row key: job + person</text>
+        <text class="d-s" x="416" y="244">Rebuildable at any time.</text>
+      </svg>
+    </div>
+    <figcaption>The rules are deterministic: the same evidence and settings always give the same rows. So a settings change or a code fix is a rebuild, never a data migration, and an explanation does not need to be stored. A test checks that a rebuilt explanation is identical to one held in full.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>What each event costs</h2>
+  <p>Work follows the thing that changed. Times are medians on synthetic people, in one process on an 8 GB laptop.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>What happens</th><th>Work that is redone</th><th>Grows with</th><th>20,000 people</th><th>100,000 people</th></tr></thead>
+    <tbody>
+      <tr><td class="name">A job arrives</td><td>Resolve the job, then run all 14 rules for everyone in its profession. Done once.</td><td>People in that profession</td><td class="num">0.74 s</td><td class="num">5.0 s</td></tr>
+      <tr><td class="name">A candidate changes</td><td>Re-read their text, re-resolve them, re-check them against open jobs, replace their one row in each list.</td><td>Open jobs in their profession</td><td class="num">0.2 ms</td><td class="num">1.6 ms</td></tr>
+      <tr><td class="name">A job's requirements change</td><td>Rebuild that job's list, compare with the old one, report only the people who moved.</td><td>People in that profession</td><td class="num" colspan="2">as a new job</td></tr>
+      <tr><td class="name">A job closes</td><td>Withdraw its list.</td><td>Nothing</td><td class="num" colspan="2">not timed</td></tr>
+      <tr><td class="name">A recruiter opens a list</td><td>Read 25 rows.</td><td>The 25 rows</td><td class="num">2.3 ms</td><td class="num">3.5 ms</td></tr>
+      <tr><td class="name">A recruiter moves a weight or a filter</td><td>Re-score one list from stored dimensions, serve the first screenful. No text is re-read.</td><td>The rows in that list</td><td class="num">2.7 ms</td><td class="num">6.5 ms</td></tr>
+      <tr><td class="name">A recruiter opens a person</td><td>Rebuild one explanation, with only the evidence it cites.</td><td>One person, one job</td><td class="num">0.5 ms</td><td class="num">0.9 ms</td></tr>
+      <tr><td class="name">Settings change</td><td>Rebuild every open list. <span class="plan">Today this is a restart.</span></td><td>Open jobs × their professions</td><td class="num" colspan="2">not measured</td></tr>
+      <tr><td class="name">The date changes</td><td>Freshness, years of experience and start dates all move with the date. <span class="plan">Today the reference date is fixed in settings.</span></td><td>Open jobs × their professions</td><td class="num" colspan="2">not built</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Before the 100,000 run the laptop had about 5 GB of swap in use by other apps, so its worst cases include waiting on the disk. The 20,000 run peaks at 355 MB and is the cleaner measurement.</p>
+  <p>The one-event path gives the same rows, totals and change messages as rebuilding everything from scratch. That is tested on the sample and on all 102 scenarios.</p>
+</section>
+
+<section>
+  <h2>The same design as a running service</h2>
+  <p>Today the solid boxes run in one process and keep in memory what the dashed boxes would keep on disk. Nothing in the five steps changes. What changes is where records come from and where facts and rows live.</p>
+  <figure>
+    <div class="draw">
+      <svg class="w860" viewBox="0 0 1050 400" role="img" aria-label="Production shape. Source systems feed connectors, then an ordered event queue, then match workers split by profession, which write to a database. An outbox relay sends changes to destinations. Stateless API servers read shortlist rows for the recruiter page. The match worker, API server, page and destinations run today; the connectors, queue, extra workers, database and outbox relay are designed and not built.">
+        <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="d-head"/></marker></defs>
+
+        <rect class="d-box" x="20" y="60" width="130" height="70" rx="6"/>
+        <text class="d-t" x="34" y="84">Source systems</text><text class="d-s" x="34" y="102">ATS, VMS feed,</text><text class="d-s" x="34" y="117">client database</text>
+        <line class="d-arrow" x1="150" y1="95" x2="218" y2="95" marker-end="url(#a3)"/><text class="d-s" x="185" y="87" text-anchor="middle">records</text>
+
+        <rect class="d-plan" x="220" y="60" width="130" height="70" rx="6"/>
+        <text class="d-t" x="234" y="84">Connectors</text><text class="d-s" x="234" y="102">pull or webhook;</text><text class="d-s" x="234" y="117">keep raw record</text>
+        <line class="d-arrow" x1="350" y1="95" x2="418" y2="95" marker-end="url(#a3)"/><text class="d-s" x="385" y="87" text-anchor="middle">events</text>
+
+        <rect class="d-plan" x="420" y="60" width="130" height="70" rx="6"/>
+        <text class="d-t" x="434" y="84">Event queue</text><text class="d-s" x="434" y="102">one lane per</text><text class="d-s" x="434" y="117">person and job</text>
+        <line class="d-arrow" x1="550" y1="95" x2="618" y2="95" marker-end="url(#a3)"/><text class="d-s" x="585" y="87" text-anchor="middle">in order</text>
+
+        <rect class="d-plan" x="632" y="76" width="150" height="70" rx="6"/>
+        <rect class="d-plan" x="626" y="68" width="150" height="70" rx="6"/>
+        <rect class="d-box" x="620" y="60" width="150" height="70" rx="6"/>
+        <text class="d-t" x="634" y="84">Match workers</text><text class="d-s" x="634" y="102">steps 1 to 5 per event;</text><text class="d-s" x="634" y="117">split by profession</text>
+        <line class="d-arrow" x1="784" y1="95" x2="848" y2="95" marker-end="url(#a3)"/><text class="d-s" x="816" y="87" text-anchor="middle">writes</text>
+
+        <rect class="d-plan" x="850" y="60" width="180" height="310" rx="6"/>
+        <text class="d-t" x="866" y="84">Database</text>
+        <text class="d-m" x="866" y="106">evidence</text><text class="d-m" x="866" y="122">claim</text><text class="d-s" x="866" y="140">only added to</text>
+        <text class="d-m" x="866" y="216">change</text><text class="d-m" x="866" y="232">outbox</text>
+        <text class="d-m" x="866" y="326">shortlist_row</text><text class="d-s" x="866" y="344">key: job + person</text>
+
+        <line class="d-arrow" x1="850" y1="220" x2="772" y2="220" marker-end="url(#a3)"/><text class="d-s" x="811" y="212" text-anchor="middle">changes</text>
+        <rect class="d-plan" x="620" y="185" width="150" height="70" rx="6"/>
+        <text class="d-t" x="634" y="209">Outbox relay</text><text class="d-s" x="634" y="227">retries until sent;</text><text class="d-s" x="634" y="242">never sends twice</text>
+        <line class="d-arrow" x1="620" y1="220" x2="552" y2="220" marker-end="url(#a3)"/><text class="d-s" x="586" y="212" text-anchor="middle">sends</text>
+        <rect class="d-box" x="420" y="185" width="130" height="70" rx="6"/>
+        <text class="d-t" x="434" y="209">Destinations</text><text class="d-s" x="434" y="227">CSV, JSON, webhook</text><text class="d-s" x="434" y="242">top 200 + totals</text>
+
+        <line class="d-arrow" x1="850" y1="335" x2="772" y2="335" marker-end="url(#a3)"/><text class="d-s" x="811" y="327" text-anchor="middle">reads</text>
+        <rect class="d-box" x="620" y="300" width="150" height="70" rx="6"/>
+        <text class="d-t" x="634" y="324">API servers</text><text class="d-s" x="634" y="342">no state of their own;</text><text class="d-s" x="634" y="357">25 rows per call</text>
+        <line class="d-arrow" x1="620" y1="335" x2="552" y2="335" marker-end="url(#a3)"/><text class="d-s" x="586" y="327" text-anchor="middle">JSON</text>
+        <rect class="d-box" x="420" y="300" width="130" height="70" rx="6"/>
+        <text class="d-t" x="434" y="324">Recruiter page</text><text class="d-s" x="434" y="342">list, detail,</text><text class="d-s" x="434" y="357">compare, replay</text>
+
+        <rect class="d-box" x="20" y="306" width="28" height="16" rx="3"/><text class="d-s" x="58" y="318">runs today, in one process</text>
+        <rect class="d-plan" x="20" y="336" width="28" height="16" rx="3"/><text class="d-s" x="58" y="348">designed, not built</text>
+      </svg>
+    </div>
+    <figcaption>Writes travel along the top, reads along the bottom, and they meet only in the database. A recruiter's page never waits for a shortlist to be built. The three simulated destinations write local files today and send nothing anywhere.</figcaption>
+  </figure>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>Part</th><th>Today</th><th>As a service</th><th>Where it plugs in</th></tr></thead>
+    <tbody>
+      <tr><td class="name">Intake</td><td>Reads the export files named in settings</td><td><span class="plan">A connector per source.</span> It saves the raw record first, then hands it to the adapter</td><td>An adapter already takes one record at a time</td></tr>
+      <tr><td class="name">Events</td><td>A list replayed in time order</td><td><span class="plan">A queue</span> that keeps each person's and each job's events in order</td><td><code>Live.ingest(event)</code></td></tr>
+      <tr><td class="name">Facts</td><td>In memory. A restart re-reads every source</td><td><span class="plan">Two tables, only added to.</span> Text is read once per document, not once per start</td><td><code>World.apply(batch)</code></td></tr>
+      <tr><td class="name">Rows</td><td>In memory, for every open job</td><td><span class="plan">One table keyed by job and person</span>, with a stored sort key. Only lists being viewed are in memory</td><td><code>Shortlist.page</code>, <code>Shortlist.patch</code></td></tr>
+      <tr><td class="name">Workers</td><td>One process</td><td><span class="plan">Several, split by profession.</span> A list is independent per job, and per person within a job</td><td><code>Shortlist</code> build</td></tr>
+      <tr><td class="name">Notifications</td><td>Written to a local file</td><td><span class="plan">An outbox table and a relay</span> that retries and carries a key so a destination can ignore repeats</td><td><code>sinks/</code></td></tr>
+      <tr><td class="name">Clock</td><td>A fixed reference date in settings</td><td><span class="plan">A nightly "day changed" event</span> that rebuilds open lists</td><td><code>World(as_of=…)</code></td></tr>
+      <tr><td class="name">Access</td><td>No sign-in</td><td><span class="plan">Sign-in, roles, and a log</span> of who changed a setting or published a list</td><td>Server</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Six rules that keep it correct across machines</h3>
+  <ol>
+    <li><b>One person, one worker.</b> Identity is settled before routing, on an index of emails and explicit references, so two records of one person always reach the same place.</li>
+    <li><b>Unknown is not "no".</b> Only a stated, different profession sets a person aside. People with no stated profession stay in every worker's pool.</li>
+    <li><b>Order per person and per job.</b> A late arrival is still placed correctly, because every fact carries its own date.</li>
+    <li><b>An event applied twice changes nothing.</b> Events carry an id; a row is written by its key.</li>
+    <li><b>A row, its change message and its outbox entry are written together</b>, so a recruiter is never told about a move that was not saved.</li>
+    <li><b>Every row records the settings version that produced it.</b> A rebuild writes the new version beside the old one and switches when complete.</li>
+  </ol>
+  <p class="note">Rules 3 and 4 hold in the code today. Rules 1, 2, 5 and 6 describe how the unbuilt parts must behave; rule 2 is already how the profession index works inside one process.</p>
+</section>
+
+<section>
+  <h2>How large it gets</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Quantity</th><th>Figure</th><th>Basis</th></tr></thead>
+    <tbody>
+      <tr><td>Evidence items and dated facts for 100,000 people</td><td class="num">460,064 and 1,654,770</td><td>Measured</td></tr>
+      <tr><td>Rows held for one job with 30,047 people in its profession</td><td class="num">30.4 MB</td><td>Measured</td></tr>
+      <tr><td>Rows held for 13 open jobs</td><td class="num">354 MB</td><td>Measured</td></tr>
+      <tr><td>One person against one job, all rules and dimensions</td><td class="num">130 to 190 µs</td><td>Measured</td></tr>
+      <tr><td>Rows for 1,000 open jobs in one profession of 30,000</td><td class="num">30 million</td><td>Arithmetic. A table, not memory</td></tr>
+      <tr><td>A candidate update with 1,000 open jobs in their profession</td><td class="num">about 0.2 s</td><td>Estimate from the cost per pair</td></tr>
+      <tr><td>Rebuilding 1,000 open lists after a settings change</td><td class="num">about 80 min of one core</td><td>Estimate. Divides across workers</td></tr>
+    </tbody>
+  </table></div>
+  <p>A new job is the expensive event, at about 0.15 ms per person in its profession. It happens once per job and off the page's path. Splitting it across workers should shorten it in proportion; that is not measured.</p>
+</section>
+
+<section>
+  <h2>What surrounds the pipeline</h2>
+  <ul>
+    <li><b>Settings.</b> Which rules are gates, dimension weights and presets, source precedence, target employers, thresholds, tie-breakers, freshness windows, who may assert what, vocabulary, and per-division overrides are all in one file. Four things are deliberately fixed: every rule runs for every pair, every fact keeps its source, credentials are shown as reported and never as verified, and nothing is sent automatically.</li>
+    <li><b>Bad data.</b> A missing file, a broken record, an unreadable date or a duplicate never stops matching. Each is worked around, and listed for a person to fix.</li>
+    <li><b>Names.</b> A stated name is used. Failing that, an email that clearly looks like a name, labelled as such. Failing that, the record id. A guessed name never decides that two records are one person.</li>
+    <li><b>What to watch in production.</b> Time from event to updated shortlist, queue delay, share of text left unread per source, data problems per source, people moved per event, failed sends. <span class="plan">Unread text, data problems and people moved are counted today; the others need the unbuilt parts.</span></li>
+    <li><b>A language model, if the client wants one,</b> is a second reader in step 2, behind a guard of ordinary code: a proposal counts only if its quote is word for word in one sentence, mentions the thing outside any understood negation, uses the tool's vocabulary, comes from a document allowed to assert it, and comes from a sentence with no doubt. Disagreement with the rules becomes a question. Paid for once per document. <span class="plan">Built and off by default; never run against a real model.</span></li>
+    <li><b>The checker</b> (<code>python3 -m shortlist audit</code>) reads every result and confirms the product's own rules hold: tier, score, evidence, authority, doubt, time, action, wording, list order. Clean on the sample, every scenario and with a lying model reader on; a test plants eleven mistakes and each is caught.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Order to build the rest</h2>
+  <p>Each step is useful on its own. More workers come last because the measurements say one process already carries 100,000 people.</p>
+  <ol class="steps">
+    <li><span><b>Store evidence and claims in a database.</b> A restart stops re-reading every document.</span></li>
+    <li><span><b>Store rows in a table and read pages from it.</b> Memory no longer grows with open jobs.</span></li>
+    <li><span><b>Add the queue and one real connector.</b> Replay a real day of events and record the time from event to shortlist.</span></li>
+    <li><span><b>Add sign-in, the change log and settings versions.</b> The ownership rule can then use the signed-in recruiter.</span></li>
+    <li><span><b>Add the nightly date event.</b></span></li>
+    <li><span><b>Split workers by profession,</b> only if step 3 shows a new job takes too long.</span></li>
+  </ol>
+</section>
+
+<footer>
+  <p>Tied to the sample, and first to revisit with real data: the text reader's 55 rules, the six meanings it recognises in job notes, the vocabulary, and the hand-set weights. A differently worded note is left unread and counted, not misread; a sweep of 124 reworded sentences tests that. The synthetic people measure speed and memory only; they say nothing about match quality.</p>
+</footer>
+
+</div>

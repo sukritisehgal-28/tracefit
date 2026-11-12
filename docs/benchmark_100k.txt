@@ -1,0 +1,26 @@
+SYNTHETIC benchmark: 100,000 generated candidates + the supplied sample = 100,016 people
+machine: macOS-26.3-arm64-arm-64bit-Mach-O, Python 3.13.7, one process, in memory
+
+LOAD (one-off; after this, changes are applied one at a time)
+  adapters: translate source records          3.15 s
+  read text, link, resolve                   49.09 s   (1,914 people/s end to end)
+  evidence items 460,064; dated facts 1,654,770
+  memory after load 966 MB; the largest shortlist holds 30.4 MB of rows, all 13 together 354.0 MB; at the end 514 MB; peak 1,204 MB
+
+EVENTS AND READS (13 open jobs by the end)
+  what                                                                          median       min       p95       max  runs   people
+  shortlist for a job already open (VMS-901)                                     5.02s     5.02s     5.02s     5.02s     1   30,047
+  shortlist for a job already open (VMS-902)                                     2.61s     2.61s     2.61s     2.61s     1   11,953
+  NEW JOB arrives -> ranked shortlist (11 jobs, one at a time)                   4.96s     3.76s     6.46s     6.46s    11   30,047
+  first screenful of a list (25 people)                                          3.5ms     3.0ms     5.2ms    14.1ms   200   30,047
+  last screenful of the same list                                                2.5ms     2.3ms     2.6ms     8.1ms   200   30,047
+  one person opened: every rule, with evidence                                   0.9ms     0.6ms     1.8ms    13.0ms   500   30,047
+  CANDIDATE UPDATE -> their row replaced in every open job (13 open)             1.6ms     0.3ms     9.8ms    19.9ms   200       13
+  a list put back in order on its first read after an update                   271.1ms   248.8ms   280.3ms   280.3ms     5   30,047
+  a recruiter moves a weight or a filter: the whole list re-scored, first screenful served     6.5ms     6.3ms    10.8ms    10.8ms     8   30,047
+  one job with the profession index off: every rule for every person            18.97s    18.97s    18.97s    18.97s     1  100,016
+
+  one person against one job, all 14 rules: 190 microseconds on average across all professions
+  a screenful of 25 people is 32,318 bytes; one explanation is about 17,298 bytes
+  200 updates moved 813 results between tiers
+  written to out/benchmark_100k.json

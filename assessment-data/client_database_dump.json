@@ -1,0 +1,78 @@
+{
+  "synthetic": true,
+  "source": "fictional_client_database",
+  "exported_at": "2026-11-07T18:00:00Z",
+  "client_id": "agency-demo-01",
+  "description": "Fictional response format for this assessment; not a real vendor API or production schema.",
+  "tables": {
+    "people": [
+      {
+        "person_pk": 501,
+        "ats_candidate_id": "C1",
+        "email_address": "c1@example.invalid",
+        "preferred_region_text": "Oregon",
+        "last_updated": "2026-03-01"
+      },
+      {
+        "person_pk": 502,
+        "ats_candidate_id": "C2",
+        "email_address": "c2@example.invalid",
+        "owner": "R2",
+        "last_updated": "2026-11-04"
+      },
+      {
+        "person_pk": 503,
+        "ats_candidate_id": "C3",
+        "email_address": "c3@example.invalid",
+        "owner": "R3",
+        "last_updated": "2026-11-06"
+      },
+      {
+        "person_pk": 504,
+        "ats_candidate_id": "C4",
+        "email_address": "c4@example.invalid",
+        "last_updated": "2026-11-06"
+      }
+    ],
+    "journal_entries": [
+      {
+        "entry_pk": "C1-MSG",
+        "person_fk": 501,
+        "entry_type": "candidate_message",
+        "created_on": "2026-11-06",
+        "body": "I am open to Spokane now. I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours."
+      },
+      {
+        "entry_pk": "C2-NOTE",
+        "person_fk": 502,
+        "entry_type": "recruiter_note",
+        "created_on": "2026-11-04",
+        "body": "Strong clinician. Hospital and school background may be helpful. Has not yet answered questions about home-health work."
+      },
+      {
+        "entry_pk": "C3-MSG",
+        "person_fk": 503,
+        "entry_type": "candidate_message",
+        "created_on": "2026-11-06",
+        "body": "My current assignment is Monday through Wednesday. I could cover both December 5 and 6 day shifts in Dayton. My minimum is $230/hour."
+      },
+      {
+        "entry_pk": "C4-MSG",
+        "person_fk": 504,
+        "entry_type": "candidate_message",
+        "created_on": "2026-11-06",
+        "body": "I cannot work December 5 or 6. Please do not contact me about any jobs until January 15, 2027."
+      }
+    ],
+    "job_notes": [
+      {
+        "note_pk": "J1-AM",
+        "ats_job_id": "J1",
+        "requisition_ref": "VMS-901",
+        "author_role": "account_manager",
+        "created_on": "2026-11-05",
+        "body": "Facility confirmed one year of home-health experience is acceptable. OASIS remains required for start-of-care visits. Homecare Homebase is preferred; facility can train it. Washington license must be active before start."
+      }
+    ]
+  }
+}

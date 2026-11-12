@@ -1,0 +1,10 @@
+# Overlay: treat approved pay as a hard ceiling and count unknown answers as zero.
+# An example of a division that prioritises differently.
+label = "Strict pay, no benefit of the doubt"
+description = "Pay above the approved rate rules a person out, and unknown answers earn no credit."
+
+[rules.pay]
+level = "hard"
+
+[scoring]
+unknown_credit = 0.0

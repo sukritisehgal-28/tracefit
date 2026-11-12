@@ -1,0 +1,92 @@
+{
+  "synthetic": true,
+  "source": "fictional_vms",
+  "exported_at": "2026-11-07T18:00:00Z",
+  "client_id": "agency-demo-01",
+  "description": "Fictional response format for this assessment; not a real vendor API or production schema.",
+  "requisitions": [
+    {
+      "requisitionNumber": "VMS-901",
+      "lastModified": "2026-10-25T12:00:00Z",
+      "positionName": "Home Health PT",
+      "facility": {
+        "name": "Cedar Home Services",
+        "city": "Spokane",
+        "region": "Washington"
+      },
+      "state": "OPEN",
+      "startDate": "12/01/2026",
+      "contractWeeks": 13,
+      "weeklyHours": 40,
+      "shiftDescription": "Weekdays",
+      "details": "Open physical therapist role; Spokane, Washington; home health; start 2026-12-01; 13 weeks; weekdays, 40 hours/week; approved candidate pay USD 2,450/week for 40 hours. Structured minimum experience: 2 years. Description: independent home visits and start-of-care documentation. Requirements: Washington PT license, OASIS, Homecare Homebase."
+    },
+    {
+      "requisitionNumber": "VMS-902",
+      "lastModified": "2026-11-02T12:00:00Z",
+      "positionName": "ED Physician - temporary coverage",
+      "facility": {
+        "name": "Dayton Sample Medical Center",
+        "city": "Dayton",
+        "region": "Ohio"
+      },
+      "state": "OPEN",
+      "shifts": [
+        {
+          "start": "2026-12-05T07:00:00-05:00",
+          "end": "2026-12-05T19:00:00-05:00"
+        },
+        {
+          "start": "2026-12-06T07:00:00-05:00",
+          "end": "2026-12-06T19:00:00-05:00"
+        }
+      ],
+      "candidateRate": {
+        "value": 240,
+        "currency": "USD",
+        "unit": "HOUR"
+      },
+      "details": "Open emergency-medicine locums physician role; fictional facility in Dayton, Ohio; December 5–6, 2026, 07:00–19:00 each day; approved candidate pay USD 240/hour. Requires relevant emergency-department experience and Ohio license before start. ABEM/AOBEM preferred. Other boards considered with ATLS, ACLS, PALS and BLS."
+    },
+    {
+      "requisitionNumber": "VMS-903",
+      "lastModified": "2026-11-06T12:00:00Z",
+      "positionName": "Outpatient Physical Therapist",
+      "facility": {
+        "name": "Willow Rehabilitation",
+        "city": "Portland",
+        "region": "Oregon"
+      },
+      "state": "FILLED",
+      "startDate": "12/01/2026",
+      "details": "Outpatient orthopedic rehabilitation. Oregon license required before start."
+    }
+  ],
+  "changeFeed": [
+    {
+      "eventId": "EV-JOB-904",
+      "occurredAt": "2026-11-07T18:05:00Z",
+      "eventType": "requisition.created",
+      "record": {
+        "requisitionNumber": "VMS-904",
+        "positionName": "Outpatient Physical Therapist",
+        "state": "OPEN",
+        "facility": {
+          "name": "Birch Rehabilitation",
+          "city": "Spokane",
+          "region": "Washington"
+        },
+        "startDate": "12/08/2026",
+        "contractWeeks": 13,
+        "weeklyHours": 40,
+        "candidateRate": {
+          "value": 2400,
+          "currency": "USD",
+          "unit": "WEEK",
+          "hours": 40
+        },
+        "details": "Outpatient orthopedic rehabilitation. Washington PT license required before start. One year of relevant experience preferred. Weekdays."
+      }
+    }
+  ]
+}

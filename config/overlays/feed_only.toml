@@ -1,0 +1,7 @@
+# Overlay: trust only the vendor feed for job requirements.
+# Account-manager notes are still shown, with what they would change, but do not affect results.
+label = "Vendor feed only"
+description = "Ignore requirement changes from notes until the vendor feed is updated."
+
+[requirement_changes]
+policy = "feed_only"

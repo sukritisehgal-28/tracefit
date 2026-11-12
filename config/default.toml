@@ -1,0 +1,328 @@
+# Shortlist — default configuration.
+# Everything a client is likely to want changed lives here, not in code.
+# Overlays in config/overlays/*.toml are merged on top of this file.
+
+[clock]
+reference_date = "2026-11-07"          # ages, freshness and years of experience are measured from this date, never the system clock
+snapshot_at = "2026-11-07T18:00:00Z"
+
+# ------------------------------------------------------------------ sources
+# Adding a source = one adapter file in shortlist/sources/ plus one block here.
+[[sources]]
+name = "ats"
+adapter = "ats"
+label = "ATS"
+system_id = "fictional_ats"
+path = "assessment-data/ats_response.json"
+
+[[sources]]
+name = "vms"
+adapter = "vms"
+label = "VMS feed"
+system_id = "fictional_vms"
+path = "assessment-data/vms_response.json"
+date_format = "%m/%d/%Y"               # the feed writes 12/01/2026 for 1 December
+
+[[sources]]
+name = "client_db"
+adapter = "client_db"
+label = "Client database"
+system_id = "fictional_client_database"
+path = "assessment-data/client_database_dump.json"
+candidate_source = "ats"               # ats_candidate_id points at this source
+
+[[sources]]
+name = "our_system"
+adapter = "our_system"
+label = "Our system"
+system_id = "fictional_our_system"
+path = "assessment-data/our_system_response.json"
+
+[[sources]]
+name = "supplement"
+adapter = "supplement"
+label = "Supplement"
+system_id = "supplement"
+path = "assessment-data/fde-assessment-supplement/supplemental_source_packet.json"
+candidate_source = "ats"
+profile_source = "our_system"
+
+# ------------------------------------------------------------- destinations
+# Adding a destination = one adapter file in shortlist/sinks/ plus one block here.
+# All three are SIMULATED: they write local files and send nothing anywhere.
+[[sinks]]
+name = "shortlist_files"
+adapter = "json_files"
+path = "out/shortlists"
+
+[[sinks]]
+name = "recruiter_csv"
+adapter = "csv"
+path = "out/shortlists"
+
+[[sinks]]
+name = "notifications"
+adapter = "mock_webhook"
+path = "out/outbox.jsonl"
+
+# ------------------------------------------------------------- model reader
+# An optional second reader that uses a language model, behind a guard (shortlist/model_reader.py).
+# It may only add facts whose quote appears word for word in the document, mention the thing claimed, use
+# this vocabulary, and come from a sentence with no negation or doubt. Where it and the rule reader disagree,
+# the fact becomes a question. It never removes a no-contact request.
+[model_reader]
+provider = "off"                       # off | recorded (replay saved answers, call nothing) | anthropic
+model = "claude-opus-5-5"
+effort = "medium"
+# Sending candidate text to a model provider takes it outside the client's systems. The client must agree
+# first (see HANDOFF.md, questions for the client). Until then the anthropic provider refuses to start.
+allow_external_text = false
+recorded_path = "out/model_reads.json"  # every answer the model gives is saved here; later runs replay it
+
+# ----------------------------------------------------------------- identity
+[identity]
+link_by_email = true                   # same email address = same person. Similar text alone never merges people.
+# When no source states a person's name, try these in order. "resume" uses the name at the top of their résumé.
+# "email" uses the address only when it clearly looks like a name (jane.doe@...). Either is labelled on the page
+# with where it came from, and neither is ever used to decide that two records are one person. "id" shows the record id.
+name_fallbacks = ["resume", "email", "id"]
+
+# ------------------------------------------------- requirement changes (job)
+[requirement_changes]
+# What to do when a job note changes a requirement before the vendor feed does.
+#   provisional : use the note, and flag every result that depends on it
+#   feed_only   : ignore the note until the feed changes, and say what it would change
+#   trusted     : use the note with no flag (the client has approved the author's role)
+policy = "provisional"
+approver_roles = ["account_manager"]   # only notes written by these roles count as requirement changes
+
+# ------------------------------------------------------------------ scoring
+[scoring]
+unknown_credit = 0.5                   # credit (0 to 1) given to an answer that is not known yet; the range shows 0 and 1
+strong_threshold = 80                  # minimum score for the "Strong match" tier
+tie_margin = 3                         # scores this close are shown as comparable, not ranked apart
+preferred_item_weight = 0.5            # a "preferred" skill counts this much against a "required" one
+start_tolerance_days = 0               # how many days late a start may be and still count
+min_rules_for_strong = 3               # a posting that lets fewer rules than this be checked cannot produce a strong match
+# Among people who meet every required rule, list those who must not be contacted after everyone a recruiter
+# can act on (reach out, or hand over to the owning recruiter). Fit orders people inside each group.
+# Scores and tiers are not changed by this. Set to false to order by fit alone.
+actionable_first = true
+tie_breakers = ["action_readiness", "fewer_open_questions", "most_recent_candidate_contact"]
+
+# ----------------------------------------------------------- source precedence
+# Which statement counts when sources describe the same fact differently.
+#   "newest"  the most recent statement wins, whatever its source (the default). The older one stays visible as replaced.
+#   a list    the first entry that holds a value wins, and the newest within it. An entry is a source name
+#             (ats, vms, client_db, our_system, supplement) or a kind of evidence (structured, self_reported,
+#             recruiter, operations, feed, note, profile).
+[precedence]
+candidate = "newest"
+job = "newest"
+
+[precedence.attributes]   # per fact; overrides the two lines above. Left empty here: the client has not decided.
+# "req.start" = ["vms", "ats"]              # the vendor feed is the authority on a job's start date
+# available_from = ["self_reported"]        # the candidate's own latest word beats an ATS field
+
+# ---------------------------------------------------------------- quality score
+# Two stages. The required rules are gates: a person who fails one is "not a fit", one with an unknown answer
+# "needs an answer", whatever else they offer. Only people who pass every gate are ranked, by a score out of
+# 100 from these six dimensions. Each dimension is computed from rule results already explained on the page,
+# so every point traces to a quote. Weights are relative; a recruiter can change them on the page.
+[dimensions]
+setting = 25          # experience in the job's care setting (documented, claimed, or at a target employer)
+skills = 20           # the tools and skills the job asks for
+depth = 15            # documented years in the setting, against the job's minimum
+evidence = 15         # how well the facts hold up: conflicting claims, unread newer messages, stale answers lower it
+readiness = 15        # start date, schedule and shifts, and how recently the candidate replied
+pay = 10              # the candidate's ask against the approved rate
+# Employers the client counts as the closest match to its own work (for example agencies in the same market).
+# Experience at one of them, read from the résumé, counts as full setting experience. Empty by default.
+target_employers = []
+
+# Ready-made weightings a recruiter can pick on the page, for example to compare how a client would rank.
+[presets.experience]
+label = "Experience first"
+setting = 30
+depth = 30
+evidence = 20
+skills = 10
+readiness = 5
+pay = 5
+
+[presets.soonest]
+label = "Can start soonest"
+readiness = 40
+setting = 20
+skills = 15
+evidence = 10
+depth = 5
+pay = 10
+
+[presets.budget]
+label = "Within budget"
+pay = 35
+setting = 20
+skills = 15
+depth = 10
+evidence = 10
+readiness = 10
+
+[matching]
+block_on_profession = true             # at scale, only people in the job's profession are scored in full
+block_min_population = 1000            # below this many people every rule runs for every person
+# A shortlist longer than this keeps one compact row per person (tier, score, next action, the line on the card).
+# The full rule-by-rule explanation is then rebuilt when someone opens that person. The answer is the same either way.
+keep_detail_below = 2000
+top_n = 10                             # the page opens each list on its best ten; the rest are one click away (never a cut-off)
+
+# ------------------------------------------------------------------ publish
+[publish]
+max_people_per_job = 200               # a destination receives the top of each list and the totals, not every row
+
+# ---------------------------------------------------------------- freshness
+# A fact older than its window is still used, but is flagged as stale.
+[freshness_days]
+availability = 30
+pay = 90
+location = 180
+contact = 365
+experience = 730
+credential = 365
+
+# ---------------------------------------------------------------- authority
+# Which kinds of evidence may assert which class of fact.
+# A recruiter's impression is context; it is not evidence of a specific skill.
+[authority]
+experience = ["resume", "profile", "candidate_message", "candidate_statement", "structured_record"]
+credential = ["resume", "profile", "candidate_message", "candidate_statement", "structured_record"]
+availability = ["candidate_message", "candidate_statement", "structured_record", "recruiter_note"]
+pay = ["candidate_message", "candidate_statement", "structured_record", "recruiter_note"]
+location = ["candidate_message", "candidate_statement", "structured_record", "recruiter_note"]
+contact = ["candidate_message", "candidate_statement", "structured_record", "ops_note", "recruiter_note"]
+unanswered = ["resume", "profile", "recruiter_note"]
+requirement = ["job_feed", "job_record", "job_note"]
+
+# -------------------------------------------------------------------- rules
+# Every rule below runs for every candidate and job. A rule the job says nothing about returns "not applicable".
+# level: hard (a gate: failing it means not a fit) | soft (shown, never a gate) | from_job ("required" -> hard, "preferred" -> soft)
+# How much each area counts in the score is set by the [dimensions] weights, not here.
+[rules.profession]
+label = "Profession"
+level = "hard"
+
+[rules.setting_experience]
+label = "Experience in this setting"
+level = "from_job"
+
+[rules.skills]
+label = "Skills and tools"
+level = "from_job"
+
+[rules.license]
+label = "License"
+level = "hard"
+
+[rules.certifications]
+label = "Board and certificates"
+level = "hard"
+
+[rules.location]
+label = "Location"
+level = "hard"
+
+[rules.start_date]
+label = "Start date"
+level = "hard"
+
+[rules.schedule]
+label = "Schedule and length"
+level = "hard"
+
+[rules.shift_coverage]
+label = "Shift dates"
+level = "hard"
+
+[rules.pay]
+label = "Pay"
+level = "soft"
+
+# Permission rules: they never change the fit score, only the next action.
+[gates.job_open]
+label = "Job is open"
+
+[gates.contact_permission]
+label = "Contact permission"
+
+[gates.ownership]
+label = "Recruiter ownership"
+
+[gates.requirement_source]
+label = "Requirement source"
+
+# ---------------------------------------------------------------- divisions
+# A division can override any rule, scoring value or freshness window.
+[divisions.therapy]
+label = "Therapy"
+professions = ["physical_therapist"]
+
+[divisions.locums]
+label = "Locums"
+professions = ["physician"]
+
+[divisions.locums.dimensions]
+readiness = 30        # locums: who can cover the dates matters most
+setting = 25
+pay = 5
+
+[divisions.locums.freshness_days]
+availability = 14
+
+# ------------------------------------------------------------------ lexicon
+# Words the text reader recognises. Extending this needs no code change.
+[lexicon.profession]
+physical_therapist = ["physical therapist", "PT"]
+physician = ["physician"]
+
+[lexicon.setting]
+home_health = ["home-health", "home health", "home visits", "patients' homes"]
+outpatient = ["outpatient"]
+emergency_department = ["emergency-department", "emergency department", "emergency-medicine", "emergency medicine", "ED"]
+
+[lexicon.skill]
+oasis = ["OASIS"]
+homecare_homebase = ["Homecare Homebase"]
+home_visits = ["home visits", "visits in patients' homes"]
+soc_documentation = ["start-of-care documentation"]
+orthopedic_rehab = ["orthopedic rehabilitation", "orthopedic"]
+
+[lexicon.cert]
+abem = ["ABEM"]
+aobem = ["AOBEM"]
+atls = ["ATLS"]
+acls = ["ACLS"]
+pals = ["PALS"]
+bls = ["BLS"]
+
+# Which specialty each named board certificate belongs to, so a record's specialty label can be compared with it.
+[board_specialty]
+abem = "emergency_medicine"
+aobem = "emergency_medicine"
+
+[labels]
+physical_therapist = "Physical therapist"
+physician = "Physician"
+home_health = "home health"
+outpatient = "outpatient"
+emergency_department = "emergency department"
+oasis = "OASIS"
+homecare_homebase = "Homecare Homebase"
+home_visits = "independent home visits"
+soc_documentation = "start-of-care documentation"
+orthopedic_rehab = "orthopedic rehabilitation"
+abem = "ABEM"
+aobem = "AOBEM"
+atls = "ATLS"
+acls = "ACLS"
+pals = "PALS"
+bls = "BLS"
