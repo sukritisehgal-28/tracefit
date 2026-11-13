@@ -107,8 +107,8 @@ NO_REPLY = re.compile(r"\bno\s+(?:response|reply)\b|\bnot\s+(?:yet\s+)?answered\
 # with", "my Washington license lapsed"), or that is unsure ("I plan to", "pending", a question), yields no
 # yes at all. It is left unread instead: a question for the recruiter, never a false match.
 # The negations the reader does understand (the patterns listed in _placed) are taken out before this check.
-NEGATION = re.compile(r"\b(?:not|never|no|without|unfamiliar|lacks?|lacking|neither|nor|cannot|unable|lapsed|expired|"
-                      r"revoked|suspended|inactive)\b|n['’]t\b|\btoo\s+(?:long|short|early|late|far|much|little)\b", re.I)
+NEGATION = re.compile(r"\b(?:not|never|no|none|zero|without|unfamiliar|lacks?|lacking|neither|nor|cannot|unable|"
+                      r"laps(?:e|es|ed|ing)|expired|revoked|suspended|surrender(?:ed|ing)?|inactive)\b|n['’]t\b|\btoo\s+(?:long|short|early|late|far|much|little)\b", re.I)
 UNSURE = re.compile(r"\b(?:plan|plans|planning|hope|hopes|hoping|hopefully|might|maybe|perhaps|possibly|pending|apply|"
                     r"applying|applied\s+for|studying|learning|scheduled|working\s+towards?|in\s+progress|intend|intends|"
                     r"whether|if)\b", re.I)
@@ -126,7 +126,10 @@ SECOND_HAND = re.compile(
     r"|\b(?:took|taking|attended|attending|completed)\s+(?:an?\s+|the\s+)?(?:[\w-]+\s+){0,3}(?:course|class|module)\b"
     r"|\b(?:read|reading|heard|hearing|know|knew)\s+(?:about|of)\b|\baware(?:ness)?\b"
     r"|\b(?:basic|limited|minimal|some|passing|general)\s+(?:understanding|knowledge|familiarity|awareness)\b|\bintroductory\b"
-    r"|\bshadow(?:ed|ing)?\b|\bobserv(?:ed|ing|ation|er)\b|\breferr(?:ed|ing|als?)\b|\bas\s+a\s+student\b|\brotations?\b", re.I)
+    r"|\bshadow(?:ed|ing)?\b|\bobserv(?:ed|ing|ation|er)\b|\breferr(?:ed|ing|als?)\b|\bas\s+a\s+student\b|\brotations?\b"
+    # the future and willingness: "I will have my license by January", "happy to be trained on OASIS"
+    r"|\bwill\b|\bgoing\s+to\b|\b(?:love|happy|glad|keen|eager|willing|ready|able)\s+to\s+(?:learn|be|get|train|pick|take|start|study)\b"
+    r"|\blearn(?:ing|ed|t)?\b|\btrain(?:ed|ing)?\b|\bwaiting\b|\bexams?\b|\bsitting\b|\brenew(?:ed|al|ing)?\b|\bnext\s+(?:week|month|year)\b", re.I)
 SOMEONE_ELSE = re.compile(
     r"\b(?:my|our|the|a)\s+(?:colleagues?|co-?workers?|team(?:mates?)?|manager|supervisor|staff|aides?|assistants?|partner|"
     r"wife|husband|friend|sister|brother|mother|father|students?)\b"
@@ -138,6 +141,7 @@ NOT_NOW = re.compile(
     r"\b(?:formerly|previously|used\s+to)\b|(?<!have\s)(?<!has\s)(?<!ve\s)\bheld\b"
     r"|\b(?:eligible|eligibility|application|awaiting|booked|reciprocity)\b|\bunder\s+review\b", re.I)
 ENDED = re.compile(r"\b(?:until|through|thru)\s+(?P<y>(?:19|20)\d{2})\b", re.I)
+CONTRAST = re.compile(r"\b(?:but|only|except|however|though|although|yet)\b", re.I)
 NEGATED = re.compile(
     r"\b(?:have|has|had)\s+(?:not|never)\s+(?:used|worked|done|performed|practi[cs]ed)\b"
     r"|\bnever\s+(?:used|worked|done)\b|\bno\s+experience\s+(?:with|in|of)\b|\bnot\s+familiar\s+with\b", re.I)
@@ -187,7 +191,8 @@ OCCUPIED = re.compile(rf"\b(?:assignment|placement|contract|schedule)\b[^.]*?\b(
 _STOP = r"(?:do\s+not|don['’]t|dont|not|no\s+more|stop|hold\s+off(?:\s+on)?|refrain\s+from|never)"
 _REACH = (r"(?:contact\w*|reach(?:ing)?\s+out|call\w*|e-?mail\w*|messag\w*|texts?|texting|approach\w*|get\s+in\s+touch|"
           r"hear(?:ing)?\s+(?:about|from)|send(?:ing)?\s+me)")
-DNC_ANY = re.compile(rf"\b{_STOP}\b[^.;]*?\b{_REACH}", re.I)
+_NOT_A_REQUEST = r"(?!(?:your|my|a|an|the|his|her|their|last|get|got|receiv\w*|hold|have|had|sure|seen|see)\b)"
+DNC_ANY = re.compile(rf"\b{_STOP}\b(?:\s+{_NOT_A_REQUEST}[\w'’]+){{0,4}}?\s+{_NOT_A_REQUEST}{_REACH}", re.I)
 NOT_LOOKING = re.compile(r"\bnot\s+(?:looking|available|interested)\s+(?:for|in)\s+(?:any\s+|new\s+)?(?:work|jobs?|roles?|"
                          r"opportunities|assignments?|positions?)\b", re.I)
 OPT_OUT = re.compile(r"\b(?:remove\s+me\s+from|unsubscribe|opt(?:ed|s|ing)?\s+out|take\s+me\s+off)\b", re.I)
@@ -384,6 +389,14 @@ class Extractor:
         absent = bool(ABSENT.search(t))
         asked = ev.kind == "recruiter_note" and no_reply and bool(ASKED.search(t))
         neg = NEGATED.search(t)
+        # Where a negated clause turns ("... never home health, but I have used OASIS"): what follows is not denied.
+        turned = CONTRAST.search(t, neg.end()) if neg else None
+        turn = turned.start() if turned else len(t)
+        # ...and what stands before a "but" that precedes the negation is not denied either ("I have OASIS
+        # experience but have not used Homecare Homebase"). With no such word, a thing named before the
+        # negation may be its object ("OASIS I have never used"), so it is left unread.
+        before = list(CONTRAST.finditer(t, 0, neg.start())) if neg else []
+        lead = before[-1].start() if before else 0
         pol = "unanswered" if (absent or asked) else "neg" if neg else "pos"
         doubt, ambition = doubt_in(t)
         doubt = doubt and pol != "unanswered"
@@ -410,9 +423,9 @@ class Extractor:
             for pos, k in settings:
                 if pol == "unanswered":
                     add("exp.unanswered", "experience", None, k, "unanswered")
-                elif pol == "neg" and pos > neg.start():
+                elif pol == "neg" and neg.start() < pos < turn:
                     add("exp.negated", "experience", None, k, "neg")
-                elif unclear:
+                elif unclear or (pol == "neg" and not pos < lead):      # may be the negation's object, or follows a later "but"
                     continue
                 elif k in years_settings:
                     add("exp.years_claimed", "experience", {"years_claimed": to_number(years.group("n"))}, k)
@@ -431,9 +444,9 @@ class Extractor:
         for pos, k in self.lex.spans("skill", t):
             if pol == "unanswered":
                 add("skill.unanswered", "skill", None, k, "unanswered")
-            elif pol == "neg" and pos > neg.start():
+            elif pol == "neg" and neg.start() < pos < turn:
                 add("skill.negated", "skill", False, k, "neg")
-            elif not unclear:
+            elif not unclear and (pol != "neg" or pos < lead):      # otherwise it may be the negation's object: left unread
                 add("skill.mention", "skill", True, k)
 
         if pol == "pos" and not unclear:

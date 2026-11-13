@@ -83,6 +83,44 @@ class Events(unittest.TestCase):
         self.assertEqual(find(eng, 2, J, "C1").tier, "not_fit")
 
 
+class WhoAndWhat(unittest.TestCase):
+    def test_a_different_job_that_contains_the_word_is_not_the_profession(self):
+        for profession, the_job in (("Physician Assistant", ed_job()), ("Physical Therapist Assistant", None), ("Pharmacy Technician (PT)", None)):
+            with self.subTest(profession=profession):
+                person = dict(doctor(), profession=profession) if the_job else cand(profession=profession)
+                eng = build([person], [the_job] if the_job else HH())
+                m = find(eng, 0, "VMS-2" if the_job else J, person["id"])
+                self.assertEqual(next(r for r in m.results if r.rule == "profession").outcome, "not_met")
+                self.assertEqual(m.tier, "not_fit")
+
+    def test_a_placeholder_email_joins_nobody(self):
+        for emails in (("N/A", "N/A", "n/a"), ("  ", "  "), ("none@none.com", "none@none.com"), ("frontdesk@lakeside.invalid",) * 2):
+            with self.subTest(emails=emails):
+                eng = build([cand(f"C{i}", email=e) for i, e in enumerate(emails, start=1)], HH(),
+                            people_over={f"C{i}": {"email_address": e} for i, e in enumerate(emails, start=1)})
+                self.assertEqual(len(eng.world(0).people), len(emails))
+
+
+class NotesAndTheFeed(unittest.TestCase):
+    NOTE = ("VMS-1", "account_manager", "2026-11-05", "Facility confirmed one year of home-health experience is acceptable.")
+    SHORT = "Home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase. " \
+            "Candidate reports active Washington PT license."
+
+    def setting(self, feeds):
+        eng = build([cand(cv=self.SHORT)], HH(), notes=[self.NOTE], feeds=feeds)
+        return next(r for r in find(eng, len(eng.events), J, "C1").results if r.rule == "setting_experience")
+
+    def test_a_note_stands_when_a_later_feed_version_changes_something_else(self):
+        from scenario_base import HH_JOB
+        later = feed("EV-1", "18:05", job(details=HH_JOB.replace("2,450", "2,550")), "requisition.updated")
+        self.assertEqual(self.setting([later]).outcome, "met")            # 18 months against the note's one year
+
+    def test_a_feed_that_changes_the_value_after_the_note_is_the_newer_word(self):
+        from scenario_base import HH_JOB
+        later = feed("EV-1", "18:05", job(details=HH_JOB.replace("minimum experience: 2 years", "minimum experience: 3 years")), "requisition.updated")
+        self.assertEqual(self.setting([later]).outcome, "not_met")        # the feed moved to three years after the note
+
+
 class SettingsSlips(unittest.TestCase):
     """A mistyped setting stops the tool with a message. It never quietly turns a rule off."""
 

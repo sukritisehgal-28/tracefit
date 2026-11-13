@@ -37,6 +37,9 @@ def _compile(term: str) -> re.Pattern:
     return re.compile(r"(?<![A-Za-z])" + body + r"(?![A-Za-z])", re.IGNORECASE)
 
 
+_OTHER_ROLE = re.compile(r"\b(?:assistant|aide|technician|tech|student|extern|intern|scribe|trainee)\b", re.I)
+
+
 class Lexicon:
     def __init__(self, cfg: dict):
         self.families: dict[str, list[tuple[str, re.Pattern]]] = {}
@@ -47,6 +50,8 @@ class Lexicon:
     def spans(self, family: str, text: str) -> list[tuple[int, str]]:
         """(position, canonical key) for each key of this family mentioned in the text, first mention only."""
         first: dict[str, int] = {}
+        if family == "profession" and len(text) <= 60 and _OTHER_ROLE.search(text):
+            return []          # "Physician Assistant", "Pharmacy Technician (PT)": a different job that contains the word
         for canon, pattern in self.families.get(family, ()):
             m = pattern.search(text)
             if m and (canon not in first or m.start() < first[canon]):

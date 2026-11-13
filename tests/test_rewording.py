@@ -125,21 +125,33 @@ FACTS = {
 NOT_FIRST_HAND = {
     "uses OASIS": ["Familiar with OASIS in theory.", "My colleague handles OASIS.", "Completed a one-day OASIS webinar.",
                    "Limited exposure to OASIS.", "I have read about OASIS.", "Our aides do the OASIS paperwork.",
-                   "I took a course on OASIS.", "I have heard of OASIS.", "Basic understanding of OASIS."],
+                   "I took a course on OASIS.", "I have heard of OASIS.", "Basic understanding of OASIS.",
+                   "I would love to learn OASIS and Homecare Homebase.", "I am happy to be trained on OASIS and Homecare Homebase.",
+                   "I will start OASIS training next month.", "OASIS and Homecare Homebase I have never used.",
+                   "I have zero OASIS experience."],
     "home-health experience": ["Shadowed a home health PT for a week.", "Referred patients to home health agencies.",
                                "I supervise aides who do home visits in home health.", "My wife works in home health.",
                                "I observed home health visits as a student.", "Some exposure to home health during a rotation."],
     "Washington license": ["Held a Washington PT license until 2023.", "Washington PT license application submitted.",
                            "Formerly held a Washington license.", "I used to hold a Washington license.",
                            "Eligible for a Washington license by reciprocity.", "Washington license under review.",
-                           "Awaiting my Washington license."],
-    "ACLS": ["ACLS course booked.", "Held ACLS until 2022.", "My colleague is ACLS certified."],
+                           "Awaiting my Washington license.", "I will have my Washington license by January.",
+                           "I am waiting on my Washington license.", "I let my Washington license lapse last year.",
+                           "I surrendered my Washington license in 2024.", "Washington license: none.",
+                           "I do not hold a Washington license, please call me to discuss."],
+    "ACLS": ["ACLS course booked.", "Held ACLS until 2022.", "My colleague is ACLS certified.", "Sitting the ACLS exam in March.",
+             "ACLS to be renewed before start.", "Previously ACLS certified (2017-2022)."],
 }
 # The same words in a sentence that does say yes must still be read.
 STILL_READ = [("Washington license", "Washington license valid through 2027."),
               ("Washington license", "I have held a Washington license since 2022."),
               ("uses OASIS", "Over the course of three years I completed OASIS documentation daily."),
               ("home-health experience", "Home health PT on a world-class team, 2023 to present.")]
+
+# Ordinary messages that hold "not" near "call" or "email". None is a request to be left alone.
+NOT_A_REQUEST = ["I did not get your email, can you resend it?", "I have not received a call from anyone yet, please call me.",
+                 "Not sure you got my last message. I am still keen.", "I do not hold a Washington license, please call me to discuss.",
+                 "Please don't hesitate to call me."]
 
 # Every one of these asks not to be contacted. Each must be read as a restriction.
 DO_NOT_CONTACT = [
@@ -200,6 +212,11 @@ class Rewording(unittest.TestCase):
         for s in DO_NOT_CONTACT:
             with self.subTest(sentence=s):
                 self.assertTrue(blocks(s))
+
+    def test_an_ordinary_message_is_not_read_as_a_request(self):
+        for s in NOT_A_REQUEST:
+            with self.subTest(sentence=s):
+                self.assertFalse(blocks(s))
 
     def test_a_recruiters_note_about_a_missed_call_is_not_a_request_from_the_candidate(self):
         for s in ["I did not call her back yet.", "Could not reach the candidate; no contact until we hear back."]:

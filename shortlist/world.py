@@ -34,12 +34,21 @@ KEYED_ATTRS = ("skill", "license", "cert", "location_interest", "shift_availabil
 JOB_META = ("title", "facility", "location", "status")
 # Mailboxes that belong to a role or a team, not to one person. No name is ever taken from these.
 ROLE_MAILBOXES = {"info", "admin", "office", "hr", "jobs", "careers", "contact", "hello", "mail", "sales", "support",
-                  "team", "recruiting", "recruitment", "noreply", "no", "reply", "donotreply", "billing", "accounts", "test"}
+                  "team", "recruiting", "recruitment", "noreply", "no", "reply", "donotreply", "billing", "accounts", "test",
+                  "frontdesk", "front", "desk", "reception", "enquiries", "inquiries", "staff", "clinic", "therapy"}
+
+
+PLACEHOLDER_EMAILS = {"n/a", "na", "none", "null", "nil", "unknown", "noemail", "nomail", "email", "tbd", "tbc", "x", "xx", "xxx", "-"}
 
 
 def _shared_mailbox(email: str) -> bool:
-    """An address a team or an office reads, such as info@ or jobs@. Two people can share one."""
-    words = [w for w in re.split(r"[._+-]+", email.split("@")[0]) if w]
+    """An address that does not identify one person: a mailbox a team or an office reads (info@, jobs@), or a
+    placeholder typed where an address was missing ("N/A", none@none.com, a blank). Two people can share one."""
+    email = email.strip().lower()
+    local = email.split("@")[0]
+    if "@" not in email or not local or local in PLACEHOLDER_EMAILS or email in PLACEHOLDER_EMAILS:
+        return True
+    words = [w for w in re.split(r"[._+-]+", local) if w]
     return bool(words) and all(w in ROLE_MAILBOXES for w in words)
 
 
@@ -78,6 +87,7 @@ class Requirement:
     feed: Claim | None            # what the vendor feed / ATS job record says
     clar: Claim | None            # what an approver's note says, if anything
     unapproved: list              # notes by roles that may not change requirements: shown, never used
+    feed_moved: bool = False      # the feed changed this value after the note was written
 
     def pick(self, policy: str) -> tuple[Claim | None, Claim | None, bool]:
         """(version in force, the other version, whether the two say different things)."""
@@ -86,6 +96,8 @@ class Requirement:
         differs = self.feed is None or _norm(self.attr, self.feed.value) != _norm(self.attr, self.clar.value)
         if policy == "feed_only":
             return self.feed, self.clar, differs
+        if self.feed_moved:
+            return self.feed, self.clar, differs      # the feed changed this value after the note was written: the feed is the newer word
         return self.clar, self.feed, differs
 
 
@@ -237,7 +249,8 @@ class World:
             for c in claims:
                 if c.attr == "email":
                     email = str(c.value).strip().lower()
-                    merges.append((self._by_email.setdefault(email, c.subject), c.subject))
+                    if not _shared_mailbox(email):            # the same rule as a rebuild: a shared mailbox joins nobody
+                        merges.append((self._by_email.setdefault(email, c.subject), c.subject))
         for a, b in merges:                                   # a merge moves one person's material under the other
             before = {self.canon(a), self.canon(b)}
             self._union(a, b)
@@ -593,7 +606,14 @@ class World:
                     originals = [c for c in ordered if c.version == "clarification" and not self.is_derived(c)
                                  and _norm(attr, c.value) == _norm(attr, clar.value)]
                     clar = originals[-1] if originals else clar
-                j.reqs[(attr, key)] = Requirement(attr, key, feed, clar, [c for c in ordered if c.version == "unapproved"])
+                moved = False
+                if clar is not None and feed is not None and feed.observed_at > clar.observed_at:
+                    # A feed version dated after the note. If it only repeats what the feed said before the note
+                    # (someone changed another field), the note still stands. If the value itself changed, the
+                    # feed has moved on and is the newer word.
+                    earlier = next((c for c in ordered if c.version == "feed" and c.observed_at <= clar.observed_at), None)
+                    moved = earlier is None or _norm(attr, earlier.value) != _norm(attr, feed.value)
+                j.reqs[(attr, key)] = Requirement(attr, key, feed, clar, [c for c in ordered if c.version == "unapproved"], moved)
         for (attr, key), group in grouped.items():         # do the job's own sources agree with each other?
             if not (attr.startswith("req.") or attr == "status") or attr == "req.tag":
                 continue
