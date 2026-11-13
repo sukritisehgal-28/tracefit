@@ -74,7 +74,7 @@ When an event arrives, only what it touches is redone: a new job is matched once
 | `config/` | Every setting: rules, weights, presets, thresholds, source precedence, freshness, vocabulary. `overlays/` holds two other client profiles. |
 | `tests/` | 231 tests, 110 synthetic scenarios, the rewording sweep, inputs unlike the sample, and `model_run.py`. |
 | `recorded/` | The language-model reader's saved answers, so its run replays without a key. |
-| `bench/` | The synthetic scale benchmark. |
+| `bench/` | The synthetic scale benchmark, run on a laptop and on Google Cloud; outputs in `docs/benchmark_*.txt`. |
 | `docs/` | The written explanation (below), the benchmark outputs, the illustrated architecture (`architecture.pdf`), and a draft first message to the client. |
 | `assessment-data/` | The supplied sample, unchanged. |
 | `Dockerfile` | The hosted demo. |
@@ -84,7 +84,7 @@ When an event arrives, only what it touches is redone: a new job is matched once
 | Part | Status |
 |---|---|
 | Reading the supplied sources, rules, score, events, recruiter page, checker | Implemented, on the supplied data |
-| Speed at 20,000 and 100,000 people | Measured on **synthetic** data |
+| Speed at 20,000 and 100,000 people | Measured on **synthetic** data, on a laptop and on a 16-core Google Cloud machine (a new job at 100,000 people: 7.1 s on one worker, 1.2 s on sixteen) |
 | Destinations (JSON, CSV, notifications) | **Simulated**: local files only |
 | Language-model reader | Off by default. Run once with `gpt-4o` on the sample: it changed no result |
 | Database, queue, several machines, live connections, sign-in | Designed, not built |
