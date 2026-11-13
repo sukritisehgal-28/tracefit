@@ -121,7 +121,14 @@ sequenceDiagram
   L-->>P: Alex for VMS-901: Match to Not a fit (start date)
 ```
 
-A job whose requirements change is rebuilt and only the people who moved are reported; a job that closes withdraws its list; a reopened job is announced as reopened. An event delivered twice is applied once; events out of order are applied by their own dates. A test checks that applying events one at a time gives exactly the rows, totals and messages of rebuilding from scratch, on the sample and all 102 scenarios.
+A job whose requirements change is rebuilt and only the people who moved are reported; a job that closes withdraws its list; a reopened job is announced as reopened. An event delivered twice is applied once; events out of order are applied by their own dates. A test checks that applying events one at a time gives exactly the rows, totals and messages of rebuilding from scratch, on the sample and all 110 scenarios.
+
+**Several events at the same moment.** A running service gets bursts, and the supplied sample has only two events five minutes apart, so this is covered with synthetic ones:
+
+- **Order never matters.** Seven different events with one timestamp (a new job, a pay change, a job filled, four candidate messages) give identical lists in 40 random delivery orders, and the same as a rebuild. `python3 -m shortlist burst` shows this on the supplied data with eight labelled synthetic events.
+- **Two statements from one person at the same moment that disagree** ("I can start December 1" and "I cannot start until December 8") cannot be put in order. Neither is taken: the rule becomes a question that shows both, and only the rule about that fact is affected. A later message settles it.
+- **A job updated and filled at the same moment** is treated as filled, and the clash is listed under data problems: nobody is put forward for a job that may be gone.
+- **What measuring found.** Before this, such ties were settled by whichever record arrived first, so the one-event path and a rebuild could disagree. Ties are now settled the same way everywhere.
 
 ## Scale, latency and cost
 
@@ -203,7 +210,7 @@ A language model can be switched on as a **second reader** (off by default, neve
 
 ## The checker
 
-`python3 -m shortlist audit` reads every result and confirms the product's own rules hold: the tier follows from the gates; the score is exactly the weighted average of its dimensions; every quote was really recorded by its evidence; no skill counts on a recruiter's impression; nothing counts on a doubtful or future-dated sentence; nobody blocked or owned by another recruiter is marked "reach out"; nothing is called verified; the list is in its stated order. It is clean on the sample, both overlays, all 102 scenarios and with the lying model on, and a test plants twelve kinds of mistake to show each check catches its own.
+`python3 -m shortlist audit` reads every result and confirms the product's own rules hold: the tier follows from the gates; the score is exactly the weighted average of its dimensions; every quote was really recorded by its evidence; no skill counts on a recruiter's impression; nothing counts on a doubtful or future-dated sentence; nobody blocked or owned by another recruiter is marked "reach out"; nothing is called verified; the list is in its stated order. It is clean on the sample, both overlays, all 110 scenarios and with the lying model on, and a test plants twelve kinds of mistake to show each check catches its own.
 
 ## What is general, and what is tied to this sample
 

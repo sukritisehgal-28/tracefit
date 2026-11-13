@@ -23,15 +23,76 @@ python3 -m unittest discover -s tests
 | `python3 -m shortlist replay` | The demo in text: the 18:00 snapshot, the 18:05 new job, the 18:10 candidate update |
 | `python3 -m shortlist worked` | Four candidates evaluated side by side ([docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md)) |
 | `python3 -m shortlist audit` | The checker: every result against the product's own rules |
+| `python3 -m shortlist burst` | Eight **synthetic** events at the same moment on the supplied data: what changed, and the same lists in 30 delivery orders |
 | `python3 -m shortlist explain VMS-901 C2` | Every rule for one person and one job |
 | `python3 -m shortlist coverage` | Every rule ran for every pair; what the text reader could not read |
-| `python3 tests/scenario_base.py` | 102 synthetic situations, each passing or failing by name |
+| `python3 tests/scenario_base.py` | 110 synthetic situations, each passing or failing by name |
 | `python3 tests/test_rewording.py` | 124 reworded sentences: a "no" is never read as a "yes" |
 | `python3 tests/test_own_criteria.py` | 37 typed phrases and 22 institutions against synthetic résumés, with the known limits listed |
 | `python3 bench/benchmark.py --n 100000` | The synthetic scale benchmark |
 | `python3 bench/benchmark.py --n 20000 --workers 1,2,4` | The same lists built on 1, 2 and 4 worker processes, checked identical and timed (also run at 100,000 on a 16-core cloud machine; see the architecture doc) |
 
 Add `--overlay feed_only` or `--overlay strict_pay` to any command to see another client's settings.
+
+## How it works
+
+**From the sources to a recruiter's list.** Every step keeps the source, the date and the exact words, so each result can be traced back.
+
+```mermaid
+flowchart TD
+  A["Sources<br/>ATS, VMS feed, client database,<br/>our system, extra packet"] --> B["Adapters<br/>one per source"]
+  B --> C["Evidence and dated facts<br/>each keeps its source, date and words"]
+  C --> D["Who is who, what is current<br/>joined only on a reference or an email"]
+  D --> E{"Required rules<br/>profession, setting, skills, license,<br/>location, start date, schedule"}
+  E -->|"a rule is not met"| F["Not a fit<br/>kept off the list, counted"]
+  E -->|"no answer yet"| G["Needs an answer<br/>stays on the list, with the question"]
+  E -->|"all met"| H["Six marks out of 100<br/>setting, skills, depth,<br/>evidence, readiness, pay"]
+  G --> H
+  H --> I["One ranked list per job<br/>score with a range"]
+  P["Permission rules<br/>job open, contact, ownership"] --> J
+  I --> J["Next action<br/>reach out, go through the owner,<br/>ask first, or do not contact"]
+  J --> K["Recruiter page"]
+  J --> L["Destinations<br/>simulated: local files only"]
+```
+
+**When something changes.** Only what the event touches is redone. Events that carry the same timestamp give the same lists whichever arrives first.
+
+```mermaid
+flowchart TD
+  EV(["An event arrives"]) --> DUP{"Seen this event<br/>id before?"}
+  DUP -->|"yes"| SKIP["Applied once only"]
+  DUP -->|"no"| KIND{"What changed?"}
+  KIND -->|"new job"| NJ["Build its list once:<br/>every rule for everyone<br/>in its profession"]
+  KIND -->|"job changed"| JC["Rebuild that one list,<br/>report only who moved"]
+  KIND -->|"job filled"| JX["Withdraw its list"]
+  KIND -->|"candidate update"| CU["Re-read that person,<br/>replace their row<br/>in each open job"]
+  KIND -->|"a kind the tool<br/>does not know"| UK["Ignored, listed<br/>under data problems"]
+  CU --> TIE{"Two statements at the<br/>same moment that disagree?"}
+  TIE -->|"yes"| Q["Neither is taken:<br/>the rule becomes a question"]
+  TIE -->|"no"| NEW["The newest counts; the older<br/>stays visible as replaced"]
+  NJ --> OUT["What changed, rule by rule,<br/>with the record behind it"]
+  JC --> OUT
+  JX --> OUT
+  Q --> OUT
+  NEW --> OUT
+```
+
+**The demo, in time order.** The first three steps are the supplied data. The last is a synthetic burst (`python3 -m shortlist burst`).
+
+```mermaid
+sequenceDiagram
+  participant S as Sources
+  participant T as Tracefit
+  participant R as Recruiter page
+  S->>T: 18:00 snapshot: 16 people, 3 jobs
+  T->>R: Home Health PT: 12 on the list, 2 need an answer
+  S->>T: 18:05 new job VMS-904
+  T->>R: Outpatient PT matched at once, Blair first at 96
+  S->>T: 18:10 Alex can only start 8 December
+  T->>R: Alex for VMS-901: Match to Not a fit (start date)
+  S-->>T: 18:15 eight events at the same moment (synthetic)
+  T-->>R: Same lists in any delivery order, same as a full rebuild
+```
 
 ## Five-minute demo
 
@@ -56,7 +117,7 @@ Add `--overlay feed_only` or `--overlay strict_pay` to any command to see anothe
 | `shortlist/rules.py`, `dimensions.py`, `matching.py` | The gates, the quality score, tiers, order, next action. |
 | `shortlist/pipeline.py`, `server.py`, `web/` | Replay, the running-service path, the page. |
 | `shortlist/audit.py`, `model_reader.py`, `workers.py` | The checker; an optional guarded language-model reader (off); list building on several worker processes (used by the benchmark). |
-| `tests/`, `bench/` | 187 tests, 102 scenarios, the rewording sweep; the synthetic benchmark. |
+| `tests/`, `bench/` | 198 tests, 110 scenarios, the rewording sweep; the synthetic benchmark. |
 
 ## What is real and what is simulated
 

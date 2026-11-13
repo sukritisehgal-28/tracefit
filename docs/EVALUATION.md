@@ -28,7 +28,7 @@ In each case a matcher that trusts structured fields and keywords gives a confid
 
 ## Experiments
 
-Run everything with `python3 -m unittest discover -s tests`: 187 tests.
+Run everything with `python3 -m unittest discover -s tests`: 198 tests.
 
 1. **Three client profiles on the same data** (the bonus: comparing configurations). Home-health job at 18:00:
 
@@ -42,10 +42,10 @@ Run everything with `python3 -m unittest discover -s tests`: 187 tests.
 
 2. **Every rule is touched.** Every rule runs for every pair; every outcome each rule can return is reached by a synthetic case; every one of the 55 text rules fires on the data or a case.
 3. **The quality score separates people the old score tied.** Under the default weights the ten people who pass every required rule score between 81 and 93, each difference traceable to one dimension; the score is checked to be exactly the weighted average of its dimensions.
-4. **Updates equal a rebuild.** Applying events one at a time gives the same rows, order, totals and messages as rebuilding from scratch, on the sample and all 102 scenarios; after a candidate update every other row is untouched.
+4. **Updates equal a rebuild.** Applying events one at a time gives the same rows, order, totals and messages as rebuilding from scratch, on the sample and all 110 scenarios; after a candidate update every other row is untouched. Events that share one timestamp give the same lists in any delivery order (40 random orders of a seven-event burst). Writing that test found a real defect: two conflicting messages from one person at the same moment were settled by arrival order, so the one-event path and a rebuild disagreed. Such a pair is now a question that shows both.
 5. **Sources and destinations are independent.** Matching imports no adapter; a synthetic fifth source and a new destination added at run time change nobody else's result.
 6. **Deterministic.** Two runs give byte-identical output; moving the reference date changes experience arithmetic and ends Drew's no-contact period, as it should.
-7. **102 synthetic scenarios** (`python3 tests/scenario_base.py`): 53 matching, 25 failures and fallbacks, 12 events, 12 identity (including three people called Maria Lopez: no email, two systems, and one person under a married name). Writing the last batch found five real defects, all fixed: a denial worded unusually was read as a yes; two people sharing an `info@` mailbox were merged; an unknown feed event became a job update; a record dated after its own export was trusted; a reopened job was announced as nonsense.
+7. **110 synthetic scenarios** (`python3 tests/scenario_base.py`): 53 matching, 25 failures and fallbacks, 20 events (8 of them several events at one moment), 12 identity (including three people called Maria Lopez: no email, two systems, and one person under a married name). Writing the last batch found five real defects, all fixed: a denial worded unusually was read as a yes; two people sharing an `info@` mailbox were merged; an unknown feed event became a job update; a record dated after its own export was trusted; a reopened job was announced as nonsense.
 8. **124 reworded sentences** (`python3 tests/test_rewording.py`). A "no" or "unsure" must never be read as a "yes", and a request not to be contacted must never be missed. The first run found **57 unsafe readings and 10 of 11 contact requests missed**: the reader had worked like a keyword finder ("My Washington license lapsed" counted as a license). Now: 0 unsafe, 11 of 11 caught, 28 of 30 plain yes sentences still read, the sample unchanged.
 9. **The model reader's guard** against stand-in models that say yes to everything, invent quotes, quote true words about something else, disagree, or crash: no false yes, no contact request lifted, nobody's tier raised on the sample. This tests the guard, not a model.
 10. **The checker** (`python3 -m shortlist audit`) is clean on all 176 results in the sample, both overlays, all scenarios and with the lying model on; twelve planted mistakes are each caught by their own check.
@@ -61,7 +61,7 @@ Run everything with `python3 -m unittest discover -s tests`: 187 tests.
 - **Nothing is verified.** Licenses, certificates and schedules are what a candidate or a record says.
 - **Identity is cautious.** Two records of one person sharing no email or reference stay apart.
 - **Experience arithmetic is simple.** Overlapping roles are merged; part-time work and gaps inside a role are not modelled.
-- **Two date-only facts on the same day** cannot be ordered.
+- **Two statements with the same timestamp cannot be ordered.** When they disagree the rule becomes a question showing both. Records dated only to the day share a timestamp, so this includes two conflicting records on one day.
 - **No fairness review yet.** No rule uses a protected attribute, but an adverse-impact analysis is needed before real use.
 
 ## How I would evaluate with the client

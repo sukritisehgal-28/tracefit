@@ -26,7 +26,7 @@ ORDER = ("setting", "skills", "depth", "evidence", "readiness", "pay")
 LABELS = {"setting": "Setting", "skills": "Skills", "depth": "Depth", "evidence": "Evidence",
           "readiness": "Readiness", "pay": "Pay"}
 DEFAULT_WEIGHTS = {"setting": 25, "skills": 20, "depth": 15, "evidence": 15, "readiness": 15, "pay": 10}
-PENALTY = {"disputed": 30, "unread_update": 30, "stale": 15}
+PENALTY = {"disputed": 30, "unread_update": 30, "same_moment": 30, "stale": 15}
 MEANS = {"setting": "Dated experience in the job's care setting",
          "skills": "Every skill and tool the job asks for",
          "depth": "Documented years at twice the minimum",
@@ -113,6 +113,7 @@ def compute(ctx, job, p, results) -> dict:
                 lost += cost
                 reasons.append({"disputed": f"{r.label.lower()}: a claim the records do not support",
                                 "unread_update": f"{r.label.lower()}: a newer message could not be read",
+                                "same_moment": f"{r.label.lower()}: two statements at the same moment disagree",
                                 "stale": f"{r.label.lower()}: answer is old"}[flag])
                 worst = worst or _first_ref(r)
     val = max(0.0, 100.0 - lost)

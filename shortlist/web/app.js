@@ -39,7 +39,7 @@ const OUT = {
 const TIER_ICON = { strong: "✓", possible: "○", clarify: "?", not_fit: "✕" };
 const FLAG = {
   provisional: "relies on a note not yet in the feed", pending_clarification: "a pending note would change this",
-  disputed: "conflicting claim", unread_update: "a newer message could not be read", replaced: "newer statement used", stale: "old information", alternative_route: "other-boards route",
+  disputed: "conflicting claim", unread_update: "a newer message could not be read", same_moment: "two statements at the same moment disagree", replaced: "newer statement used", stale: "old information", alternative_route: "other-boards route",
 };
 const KIND = {
   structured_record: "record", resume: "résumé", profile: "imported profile", candidate_message: "candidate message",

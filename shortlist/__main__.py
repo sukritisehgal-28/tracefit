@@ -8,6 +8,7 @@
     python3 -m shortlist health          list the data problems the tool worked around
     python3 -m shortlist audit           check every result against the product's own rules (audit.py)
     python3 -m shortlist worked          the worked four-candidate evaluation (--write updates docs/WORKED_EXAMPLE.md)
+    python3 -m shortlist burst           eight SYNTHETIC events at the same moment, delivered in many orders
 """
 from __future__ import annotations
 
@@ -91,7 +92,7 @@ def explain(engine: Engine, job_id: str, person_id: str, step: int) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(prog="shortlist", description="Rule-based candidate-job matching for recruiters.")
-    parser.add_argument("command", nargs="?", default="serve", choices=["serve", "replay", "coverage", "explain", "publish", "health", "audit", "worked"])
+    parser.add_argument("command", nargs="?", default="serve", choices=["serve", "replay", "coverage", "explain", "publish", "health", "audit", "worked", "burst"])
     parser.add_argument("args", nargs="*")
     parser.add_argument("--overlay", help="configuration overlay from config/overlays, e.g. feed_only")
     parser.add_argument("--step", type=int, help="replay step (0 = snapshot)")
@@ -99,6 +100,10 @@ def main() -> None:
     parser.add_argument("--write", action="store_true", help="worked: rewrite docs/WORKED_EXAMPLE.md")
     opts = parser.parse_args()
 
+    if opts.command == "burst":                  # several SYNTHETIC events at the same moment, on the supplied data
+        from .burst import render, run
+        print(render(run(opts.overlay)))
+        return
     if opts.command == "serve":
         from .server import serve
         serve(opts.port)

@@ -99,7 +99,7 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
     <span><b>5</b> sources, <b>3</b> destinations</span>
     <span><b>10</b> fit rules, <b>4</b> permission rules</span>
     <span><b>6</b> quality dimensions</span>
-    <span><b>187</b> tests, <b>102</b> scenarios</span>
+    <span><b>198</b> tests, <b>110</b> scenarios</span>
     <span>timed at <b>20,000</b> and <b>100,000</b> synthetic people</span>
   </div>
   <div class="key">
@@ -308,7 +308,7 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
     </tbody>
   </table></div>
   <p class="note">Before the 100,000 run the laptop had about 5 GB of swap in use by other apps, so its worst cases include waiting on the disk. The 20,000 run stays under 460 MB, worker runs included, and is the cleaner measurement. * The laptop's 100,000 run predates the single list per job. A clean 100,000 run on a 16-core cloud machine, after that change, gives 51 ms for this row and 6.0 s for a new job on one process.</p>
-  <p>The one-event path gives the same rows, totals and change messages as rebuilding everything from scratch. That is tested on the sample and on all 102 scenarios.</p>
+  <p>The one-event path gives the same rows, totals and change messages as rebuilding everything from scratch. That is tested on the sample and on all 110 scenarios. Events that share one timestamp give the same lists in any delivery order; two statements from one person at the same moment that disagree become a question showing both, and a job updated and filled at the same moment is treated as filled.</p>
 </section>
 <section>
   <h2>The same design as a running service</h2>

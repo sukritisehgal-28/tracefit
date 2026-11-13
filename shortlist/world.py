@@ -111,13 +111,15 @@ def _norm(attr: str, value):
 
 
 class Person:
-    __slots__ = ("key", "name", "name_basis", "profession", "records", "facts", "evidence_ids", "last_candidate_contact", "unclear")
+    __slots__ = ("key", "name", "name_basis", "profession", "records", "facts", "evidence_ids", "last_candidate_contact", "unclear",
+                 "contested")
 
     def __init__(self, key: str):
         self.key = key
         self.name = key
         self.name_basis = "id"            # stated | email | id : where the displayed name comes from
         self.unclear: list = []           # the candidate's own words the reader could not read with confidence, newest first
+        self.contested: list = []         # (attr, key, claims): statements recorded at the same moment that disagree
         self.profession = None
         self.records: list[str] = []
         self.facts: dict[tuple[str, str], Fact] = {}
@@ -410,13 +412,28 @@ class World:
         and the newest first within it. The default is newest first, whatever the source."""
         prec = self.cfg.get("precedence", {})
         rule = prec.get("attributes", {}).get(attr) or prec.get(kind, "newest")
-        if not isinstance(rule, list):
-            return sorted(claims, key=lambda c: c.observed_at, reverse=True)
+        if not isinstance(rule, list):                # the evidence id settles a tie, so the order never depends on arrival
+            return sorted(claims, key=lambda c: (-c.observed_at.timestamp(), c.evidence_id))
 
         def rank(c: Claim) -> int:
             src = self.evidence[c.evidence_id].source
             return next((i for i, entry in enumerate(rule) if entry in (src, c.basis)), len(rule))
-        return sorted(claims, key=lambda c: (rank(c), -c.observed_at.timestamp()))
+        return sorted(claims, key=lambda c: (rank(c), -c.observed_at.timestamp(), c.evidence_id))
+
+    def _same_moment(self, attr: str, key: str, claims: list[Claim]) -> list[Claim]:
+        """The statements about one fact that were recorded at the same moment as the one in force and say
+        something different. Neither can be called the later one, so the fact is a question, not an answer."""
+        if len(claims) < 2 or len({c.observed_at for c in claims}) == len(claims):
+            return []
+        decided = [c for c in claims if c.polarity in ("pos", "neg")] if attr in KEYED_ATTRS else claims
+        ordered = self._ordered(attr, decided)
+        if len(ordered) < 2:
+            return []
+        top = ordered[0]
+        said = (lambda c: c.polarity) if attr in KEYED_ATTRS else (lambda c: _norm(attr, c.value))
+        rivals = [c for c in ordered[1:] if c.observed_at == top.observed_at and said(c) != said(top)
+                  and self.root(c.evidence_id) != self.root(top.evidence_id)]
+        return [top] + rivals if rivals else []
 
     def _latest(self, attr: str, key: str, claims: list[Claim]) -> Fact:
         ordered = self._ordered(attr, claims, "job" if claims and claims[0].subject.startswith("job:") else "candidate")
@@ -494,6 +511,10 @@ class World:
                 p.facts[(attr, key)] = self._keyed(attr, key, group)
             elif attr in LATEST_ATTRS:
                 p.facts[(attr, key)] = self._latest(attr, key, group)
+            if attr in LATEST_ATTRS or attr in KEYED_ATTRS:
+                tied = self._same_moment(attr, key, group)
+                if tied:
+                    p.contested.append((attr, key, tied))
         local = subject.split(":")[-1]
         p.name, p.name_basis = self._display_name(p, local)
         self._issues[subject] = [] if any(e.kind == "structured_record" for e in evs) else [Issue(
@@ -551,6 +572,19 @@ class World:
                         j.titles.append(c.value)
             elif attr in JOB_META:
                 j.meta[attr] = self._latest(attr, key, group)
+                if attr == "status":
+                    # Two records of the job at the same moment, one open and one not: nobody is put forward
+                    # for a job that may be filled, whichever record happened to arrive first.
+                    top = j.meta[attr]
+                    rivals = [c for c in group if c.observed_at == top.observed_at and _norm(attr, c.value) != _norm(attr, top.value)]
+                    if rivals:
+                        shut = min((c for c in [*top.claims, *rivals] if str(c.value).lower() != "open"), key=lambda c: c.evidence_id, default=None)
+                        if shut is not None and str(top.value).lower() == "open":
+                            agree = [c for c in group if c.observed_at == shut.observed_at and _norm(attr, c.value) == _norm(attr, shut.value)]
+                            j.meta[attr] = self._fact(attr, key, "pos", shut.value, agree, [c for c in group if c not in agree])
+                        problems.append(Issue("warning", "all sources", f"job {number}",
+                                              "Two records of this job at the same moment disagree on whether it is open. "
+                                              f"It is treated as {j.meta[attr].value} until the feed settles."))
             elif attr.startswith(("req.", "note.")) and attr != "req.tag":
                 ordered = sorted(group, key=lambda c: (c.observed_at, not self.is_derived(c)), reverse=True)
                 feed = next((c for c in self._ordered(attr, ordered, "job") if c.version == "feed"), None)

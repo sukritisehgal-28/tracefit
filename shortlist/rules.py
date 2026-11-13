@@ -751,6 +751,7 @@ def evaluate(ctx: Ctx, job, p) -> tuple[list[Result], list[Result]]:
         r.refs, r.job_refs = _unique(r.refs), _unique(r.job_refs)
     for r in results:
         _unread_update(ctx, job, p, r)
+        _same_moment(ctx, p, r)
     for r in results:
         r.brief = _brief(ctx, job, p, r)
     return results, gates
@@ -804,6 +805,38 @@ def _unread_update(ctx: Ctx, job, p, r: Result) -> None:
                            f"so the older answer is not relied on ({ctx.cite(c)}).")
             r.questions.append(f"Ask {_first_name(p)} to confirm {r.label.lower()}: their message “{c.quote}” could not be read")
             return
+
+
+# Which of a person's facts each rule reads, so a disagreement about pay never unsettles the start date.
+RULE_FACTS = {"skills": ("skill",), "license": ("license",), "certifications": ("cert",), "location": ("location_interest", "pref_states", "travel", "home"),
+              "start_date": ("available_from",), "schedule": ("schedule", "weeks", "hours"), "shift_coverage": ("shift_availability", "occupied_days"),
+              "pay": ("pay",)}
+
+
+def _same_moment(ctx: Ctx, p, r: Result) -> None:
+    """Two statements recorded at the same moment that disagree cannot be put in order, so a rule decided on
+    either of them becomes a question. The answer is then the same whichever arrived first."""
+    if r.outcome not in (MET, NOT_MET) or not p.contested:
+        return
+    relied = {ref["evidence"] for ref in r.refs}
+    for attr, _key, claims in p.contested:
+        if attr not in RULE_FACTS.get(r.rule, ()) or not relied & {c.evidence_id for c in claims}:
+            continue
+        tied = {c.evidence_id for c in claims}
+        for ref in r.refs:                                    # neither statement replaced the other
+            if ref["evidence"] in tied and ref.get("note") == "replaced":
+                ref["note"] = ""
+        if "replaced" in r.flags and not any(ref.get("note") == "replaced" for ref in r.refs):
+            r.flags.remove("replaced")
+            r.notes[:] = [n for n in r.notes if not n.startswith("An earlier record said")]
+        said = " and ".join(f"“{c.quote}”" for c in claims[:3])
+        r.outcome = UNKNOWN
+        r.credit, r.low, r.high = float(ctx.scoring["unknown_credit"]), 0.0, 1.0
+        r.flags.append("same_moment")
+        r.shows = "Two statements at the same moment disagree"
+        r.notes.append(f"{said} were recorded at the same moment ({ctx.cite(claims[0])}), so neither is taken as the later one.")
+        r.questions.append(f"Ask {_first_name(p)} which is right: {said}")
+        return
 
 
 def _lower(text: str) -> str:
