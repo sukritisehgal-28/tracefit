@@ -342,6 +342,29 @@ def anthropic_provider(cfg: dict):
     return provider
 
 
+def openai_provider(cfg: dict):
+    """An OpenAI model over plain HTTPS (standard library only), with the same JSON schema, so the answer always
+    parses. Reads OPENAI_API_KEY from the environment. Not exercised in this repository's tests."""
+    import os
+    import urllib.request
+    key = os.environ.get("OPENAI_API_KEY")
+    if not key:
+        raise RuntimeError("OPENAI_API_KEY is not set")
+    model = os.environ.get("OPENAI_MODEL") or cfg.get("openai_model", "gpt-4o")
+
+    def provider(text, kind, vocabulary):
+        content = f"Document kind: {kind}\nVocabulary: {json.dumps(vocabulary)}\n\nDocument:\n<<<\n{text}\n>>>"
+        body = {"model": model, "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": content}],
+                "response_format": {"type": "json_schema", "json_schema": {"name": "facts", "strict": True, "schema": SCHEMA}}}
+        req = urllib.request.Request("https://api.openai.com/v1/chat/completions", data=json.dumps(body).encode(),
+                                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=90) as response:
+            message = json.loads(response.read())["choices"][0]["message"]
+        return [] if message.get("refusal") or not message.get("content") else json.loads(message["content"]).get("facts", [])
+    provider.model = model
+    return provider
+
+
 def make_reader(cfg: dict, provider=None):
     """The configured model reader, or None when it is off."""
     mcfg = cfg.get("model_reader", {})
@@ -359,7 +382,11 @@ def make_reader(cfg: dict, provider=None):
                 raise ValueError("model_reader.provider is 'anthropic' but allow_external_text is false. Sending candidate "
                                  "text to a model provider needs the client's agreement first.")
             provider = anthropic_provider(mcfg)
+        elif name == "openai":
+            if not mcfg.get("allow_external_text"):
+                raise ValueError("model_reader.provider is 'openai' but allow_external_text is false.")
+            provider = openai_provider(mcfg)
         else:
-            raise ValueError(f"model_reader.provider must be off, recorded or anthropic, not {name!r}")
+            raise ValueError(f"model_reader.provider must be off, recorded, anthropic or openai, not {name!r}")
     from .lexicon import Lexicon
     return ModelReader(provider, Lexicon(cfg), mcfg.get("model", name), Path(store) if store else None)

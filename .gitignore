@@ -6,3 +6,4 @@ out/
 *.tmp
 notes/
 .venv-model/
+.env

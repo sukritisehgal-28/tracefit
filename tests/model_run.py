@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -30,7 +31,7 @@ from shortlist import config  # noqa: E402
 from shortlist.config import deep_merge  # noqa: E402
 from shortlist.extract import Extractor  # noqa: E402
 from shortlist.lexicon import Lexicon  # noqa: E402
-from shortlist.model_reader import ModelReader, anthropic_provider, recorded  # noqa: E402
+from shortlist.model_reader import ModelReader, anthropic_provider, openai_provider, recorded  # noqa: E402
 from shortlist.pipeline import Engine  # noqa: E402
 import test_rewording as sweep  # noqa: E402
 
@@ -93,8 +94,20 @@ def everything_to_ask(model_id: str) -> dict:
     return asks
 
 
+def load_env() -> None:
+    """Reads keys from a .env file in the project folder (never committed), without printing them."""
+    env = ROOT / ".env"
+    if env.exists():
+        for line in env.read_text(encoding="utf-8").splitlines():
+            name, _, value = line.partition("=")
+            if name.strip() and value.strip() and not name.strip().startswith("#"):
+                os.environ.setdefault(name.strip(), value.strip().strip('"').strip("'"))
+
+
 def go_live(limit: int | None, stand_in: bool) -> None:
+    load_env()
     cfg = config.load()["model_reader"]
+    use_openai = bool(os.environ.get("OPENAI_API_KEY")) and not os.environ.get("ANTHROPIC_API_KEY")
     model_id = cfg.get("model", "claude-opus-5-5")
     asks = everything_to_ask(model_id)
     saved = json.loads(STORE.read_text(encoding="utf-8")) if STORE.exists() else {}
@@ -107,7 +120,7 @@ def go_live(limit: int | None, stand_in: bool) -> None:
             return []
     else:
         try:
-            provider = anthropic_provider(cfg)
+            provider = openai_provider(cfg) if use_openai else anthropic_provider(cfg)
         except ImportError:
             sys.exit("The anthropic package is not installed here. Install it first, for example:\n"
                      "  python3 -m venv .venv-model && .venv-model/bin/pip install anthropic\n"
@@ -130,7 +143,7 @@ def go_live(limit: int | None, stand_in: bool) -> None:
                 failed += 1
                 print(f"  {n}/{len(todo)} failed: {error}")
                 continue
-            saved[d] = {"model": "stand-in" if stand_in else model_id, "kind": kind, "evidence": "live run", "facts": facts if isinstance(facts, list) else []}
+            saved[d] = {"model": "stand-in" if stand_in else getattr(provider, "model", model_id), "kind": kind, "evidence": "live run", "facts": facts if isinstance(facts, list) else []}
             if n % 20 == 0 or n == len(todo):
                 print(f"  {n}/{len(todo)} answered")
     if stand_in:
