@@ -240,10 +240,8 @@ function card(m, job, twin, rank) {
         <div class="name"><span class="rank">${num(rank)}</span>${esc(m.name)}${same}${m.namesakes ? `<span class="tag" title="${num(m.namesakes)} other ${m.namesakes > 1 ? "people have" : "person has"} this name. They are different people: no record links them.">${esc(m.ref)} · same name as ${num(m.namesakes)} other${m.namesakes > 1 ? "s" : ""}</span>` : ""}</div>
         <div class="head">${esc([m.headline, m.home].filter(Boolean).join(" · "))}</div>
         ${watch}${good}${watch || good ? "" : `<div class="why">${esc(m.summary.split(". ")[0])}</div>`}
-        ${m.key && m.tier !== "not_fit" ? `<div class="keyev"><span class="q">“${esc(m.key.quote.length > 110 ? m.key.quote.slice(0, 108) + "…" : m.key.quote)}”</span> <span class="muted">${esc(m.key.source)}</span></div>` : ""}
         ${(m.found || []).map((f) => `<div class="keyev"><b>“${esc(f.phrase)}”</b> <span class="q">“${esc(f.quote.length > 110 ? f.quote.slice(0, 108) + "…" : f.quote)}”</span> <span class="muted">${esc(f.source)}</span></div>`).join("")}
         ${(m.links || []).length ? `<div class="keyev" data-stop="1">${m.links.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u.replace(/^https?:\/\//, "").slice(0, 48))}</a>`).join(" · ")}</div>` : ""}
-        ${m.also && m.also.length ? `<div class="also">Also on résumé: ${esc(m.also.slice(0, 3).join(" · "))}${m.also.length > 3 ? ` +${m.also.length - 3}` : ""}</div>` : ""}
         <div class="do ${m.action.status}"><span class="i" aria-hidden="true">${icon}</span>${esc(text)}</div>
       </div>
       <div class="right">${m.tier === "not_fit" ? "" : badge(m)}${score}${strip(m, job)}
@@ -262,9 +260,7 @@ function sameAs(list, i) {
   for (let k = i; k < list.length && list[k].same === list[i].same; k++) run.push(list[k]);
   const m = list[i], sameDocs = m.docs != null && run.every((x) => x.docs === m.docs);
   const ask = (m.apart || []).filter((d) => run.every((x) => (x.apart || []).some((y) => y.key === d.key))).map((d) => esc(d.text));
-  return `<div class="sameas"><b>${num(m.identical)} people have the same result on every rule</b>${sameDocs ? ", and their documents are word for word the same" : ""}.
-      Nothing on file tells them apart, so their order is arbitrary.
-      ${ask.length ? `<span class="ask">To tell them apart, ask each for: ${ask.join(" · ")}.</span>` : ""}</div>`;
+  return `<div class="sameas"><b>${num(m.identical)} people are level on every rule</b>${sameDocs ? ", with identical documents" : ""}, so their order is arbitrary.${ask.length ? ` To tell them apart, ask: ${ask.join(" · ")}.` : ""}</div>`;
 }
 
 function cards(list, job) {
@@ -274,7 +270,7 @@ function cards(list, job) {
     const above = list[i - 1], below = list[i + 1];
     if (S.filter === "best" && job.action_first && !cut && !ACTIONABLE.includes(m.action.status)) {
       cut = true;
-      html += `<div class="sect">Must not be contacted <span>${num(held)}</span><small>They meet every required rule, and are listed last because a recruiter cannot act on them.</small></div>`;
+      html += `<div class="sect">Must not be contacted <span>${num(held)}</span></div>`;
     }
     const joinsAbove = m.same != null && above && above.same === m.same, joinsBelow = m.same != null && below && below.same === m.same;
     if (joinsBelow && !joinsAbove) html += sameAs(list, i);
@@ -326,8 +322,7 @@ function flowView(job) {
   const why = (t) => Object.entries(r[t] || {}).sort((x, y) => y[1] - x[1]).map(([k, n]) => `${esc(k.toLowerCase())} ${num(n)}`).join(" · ");
   const pass = g.best - job.need_answer, held = (a.blocked || 0) + (a.none || 0);
   const aside = st.excluded_by_profession ? `<small>${num(st.excluded_by_profession)} in other professions were set aside first</small>` : "";
-  const out = g.not_fit ? `<div class="fnode"><b>${num(g.not_fit)}</b><span>not a fit: a required rule is not met</span><small>${why("not_fit")}</small>
-      <button class="linkish" data-act="filter" data-filter="not_fit">See them</button></div>` : "";
+  const out = g.not_fit ? `<div class="fnode"><b>${num(g.not_fit)}</b><span>not a fit</span><small>${why("not_fit")}</small></div>` : "";
   const used = ((job.process || {}).rules || []).filter((x) => x.level !== "soft" && x.met + x.unknown + x.not_met > 0).map((x) => x.label.toLowerCase());
   const w = currentWeights(), dims = S.data.meta.dimensions, total = dims.reduce((s, d) => s + (w[d.name] || 0), 0) || 1;
   const heavy = dims.slice().sort((x, y) => (w[y.name] || 0) - (w[x.name] || 0)).slice(0, 2).map((d) => `${d.label.toLowerCase()} ${Math.round(((w[d.name] || 0) / total) * 100)}%`);
@@ -346,16 +341,12 @@ function flowView(job) {
       <div class="flowhead"><b>How this list was made</b>
         <button class="btn plain small" data-act="process" aria-expanded="${S.process ? "true" : "false"}">${S.process ? "Hide the whole process" : "Show the whole process"}</button></div>
       <div class="flow">
-        <div class="fnode"><b>${num(st.people)}</b><span>people on file, each checked against every rule</span>${aside}</div>
+        <div class="fnode"><b>${num(st.people)}</b><span>people on file</span>${aside}</div>
         <div class="farrow" aria-hidden="true"></div>
         <div class="fnode win"><b>${num(g.best)}</b><span>on this list</span><small>${num(pass)} pass every required rule${job.need_answer ? ` · ${num(job.need_answer)} need an answer` : ""}</small></div>
         ${out ? '<div class="farrow off" aria-hidden="true"></div>' + out : ""}
       </div>
-      <div class="decided">
-        <div><div class="h">What decided it</div><ul class="points">${points}</ul></div>
-        <figure class="web"><figcaption class="h">Weights${S.weights ? " (yours)" : ""}</figcaption>${weightsWeb(job)}</figure>
-      </div>
-      ${S.process ? processView(job) : ""}
+      ${S.process ? `<div class="decided"><ul class="points">${points}</ul><figure class="web">${weightsWeb(job)}</figure></div>` + processView(job) : ""}
     </section>`;
 }
 
@@ -371,11 +362,10 @@ function rankBar(job) {
   const options = [`<option value="">As configured for this job</option>`].concat(S.data.meta.presets.map((p) =>
     `<option value="${esc(p.name)}" ${S.preset === p.name ? "selected" : ""}>${esc(p.label)}</option>`)).join("");
   const own = S.weights && !S.preset ? '<span class="tag">your weights</span>' : "";
-  const sliders = `<div class="sliders">${S.data.meta.dimensions.map((d) => `
+  const sliders = `<div class="sliders" title="Weights change the order and the score shown. They never move anyone past a required rule.">${S.data.meta.dimensions.map((d) => `
       <label class="slider"><span>${esc(d.label)}</span>
         <input type="range" min="0" max="50" step="5" value="${w[d.name]}" data-dim="${d.name}" id="w-${d.name}" aria-label="Weight for ${esc(d.label)}">
-        <b data-share="${d.name}">${Math.round((100 * w[d.name]) / total)}%</b></label>`).join("")}
-      <div class="muted small">Weights change the order and the score shown. They never move anyone past a required rule.</div></div>`;
+        <b data-share="${d.name}">${Math.round((100 * w[d.name]) / total)}%</b></label>`).join("")}</div>`;
   const chips = FILTER_CHIPS(job).map(([f, label]) => `<button class="chipbtn ${S.flt.has(f) ? "on" : ""}" data-act="flt" data-f="${esc(f)}" aria-pressed="${S.flt.has(f)}">${esc(label)}</button>`).join("");
   // Criteria the recruiter typed. Each is a chip; clicking it removes it.
   const mine = [...S.flt].filter((f) => OWN_LABEL[f.split(":")[0]]).map((f) => {
@@ -400,7 +390,7 @@ function jobView(job) {
   const changed = job.requirements.filter((l) => l.status === "provisional" || l.status === "pending");
   const names = [...new Set(changed.map((l) => l.label.toLowerCase()))].join(" and ");
   const alert = !changed.length ? "" : `<div class="alert">${changed[0].status === "provisional"
-    ? `The account manager's note is ahead of the vendor feed on ${esc(names)}. Matches that rely on it say so.`
+    ? `The account manager's note is ahead of the vendor feed on ${esc(names)}.`
     : `A note not yet in the vendor feed would change ${esc(names)}. It is not being used.`}
     <button class="linkish" data-act="details">${S.details ? "Hide" : "See"} details</button></div>`;
   const ids = Object.entries(job.ids).map(([k, v]) => `${k.toUpperCase()} ${v}`).join(" · ");
@@ -425,10 +415,9 @@ function jobView(job) {
   const legend = `<span class="legend"><i class="met"></i>met <i class="caution"></i>met, to check <i class="unknown"></i>unknown <i class="not_met"></i>not met</span>`;
   const title = S.filter === "not_fit"
     ? `<b>Not a fit · ${num(totals.not_fit)}</b> <button class="linkish" data-act="filter" data-filter="best">Back to the list</button>`
-    : `<b>${num(totals.best)} ${totals.best === 1 ? "person" : "people"}</b>${job.need_answer ? ` · ${num(job.need_answer)} need${job.need_answer > 1 ? "" : "s"} an answer` : ""}`;
-  const lead = S.filter === "not_fit" ? "A required rule is not met as posted. Each card says which."
-    : "Best fit first. Someone who needs an answer sits where their score puts them, with what is missing.";
-  const note = `<div class="listhead"><span>${title}</span>${legend}</div><div class="muted small" style="margin:0 2px 8px">${lead}</div>`;
+    : `<b>${num(totals.best)} ${totals.best === 1 ? "person" : "people"}</b>${job.need_answer ? ` · ${num(job.need_answer)} need${job.need_answer > 1 ? "" : "s"} an answer` : ""}`
+      + (totals.not_fit ? ` · <button class="linkish" data-act="filter" data-filter="not_fit">${num(totals.not_fit)} not a fit</button>` : "");
+  const note = `<div class="listhead"><span>${title}</span>${legend}</div>`;
   const left = shown.total - list.length;
   const more = left > 0 ? `<div class="morerow"><button class="btn plain" data-act="more">Show next ${num(Math.min(S.data.meta.top_n, left))}</button>
       <span class="muted small">Showing the top ${num(list.length)} of ${num(shown.total)}</span></div>` : "";
@@ -473,17 +462,16 @@ function backgroundView(b, name) {
   const sec = (title, body) => (body ? `<div class="bgsec"><div class="k">${title}</div>${body}</div>` : "");
   const head = Object.keys(b.header).length ? `<div class="muted small">${esc([b.header.name, b.header.home, b.header.email].filter(Boolean).join(" · "))}</div>` : "";
   const src = b.sources.map((s) => `${esc(s.label)}, ${when(s.at, true)}`).join(" · ");
-  return `<h3>Background</h3>
+  return `<details class="fold" ${S.everything ? "open" : ""}><summary>Background, as written by ${esc(name)}</summary>
     <div class="bg">${head}
       ${sec("Links", (b.links || []).length ? `<ul>${b.links.map((l) => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.url.replace(/^https?:\/\//, ""))}</a> <span class="muted small">· ${esc(l.source)}</span></li>`).join("")}</ul>` : "")}
       ${sec("Experience", roles ? `<ul class="roles">${roles}</ul>` : "")}
       ${sec("Skills", b.skills.length ? `<div class="chips">${b.skills.map(chip).join("")}</div>` : "")}
       ${sec("Education", b.education.length ? `<ul>${list(b.education)}</ul>` : "")}
       ${sec("Licenses and certificates, as reported", b.credentials.length ? `<ul>${list(b.credentials)}</ul>` : "")}
-      ${b.summary.length ? sec("Summary", `<ul>${b.summary.map((i) => `<li>${esc(i.text)}</li>`).join("")}</ul>`) : ""}
       ${b.not_stated.length ? `<details ${S.everything ? "open" : ""}><summary>What these documents do not state (${b.not_stated.length})</summary><ul>${b.not_stated.map((i) => `<li>${esc(i.text)}</li>`).join("")}</ul></details>` : ""}
-      <div class="muted small">As written by ${esc(name)} in: ${src}. Solid skills are checked by the rules; outlined ones are listed only.</div>
-    </div>`;
+      <div class="muted small">From: ${src}.</div>
+    </div></details>`;
 }
 
 // A radar of the quality dimensions: one polygon per person, the range shown dashed where answers are missing.
@@ -527,7 +515,7 @@ function drawer() {
   const applies = m.results.filter((r) => r.outcome !== "na"), na = m.results.filter((r) => r.outcome === "na");
   const range = m.low !== m.high ? ` Between ${m.low} and ${m.high} once the open questions are answered.` : "";
   const steps = m.action.steps.length ? `<ol>${m.action.steps.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>` : "";
-  const similar = m.band ? `<h3>Place in the list</h3><div class="small">${m.identical > 1 ? `Same result on every rule as ${m.identical - 1} other${m.identical > 2 ? "s" : ""}. ` : ""}${esc(m.decided_by || "Listed first among people with a similar score.")}</div>` : "";
+  const similar = m.band ? `<div class="muted small" style="margin-top:8px">${m.identical > 1 ? `Same result on every rule as ${m.identical - 1} other${m.identical > 2 ? "s" : ""}. ` : ""}${esc(m.decided_by || "Listed first among people with a similar score.")}</div>` : "";
   return `<div class="scrim" data-act="close"></div>
     <aside class="drawer" role="dialog" aria-label="${esc(m.name)}">
       <button class="x" data-act="close" aria-label="Close">✕</button>
@@ -546,8 +534,7 @@ function drawer() {
       ${na.length ? (S.showNA || S.everything ? na.map(ruleRow).join("") : `<div style="border-top:1px solid var(--line);padding:10px 0"><button class="linkish" data-act="na">Show ${na.length} rules that do not apply to this job</button></div>`) : ""}
       <h3>Permission to act</h3>
       ${m.gates.map(ruleRow).join("")}
-      <h3>On file</h3>
-      <details ${S.everything ? "open" : ""}><summary>Everything on file for ${esc(m.name)} (${p.evidence_ids.length})</summary>
+      <details class="fold" ${S.everything ? "open" : ""}><summary>Everything on file for ${esc(m.name)} (${p.evidence_ids.length})</summary>
         <div class="muted small" style="margin-top:6px">${esc(p.records.join(" · "))}</div>${p.evidence_ids.map(fileBlock).join("")}</details>
     </aside>`;
 }
@@ -583,7 +570,7 @@ function popover() {
     const steps = m.steps.map((s, i) => `<button class="opt ${i === m.step ? "on" : ""}" data-act="step" data-step="${i}">
         <span class="n">${i + 1}</span><span><b>${esc(names[s.kind] || s.label)}</b><br><span class="muted small">${hhmm(s.at)} UTC · ${esc(s.id ? s.label : `${m.sources.length} sources loaded, ${num(m.people)} people`)}</span></span></button>`).join("");
     const options = ['<option value="">Use account-manager notes, flagged</option>'].concat(m.overlays.map((o) => `<option value="${esc(o.name)}">${esc(o.label)}</option>`)).join("");
-    return `<div class="popover"><h2>Demo</h2><div class="muted small">Replay the sample events. The page reacts as it would for a recruiter.</div>${steps}
+    return `<div class="popover"><h2>Demo</h2>${steps}
       <h3>Settings profile</h3><select id="overlay" aria-label="Settings profile">${options}</select>
       <div class="muted small" style="margin-top:8px">Reference date ${esc(m.reference_label)}. The sample data is fictional.</div></div>`;
   }

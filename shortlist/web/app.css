@@ -277,3 +277,9 @@ table.grid tr.diff td { background: var(--warn-wash); }
 .sameas b { color: var(--ink2); font-weight: 600; }
 .sameas .ask { display: block; margin-top: 2px; color: var(--ink2); }
 @media (max-width: 720px) { .decided { grid-template-columns: minmax(0, 1fr); } .web .radar { max-width: 230px; } }
+
+/* Folded sections of the person panel: background and everything on file. */
+details.fold { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
+details.fold > summary { font-size: 13px; }
+details.fold .bg { margin-top: 10px; }
+.sameas { padding-bottom: 2px; }
