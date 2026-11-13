@@ -287,7 +287,7 @@ const LEVEL_WORD = { hard: "Required", from_job: "Required when the job asks for
 const TIE_WORD = { action_readiness: "who can be acted on sooner", fewer_open_questions: "who has fewer open questions", most_recent_candidate_contact: "who was heard from more recently" };
 
 function weightsWeb(job, size = 230) {
-  const w = currentWeights(), dims = S.data.meta.dimensions, total = dims.reduce((a, d) => a + (w[d.name] || 0), 0) || 1;
+  const w = currentWeights(), dims = usedDims(job), total = shareTotal(w, job);
   const share = (d) => Math.round(((w[d.name] || 0) / total) * 100), top = Math.max(...dims.map(share), 1);
   const desc = "Weights: " + dims.map((d) => `${d.label} ${share(d)}%`).join(", ");
   return radar([{ name: "Weights", values: dims.map((d) => (share(d) / top) * 100) }], dims.map((d) => ({ label: `${d.label} ${share(d)}%` })), size, desc);
@@ -295,12 +295,12 @@ function weightsWeb(job, size = 230) {
 
 function processView(job) {
   const p = job.process || { rules: [], gates: [] }, meta = S.data.meta, w = currentWeights();
-  const total = meta.dimensions.reduce((a, d) => a + (w[d.name] || 0), 0) || 1;
+  const total = shareTotal(w, job);
   const used = p.rules.filter((r) => r.met + r.unknown + r.not_met > 0);
   const cell = (n, cls) => `<td class="num ${n ? cls : "zero"}">${num(n)}</td>`;
   const rules = used.map((r) => `<tr><td>${esc(r.label)}<small>${LEVEL_WORD[r.level] || "Required"}</small></td>${cell(r.met, "")}${cell(r.unknown, "warn")}${cell(r.not_met, "bad")}</tr>`).join("");
   const unused = p.rules.filter((r) => !used.includes(r)).map((r) => r.label.toLowerCase());
-  const dims = meta.dimensions.map((d) => `<tr><td>${esc(d.label)}</td><td class="num">${Math.round(((w[d.name] || 0) / total) * 100)}%</td><td>${esc(d.means)}</td></tr>`).join("");
+  const dims = usedDims(job).map((d) => `<tr><td>${esc(d.label)}</td><td class="num">${Math.round(((w[d.name] || 0) / total) * 100)}%</td><td>${esc(d.means)}</td></tr>`).join("");
   const acts = Object.entries(job.best_actions).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<li><b>${num(n)}</b> ${ACTION_WORD[k] || esc(k)}</li>`).join("");
   const ties = (job.order.tie_breakers || []).map((t) => TIE_WORD[t] || t).join(", then ");
   const st = job.stats || { people: 0, evaluated: 0 };
@@ -309,7 +309,7 @@ function processView(job) {
       <li><b>Check the required rules.</b> ${num(st.evaluated)} people are checked against each rule this job uses.
         <div class="tablewrap"><table class="grid tight"><thead><tr><th>Rule</th><th class="num">Met</th><th class="num">No answer yet</th><th class="num">Not met</th></tr></thead><tbody>${rules}</tbody></table></div>
         <span class="muted small">A rule not met means not a fit. No answer yet means needs an answer.${unused.length ? ` This job does not use: ${esc(unused.join(", "))}.` : ""}</span></li>
-      <li><b>Score.</b> Everyone on the list gets six marks out of 100, combined with the weights${S.weights ? " you set" : ""}.
+      <li><b>Score.</b> Everyone on the list gets up to six marks out of 100, combined with the weights${S.weights ? " you set" : ""}. A mark the posting gives nothing to measure is left out.
         <div class="tablewrap"><table class="grid tight"><thead><tr><th>Mark</th><th class="num">Weight</th><th>100 means</th></tr></thead><tbody>${dims}</tbody></table></div></li>
       <li><b>Order.</b> Highest score first. Scores within ${num(job.order.tie_margin)} points are marked comparable${ties ? `; between them the order goes to ${esc(ties)}` : ""}. People level on everything are grouped and their order is arbitrary. Anyone who must not be contacted is listed last.</li>
       <li><b>Next action.</b> Permission is checked separately from fit: is the job open, may the person be contacted, who owns the relationship. Of the ${num(job.groups.best)} on the list:<ul>${acts}</ul></li>
@@ -324,7 +324,7 @@ function flowView(job) {
   const aside = st.excluded_by_profession ? `<small>${num(st.excluded_by_profession)} in other professions were set aside first</small>` : "";
   const out = g.not_fit ? `<div class="fnode"><b>${num(g.not_fit)}</b><span>not a fit</span><small>${why("not_fit")}</small></div>` : "";
   const used = ((job.process || {}).rules || []).filter((x) => x.level !== "soft" && x.met + x.unknown + x.not_met > 0).map((x) => x.label.toLowerCase());
-  const w = currentWeights(), dims = S.data.meta.dimensions, total = dims.reduce((s, d) => s + (w[d.name] || 0), 0) || 1;
+  const w = currentWeights(), dims = usedDims(job), total = shareTotal(w, job);
   const heavy = dims.slice().sort((x, y) => (w[y.name] || 0) - (w[x.name] || 0)).slice(0, 2).map((d) => `${d.label.toLowerCase()} ${Math.round(((w[d.name] || 0) / total) * 100)}%`);
   const versions = job.requirements.filter((q) => q.status === "provisional" && q.other).map((q) =>
     `<li><b>${esc(q.label)}:</b> using “${esc(q.text)}” from the newer note. ${esc(q.other.role)} still says “${esc(q.other.text)}”.</li>`).join("");
@@ -332,7 +332,7 @@ function flowView(job) {
     used.length ? `<li><b>Who is on the list</b> is decided by the required rules, never by weights: ${esc(used.join(", "))}.</li>` : "",
     job.need_answer ? `<li><b>${num(job.need_answer)} need an answer</b> because a required rule has no answer yet: ${why("clarify")}.</li>` : "",
     g.not_fit ? `<li><b>${num(g.not_fit)} are not a fit</b> because a required rule is not met: ${why("not_fit")}.</li>` : "",
-    `<li><b>The order</b> is by score, the weighted average of six marks. Heaviest${S.weights ? " in your weights" : ""}: ${esc(heavy.join(", "))}.</li>`,
+    `<li><b>The order</b> is by score, the weighted average of up to six marks. Heaviest${S.weights ? " in your weights" : ""}: ${esc(heavy.join(", "))}.</li>`,
     versions,
     held ? `<li><b>${num(held)} must not be contacted</b> and ${held > 1 ? "are" : "is"} listed last, whatever the score.</li>` : "",
     `<li>${job.openings ? `<b>${num(job.openings)} opening${job.openings > 1 ? "s" : ""}.</b>` : "<b>No source says how many people this job needs</b>, so the list is not cut off."}</li>`,
@@ -354,18 +354,22 @@ function flowView(job) {
 // whole list on the server; nobody moves between Matches, Needs an answer and Not a fit, because those are
 // decided by the required rules, not by weights.
 const currentWeights = () => ({ ...(S.weights || currentJob().weights) });
+// The marks this job gives the score something to measure. One the posting says nothing about is left out of
+// every score, so it takes no share here either.
+const usedDims = (job = currentJob()) => S.data.meta.dimensions.filter((d) => !(job.dims_used || []).length || job.dims_used.includes(d.name));
+const shareTotal = (w, job) => usedDims(job).reduce((a, d) => a + (w[d.name] || 0), 0) || 1;
 const FILTER_CHIPS = (job) => [["act_now", "Can act now"], ["recent:30", "Replied in the last 30 days"], ["no_questions", "Nothing to ask the candidate"],
   ["min:evidence:80", "Evidence holds up"]].concat(job.skills.map((s) => [`skill:${s.key}`, `Has ${s.label}`]));
 const OWN_LABEL = { text: (v) => `Says “${v}”`, school: (v) => `Studied at “${v}”` };
 function rankBar(job) {
-  const w = currentWeights(), total = Object.values(w).reduce((a, b) => a + b, 0) || 1;
+  const w = currentWeights(), total = shareTotal(w, job), used = new Set(usedDims(job).map((d) => d.name));
   const options = [`<option value="">As configured for this job</option>`].concat(S.data.meta.presets.map((p) =>
     `<option value="${esc(p.name)}" ${S.preset === p.name ? "selected" : ""}>${esc(p.label)}</option>`)).join("");
   const own = S.weights && !S.preset ? '<span class="tag">your weights</span>' : "";
   const sliders = `<div class="sliders" title="Weights change the order and the score shown. They never move anyone past a required rule.">${S.data.meta.dimensions.map((d) => `
-      <label class="slider"><span>${esc(d.label)}</span>
-        <input type="range" min="0" max="50" step="5" value="${w[d.name]}" data-dim="${d.name}" id="w-${d.name}" aria-label="Weight for ${esc(d.label)}">
-        <b data-share="${d.name}">${Math.round((100 * w[d.name]) / total)}%</b></label>`).join("")}</div>`;
+      <label class="slider${used.has(d.name) ? "" : " off"}"${used.has(d.name) ? "" : ' title="This posting says nothing this mark could score, so it is left out for this job."'}><span>${esc(d.label)}</span>
+        <input type="range" min="0" max="50" step="5" value="${w[d.name]}" data-dim="${d.name}" id="w-${d.name}" aria-label="Weight for ${esc(d.label)}" ${used.has(d.name) ? "" : "disabled"}>
+        <b ${used.has(d.name) ? `data-share="${d.name}"` : ""}>${used.has(d.name) ? Math.round((100 * w[d.name]) / total) + "%" : "n/a"}</b></label>`).join("")}</div>`;
   const chips = FILTER_CHIPS(job).map(([f, label]) => `<button class="chipbtn ${S.flt.has(f) ? "on" : ""}" data-act="flt" data-f="${esc(f)}" aria-pressed="${S.flt.has(f)}">${esc(label)}</button>`).join("");
   // Criteria the recruiter typed. Each is a chip; clicking it removes it.
   const mine = [...S.flt].filter((f) => OWN_LABEL[f.split(":")[0]]).map((f) => {
@@ -393,6 +397,8 @@ function jobView(job) {
     ? `The account manager's note is ahead of the vendor feed on ${esc(names)}.`
     : `A note not yet in the vendor feed would change ${esc(names)}. It is not being used.`}
     <button class="linkish" data-act="details">${S.details ? "Hide" : "See"} details</button></div>`;
+  const unread = (job.unread || []).length ? `<div class="alert">${num(job.unread.length)} sentence${job.unread.length > 1 ? "s" : ""} in this posting could not be read, so no rule checks ${job.unread.length > 1 ? "them" : "it"}:
+    ${job.unread.map((t) => `“${esc(t)}”`).join(" · ")}. Check ${job.unread.length > 1 ? "them" : "it"} before relying on a match.</div>` : "";
   const ids = Object.entries(job.ids).map(([k, v]) => `${k.toUpperCase()} ${v}`).join(" · ");
   const details = !S.details ? "" : `<div class="reqs">${job.requirements.map(reqLine).join("")}</div>
     ${job.notes.map((n) => `<div class="note">${esc(n.text)} ${srcOf(n.ref)}</div>`).join("")}
@@ -402,7 +408,7 @@ function jobView(job) {
       <h1>${esc(job.title)}${job.new ? '<span class="new">New</span>' : ""}</h1>
       <div class="sub">${esc([job.facility, job.place].filter(Boolean).join(" · "))}</div>
       <div class="facts">${facts.map((f) => `<span class="fact">${esc(f)}</span>`).join("")}</div>
-      ${alert}
+      ${alert}${unread}
       ${changed.length ? "" : `<div style="margin-top:10px"><button class="linkish" data-act="details">${S.details ? "Hide" : "Job"} details</button></div>`}
       ${details}</section>`;
   const serious = S.data.issues.filter((i) => i.severity !== "info").length;
@@ -693,7 +699,7 @@ document.addEventListener("input", (e) => {           // a slider moving: show t
   if (!e.target.dataset.dim) return;
   const w = currentWeights();
   w[e.target.dataset.dim] = Number(e.target.value);
-  const total = Object.values(w).reduce((a, b) => a + b, 0) || 1;
+  const total = shareTotal(w);
   document.querySelectorAll("[data-share]").forEach((el) => { el.textContent = `${Math.round((100 * w[el.dataset.share]) / total)}%`; });
 });
 

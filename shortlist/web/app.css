@@ -283,3 +283,5 @@ details.fold { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--
 details.fold > summary { font-size: 13px; }
 details.fold .bg { margin-top: 10px; }
 .sameas { padding-bottom: 2px; }
+
+.slider.off { opacity: .5; }

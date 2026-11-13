@@ -293,6 +293,15 @@ def rank(matches: list[Match], scoring: dict) -> None:
             m.decided_by = "Nothing separates this person from the one below: the score and every tie-breaker are level, so the order is arbitrary."
 
 
+def _number(text: str) -> float:
+    """A number a filter carries, or 0 when it is not one (a mistyped filter narrows nothing and breaks nothing)."""
+    try:
+        value = float(text or 0)
+    except ValueError:
+        return 0.0
+    return value if 0 <= value <= 100 else 0.0
+
+
 def _passes(world, m: Match, filters, today) -> bool:
     """A recruiter's filters. Each narrows the list; none changes anyone's result.
         act_now        the next action is to reach out or to hand over to the owning recruiter
@@ -308,7 +317,7 @@ def _passes(world, m: Match, filters, today) -> bool:
         if kind == "act_now" and m.action["status"] not in ("ready", "route"):
             return False
         if kind == "recent":
-            days = int(rest or 30)
+            days = int(rest) if rest.isascii() and rest.isdigit() and len(rest) <= 5 else 30
             if not m.last_heard or (today - datetime.fromtimestamp(m.last_heard, timezone.utc).date()).days > days:
                 return False
         if kind == "no_questions" and m.open_questions - len(m.asks) > 0:
@@ -328,7 +337,7 @@ def _passes(world, m: Match, filters, today) -> bool:
         if kind == "min":
             name, _, n = rest.partition(":")
             d = dict(zip(dimensions.ORDER, m.dims)).get(name)
-            if d is None or d[0] < float(n or 0):
+            if d is None or d[0] < _number(n):
                 return False
     return True
 

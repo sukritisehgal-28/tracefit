@@ -110,14 +110,24 @@ def main() -> None:
         from .server import serve
         serve(opts.port)
         return
-    engine = Engine(overlay=opts.overlay)
+    try:
+        engine = Engine(overlay=opts.overlay)
+    except ValueError as exc:                      # an unknown settings profile, or a setting that cannot be right
+        from .config import list_overlays
+        raise SystemExit(f"{exc}\nSettings profiles available: {', '.join(o['name'] for o in list_overlays())}") from None
     last = len(engine.events)
     if opts.command == "replay":
         replay(engine)
     elif opts.command == "coverage":
         coverage(engine)
     elif opts.command == "explain":
-        explain(engine, opts.args[0], opts.args[1], last if opts.step is None else opts.step)
+        if len(opts.args) != 2:
+            raise SystemExit("explain needs a job and a person, for example: python3 -m shortlist explain VMS-901 C2")
+        try:
+            explain(engine, opts.args[0], opts.args[1], last if opts.step is None else opts.step)
+        except StopIteration:
+            raise SystemExit(f"No job {opts.args[0]!r} with a person {opts.args[1]!r} at this step. "
+                             "Run python3 -m shortlist replay to see the jobs and people on file.") from None
     elif opts.command == "health":
         found = engine.issues(last if opts.step is None else opts.step)
         print(f"{len(found)} data problem{'s' if len(found) != 1 else ''} worked around." if found else "No data problems found.")
@@ -126,6 +136,9 @@ def main() -> None:
     elif opts.command == "worked":
         from pathlib import Path
         from .worked import render
+        if opts.overlay:
+            raise SystemExit("The worked example is written for the default settings. Run it without --overlay; "
+                             "use replay or explain to see another settings profile.")
         text = render(engine)
         if opts.write:
             Path(engine.root, "docs", "WORKED_EXAMPLE.md").write_text(text, encoding="utf-8")

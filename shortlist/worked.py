@@ -20,7 +20,10 @@ MARK = {"met": "✓ met", "not_met": "✕ not met", "unknown": "? unknown", "na"
 
 def _cell(text: str, n: int = 70) -> str:
     text = " ".join(str(text).split()).replace("|", "/")
-    return text if len(text) <= n else text[: n - 1] + "…"
+    if len(text) <= n:
+        return text
+    cut = text[: n - 1]
+    return (cut[: cut.rfind(" ")] if " " in cut[n // 2:] else cut).rstrip(" ,;:(") + "…"      # cut between words
 
 
 def render(engine) -> str:
@@ -82,9 +85,8 @@ def render(engine) -> str:
         q = [x for x in m.questions if not x.startswith("Confirm the requirement change")]
         ask = f" Next question: {q[0][0].lower() + q[0][1:]}." if q else ""
         out.append(f"- **{m.name}** ({m.score}): {_cell(m.action['label'], 90)}.{ask}")
-    out += ["", "Under the earlier scoring, which counted rules met, R01 and R04 both scored 100 and could not be told apart. "
-            "The quality score now puts R04 lower for a claim its records do not support, and R06 lower for asking above the "
-            "rate, and every point traces to a quote the page shows on click. Blair needs two answers, so half of Blair's "
-            "score is unknown and Blair sits low on the list; someone who needs an answer but scores high would sit near the "
-            "top, where the missing answer is worth chasing.", ""]
+    out += ["", "R04 sits below R01 for a claim its records do not support, and R06 for asking above the rate. Every point "
+            "traces to a quote the page shows on click. Blair needs two answers, so three of Blair's six marks, carrying "
+            "60% of the weight, are unknown and Blair sits low on the list; someone who needs an answer but scores high "
+            "would sit near the top, where the missing answer is worth chasing.", ""]
     return "\n".join(out)

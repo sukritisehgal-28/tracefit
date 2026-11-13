@@ -15,8 +15,8 @@ Required rules. Failing one means *not a fit*, and the person is off the list wh
 | Rule | Candidate R01 | Candidate R04 | Candidate R06 | Blair Sample |
 |---|---|---|---|---|
 | Profession | ✓ met: Physical Therapist | ✓ met: Physical Therapist | ✓ met: Physical Therapist | ✓ met: Physical Therapist |
-| Experience in this setting | ✓ met: Home health since May 2025: 1 yr 6 mo as of 7 N… | ✓ met: Home health since May 2025: 1 yr 6 mo as of 7 N… | ✓ met: Home health since May 2025: 1 yr 6 mo as of 7 N… | ? unknown: Home health experience not answered |
-| Skills and tools | ✓ met: OASIS: described; Homecare Homebase: described | ✓ met: OASIS: described; Homecare Homebase: described | ✓ met: OASIS: described; Homecare Homebase: described | ? unknown: OASIS: not answered; Homecare Homebase: not ans… |
+| Experience in this setting | ✓ met: Home health since May 2025: 1 yr 6 mo as of 7… | ✓ met: Home health since May 2025: 1 yr 6 mo as of 7… | ✓ met: Home health since May 2025: 1 yr 6 mo as of 7… | ? unknown: Home health experience not answered |
+| Skills and tools | ✓ met: OASIS: described; Homecare Homebase: described | ✓ met: OASIS: described; Homecare Homebase: described | ✓ met: OASIS: described; Homecare Homebase: described | ? unknown: OASIS: not answered; Homecare Homebase: not… |
 | License | ✓ met: Reports an active Washington license | ✓ met: Reports an active Washington license | ✓ met: Reports an active Washington license | ✓ met: Reports an active Washington license |
 | Location | ✓ met: Said they are open to Spokane | ✓ met: Said they are open to Spokane | ✓ met: Said they are open to Spokane | ✓ met: Lives in Spokane, Washington |
 | Start date | ✓ met: Can start 1 Dec 2026 | ✓ met: Can start 1 Dec 2026 | ✓ met: Can start 1 Dec 2026 | ✓ met: Can start 1 Dec 2026 |
@@ -29,12 +29,12 @@ For everyone on the list. Six dimensions, 0 to 100, weighted as configured for t
 
 | Dimension (weight) | Candidate R01 | Candidate R04 | Candidate R06 | Blair Sample |
 |---|---|---|---|---|
-| Setting (25%) | **100**: Home health since May 2025: 1 yr 6 mo as of 7 Nov 2… | **100**: Home health since May 2025: 1 yr 6 mo as of 7 Nov 2… | **100**: Home health since May 2025: 1 yr 6 mo as of 7 Nov 2… | **50** (0–100): Home health experience not answered |
+| Setting (25%) | **100**: Home health since May 2025: 1 yr 6 mo as of 7 Nov… | **100**: Home health since May 2025: 1 yr 6 mo as of 7 Nov… | **100**: Home health since May 2025: 1 yr 6 mo as of 7 Nov… | **50** (0–100): Home health experience not answered |
 | Skills (20%) | **100**: OASIS: described; Homecare Homebase: described | **100**: OASIS: described; Homecare Homebase: described | **100**: OASIS: described; Homecare Homebase: described | **50** (0–100): OASIS: not answered; Homecare Homebase: not answered |
 | Depth (15%) | **51**: 1 yr 6 mo documented against a 1 year minimum | **51**: 1 yr 6 mo documented against a 1 year minimum | **51**: 1 yr 6 mo documented against a 1 year minimum | **50** (0–100): Years in this setting not known |
-| Evidence (15%) | **100**: Nothing contradicts or outdates the facts used | **70**: Experience in this setting: a claim the records do … | **100**: Nothing contradicts or outdates the facts used | **100**: Nothing contradicts or outdates the facts used |
-| Readiness (15%) | **100**: 2 of 2 availability checks met; last replied 1 day … | **100**: 2 of 2 availability checks met; replied on the refe… | **100**: 2 of 2 availability checks met; replied on the refe… | **78**: 2 of 2 availability checks met; no reply on record |
-| Pay (10%) | **100**: Needs at least $2,400/week: $50/week under the appr… | **100**: Needs at least $2,400/week: $50/week under the appr… | **80**: Needs at least $2,500/week: $50/week (2.0%) above t… | **100**: Expects $2,400/week: $50/week under the approved ra… |
+| Evidence (15%) | **100**: Nothing contradicts or outdates the facts used | **70**: Experience in this setting: a claim the records do… | **100**: Nothing contradicts or outdates the facts used | **100**: Nothing contradicts or outdates the facts used |
+| Readiness (15%) | **100**: 2 of 2 availability checks met; last replied 1 day… | **100**: 2 of 2 availability checks met; replied on the… | **100**: 2 of 2 availability checks met; replied on the… | **78**: 2 of 2 availability checks met; no reply on record |
+| Pay (10%) | **100**: Needs at least $2,400/week: $50/week under the… | **100**: Needs at least $2,400/week: $50/week under the… | **80**: Needs at least $2,500/week: $50/week (2.0%) above… | **100**: Expects $2,400/week: $50/week under the approved… |
 | **Score** | **93** | **88** | **91** | **67** (37–97) |
 | **Tier** | Match | Match | Match | Needs an answer |
 | **Place in the list** | 1 of 12 | 7 of 12 | 6 of 12 | 11 of 12 |
@@ -46,7 +46,7 @@ For everyone on the list. Six dimensions, 0 to 100, weighted as configured for t
 | Job is open | ✓ clear: The job is open | ✓ clear: The job is open | ✓ clear: The job is open | ✓ clear: The job is open |
 | Contact permission | ✓ clear: No contact restriction is on record | ✓ clear: No contact restriction is on record | ✓ clear: No contact restriction is on record | ✓ clear: No contact restriction is on record |
 | Recruiter ownership | ✓ clear: No owner is on record | ✓ clear: No owner is on record | ✓ clear: No owner is on record | → owner: Opportunities go through recruiter R2 |
-| Requirement source | ! confirm: This result relies on a note the vendor fee… | ! confirm: This result relies on a note the vendor fee… | ! confirm: This result relies on a note the vendor fee… | ✓ clear: Nothing in this result depends on a require… |
+| Requirement source | ! confirm: This result relies on a note the vendor… | ! confirm: This result relies on a note the vendor… | ! confirm: This result relies on a note the vendor… | ✓ clear: Nothing in this result depends on a… |
 | **Next action** | **A recruiter may reach out** | **A recruiter may reach out** | **A recruiter may reach out** | **Send to recruiter R2, who owns this relationship** |
 
 ## What the recruiter takes away
@@ -56,4 +56,4 @@ For everyone on the list. Six dimensions, 0 to 100, weighted as configured for t
 - **Candidate R06** (91): A recruiter may reach out. Next question: ask whether Candidate R06 would accept $2,450/week, or the account manager whether the rate can move.
 - **Blair Sample** (67): Send to recruiter R2, who owns this relationship. Next question: follow up with Blair on home health work: asked, with no answer recorded as of 6 Nov 2026.
 
-Under the earlier scoring, which counted rules met, R01 and R04 both scored 100 and could not be told apart. The quality score now puts R04 lower for a claim its records do not support, and R06 lower for asking above the rate, and every point traces to a quote the page shows on click. Blair needs two answers, so half of Blair's score is unknown and Blair sits low on the list; someone who needs an answer but scores high would sit near the top, where the missing answer is worth chasing.
+R04 sits below R01 for a claim its records do not support, and R06 for asking above the rate. Every point traces to a quote the page shows on click. Blair needs two answers, so three of Blair's six marks, carrying 60% of the weight, are unknown and Blair sits low on the list; someone who needs an answer but scores high would sit near the top, where the missing answer is worth chasing.

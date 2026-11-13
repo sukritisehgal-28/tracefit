@@ -16,6 +16,8 @@ time, and for one person's full explanation when a recruiter opens it.
 """
 from __future__ import annotations
 
+import re
+
 import gc
 from dataclasses import asdict
 from pathlib import Path
@@ -106,6 +108,28 @@ def _evidence(world, ids) -> dict:
     return out
 
 
+REQUIREMENT_LIKE = re.compile(r"\b(?:requir\w*|must|need\w*|minimum|min\.?|licen[cs]\w*|experience|years?|yrs?|certif\w*|prefer\w*|"
+                              r"proficien\w*|pay\w*|rate|start\w*|shifts?|hours?|hrs?|weeks?)\b|\$", re.I)
+
+
+def unread_requirements(world, job) -> list[str]:
+    """Sentences in this job's posting or notes that look like a requirement and that the reader could not read.
+    No rule checks them, so the page says so instead of letting a match look complete."""
+    cache = world.__dict__.setdefault("_unread_by_evidence", {"n": -1, "by": {}})
+    if cache["n"] != len(world.extractor.unparsed):
+        by: dict = {}
+        for eid, clause in world.extractor.unparsed:
+            by.setdefault(eid, []).append(clause)
+        cache.update(n=len(world.extractor.unparsed), by=by)
+    out = []
+    for eid in list(job.evidence_ids) + list(job.note_ids):
+        for clause in cache["by"].get(eid, ()):
+            text = " ".join(clause.split()).strip(" ;,")
+            if REQUIREMENT_LIKE.search(text) and text not in out:
+                out.append(text)
+    return out[:8]
+
+
 def cards_payload(world, sl: Shortlist, group: str, offset: int = 0, limit: int = PAGE_SIZE,
                   weights: dict | None = None, filters=()) -> dict:
     """One screenful of one list. With the settings' weights and no filters the cost does not depend on how
@@ -157,6 +181,15 @@ def job_summary(world, job, cfg: dict, sl: Shortlist | None) -> dict:
     jd["order"] = {"actionable_first": bool(sc.get("actionable_first", True)), "tie_breakers": list(sc.get("tie_breakers", [])),
                    "tie_margin": sc.get("tie_margin", 0)}
     jd["weights"] = dimensions.weights_of(sl.ctx.dims_cfg) if sl else {}
+    # The dimensions this job gives the score something to measure. One the posting says nothing about is left
+    # out of every score, so the page leaves it out of the weights too.
+    used = set()
+    for m in (sl.ranked() if sl else ()):
+        used.update(name for name, d in zip(dimensions.ORDER, m.dims) if d is not None)
+        if len(used) == len(dimensions.ORDER):
+            break
+    jd["dims_used"] = [name for name in dimensions.ORDER if name in used]
+    jd["unread"] = unread_requirements(world, job)
     jd["skills"] = [{"key": k, "label": world.lex.label(k)} for k in job.reqs_of("req.skill")]
     outcomes = sl.stats["outcomes"] if sl else {}
     jd["process"] = {                                     # every step behind the list, for "Show the whole process"

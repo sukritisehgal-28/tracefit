@@ -2,7 +2,7 @@
 
 GET  /                                      the page
 GET  /api/state?step=&overlay=              the jobs with their totals, and what changed. No people.
-GET  /api/cards?job=&group=&offset=&limit=  one screenful of one job's list (best | clarify | not_fit)
+GET  /api/cards?job=&group=&offset=&limit=  one screenful of one job's list (best | not_fit)
      &w=setting:25,pay:0  &f=act_now|text:wound care|school:Pine Valley  the recruiter's own weights and filters (optional)
 GET  /api/detail?job=&person=               one person's full rule-by-rule explanation, with its evidence
 GET  /api/coverage                          proof that every rule ran, and the outcomes seen
@@ -63,11 +63,11 @@ class Handler(BaseHTTPRequestHandler):
         url = urlparse(self.path)
         self.q = {k: v[0] for k, v in parse_qs(url.query).items()}
         step = self.q.get("step", "0")
-        return url.path, int(step) if step.isdigit() else 0, (self.q.get("overlay") or None)
+        return url.path, int(step) if _digits(step) else 0, (self.q.get("overlay") or None)
 
     def _int(self, name: str, default: int, most: int) -> int:
         value = self.q.get(name, "")
-        return max(0, min(int(value), most)) if value.isdigit() else default
+        return max(0, min(int(value), most)) if _digits(value) else default
 
     def _api(self, path: str, step: int, overlay: str | None):
         """(payload, status) for one read. Unknown jobs, lists and people are a 404, never an error page."""
@@ -93,6 +93,8 @@ class Handler(BaseHTTPRequestHandler):
                     weights[name] = float(value)
                 except ValueError:
                     return {"error": f"The weight {part!r} could not be read."}, 400
+                if not 0 <= weights[name] <= 1000:        # also refuses inf and nan
+                    return {"error": f"The weight {part!r} must be between 0 and 1000."}, 400
             filters = [f.strip() for f in self.q.get("f", "").split("|") if f.strip()][:12]      # "|" so a typed phrase may hold commas
             return engine.cards(step, job, self.q["group"], self._int("offset", 0, 10**9), self._int("limit", PAGE_SIZE, 200),
                                 weights or None, filters), 200
@@ -121,7 +123,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         path, step, overlay = self._params()
-        length = int(self.headers.get("Content-Length") or 0)
+        declared = self.headers.get("Content-Length") or "0"
+        length = min(int(declared), 1_000_000) if _digits(declared) else 0
         if length:
             self.rfile.read(length)                   # nothing is read from the body; drain it so the connection can be reused
         if path == "/api/publish":
@@ -137,8 +140,16 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
+def _digits(value: str) -> bool:
+    """Plain digits only: str.isdigit() also accepts characters such as "²" that int() refuses."""
+    return value.isascii() and value.isdigit() and len(value) <= 12
+
+
 def serve(port: int = 8765) -> None:
-    server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    try:
+        server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    except OSError as exc:
+        sys.exit(f"Port {port} is not available ({exc.strerror or exc}). Try: python3 -m shortlist --port {port + 1}")
     print(f"Tracefit is running at http://127.0.0.1:{port}  (Ctrl+C to stop)")
     try:
         server.serve_forever()
