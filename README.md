@@ -29,7 +29,7 @@ python3 -m unittest discover -s tests
 | `python3 tests/test_rewording.py` | 124 reworded sentences: a "no" is never read as a "yes" |
 | `python3 tests/test_own_criteria.py` | 37 typed phrases and 22 institutions against synthetic résumés, with the known limits listed |
 | `python3 bench/benchmark.py --n 100000` | The synthetic scale benchmark |
-| `python3 bench/benchmark.py --n 20000 --workers 1,2,4` | The same lists built on 1, 2 and 4 worker processes, checked identical and timed |
+| `python3 bench/benchmark.py --n 20000 --workers 1,2,4` | The same lists built on 1, 2 and 4 worker processes, checked identical and timed (also run at 100,000 on a 16-core cloud machine; see the architecture doc) |
 
 Add `--overlay feed_only` or `--overlay strict_pay` to any command to see another client's settings.
 

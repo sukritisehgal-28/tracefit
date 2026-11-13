@@ -137,38 +137,45 @@ Each piece of work is tied to what changed, not to the size of the database:
 
 A shortlist is one compact row per person per job (tier, score, dimensions, next action, the line on the card); the full explanation is rebuilt when someone opens that person, and a test checks it cannot differ. The page asks for 10 people at a time, then the next 10 (the benchmark times a screenful of 25). A destination gets the top 200 per job and the totals.
 
-**Measured** on synthetic people, one process, in memory, on an 8 GB laptop. Before the 100,000 run the laptop had about 5 GB of swap in use by other apps, so its worst cases include waiting on the disk; the 20,000 run stays under 460 MB, worker runs included, and is the cleaner measurement. The 20,000 column was re-measured after the page moved to one list per job; the 100,000 column was not, so its two page figures are marked.
+**Measured** on synthetic people, in memory, on two machines:
 
-| | 20,000 people | 100,000 people |
-|---|---|---|
-| One-off load: translate, read, link, resolve | 8.5 s | 52 s |
-| People in the job's profession | 6,126 | 30,047 |
-| **New job → ranked shortlist** (median of 11) | **0.63 s** | **5.0 s** (3.8 to 6.5) |
-| **Candidate update → row replaced in 13 open jobs** (median of 200) | **0.2 ms** | **1.6 ms** (p95 9.8) |
-| A recruiter moves a weight or filter: list re-scored, first screenful | 8.1 ms | 6.5 ms (before the single list; higher now) |
-| A screenful of 25 / one person opened | 2.6 ms / 0.5 ms | 3.5 ms / 0.9 ms (before the single list) |
-| Rows held for all 13 open jobs | 79 MB | 354 MB |
+- **An 8 GB laptop** (Apple M3). Before its 100,000 run it had about 5 GB of swap in use by other apps, so that run's worst cases include waiting on the disk, and it predates the single list per job.
+- **A temporary cloud machine** (Google Cloud, 16 physical cores, 125 GB, nothing else running), created for the run and deleted after it. Its cores are each slower than the laptop's, so compare ratios within a machine, not seconds across machines.
 
-One person against one job, all rules and dimensions, costs 130 to 190 microseconds. Full output: [benchmark_20k.txt](benchmark_20k.txt), [benchmark_100k.txt](benchmark_100k.txt). Reproduce with `python3 bench/benchmark.py --n 100000`.
-
-### Worker processes (measured at 20,000 people)
-
-Matching one person against one job needs nothing from anyone else, so the work splits cleanly. `shortlist/workers.py` runs it on several worker processes of one machine, and the benchmark compares 1, 2 and 4 (`--workers 1,2,4`). One worker is the product as it runs today.
-
-| Work | 1 worker | 2 workers | 4 workers |
+| | 20,000 (laptop) | 100,000 (laptop, short of memory) | 100,000 (cloud) |
 |---|---|---|---|
-| **One new job**, 6,126 people in its profession, split between workers | 0.78 s | 0.50 s (1.6×) | **0.30 s (2.6×)** |
-| **All 13 open jobs rebuilt** (a settings change), one job per worker | 8.3 s | 5.2 s (1.6×) | **3.5 s (2.4×)** |
-| Every rule for all 20,016 people, profession index off | 2.4 s | 1.4 s (1.7×) | 0.99 s (2.4×) |
-| Memory, largest worker | this process | 351 MB | 351 MB |
+| One-off load: translate, read, link, resolve | 8.5 s | 52 s | 83 s |
+| People in the job's profession | 6,126 | 30,047 | 30,047 |
+| **New job → ranked shortlist**, one process (median of 11) | **0.63 s** | **5.0 s** (3.8 to 6.5) | **6.0 s** (5.6 to 6.6) |
+| **Candidate update → row replaced in 13 open jobs** (median of 200) | **0.2 ms** | **1.6 ms** (p95 9.8) | **0.5 ms** (p95 8.2) |
+| A recruiter moves a weight or filter: list re-scored, first screenful | 8.1 ms | 6.5 ms (before the single list) | 51 ms |
+| A screenful of 25 / one person opened | 2.6 ms / 0.5 ms | 3.5 ms / 0.9 ms | 4.8 ms / 1.1 ms |
+| Rows held for all 13 open jobs | 79 MB | 354 MB | 353 MB |
+| Memory after load / at peak | 356 MB / 457 MB | — | 1.7 GB / 2.9 GB |
 
-- **The lists are identical.** A test compares every card and every total from 2, 3 and 5 workers with the one-process list, and the benchmark repeats the check at 20,000. Workers change speed, never an answer.
-- **Why 2.6× and not 4×.** The laptop has four fast and four slow cores and was running other apps, and one process still receives the rows and orders the list.
+One person against one job, all rules and dimensions, costs 120 to 220 microseconds depending on the machine. Full output: [benchmark_20k.txt](benchmark_20k.txt), [benchmark_100k.txt](benchmark_100k.txt), [benchmark_cloud_20k.txt](benchmark_cloud_20k.txt), [benchmark_cloud_100k.txt](benchmark_cloud_100k.txt). Reproduce with `python3 bench/benchmark.py --n 100000`.
+
+### Worker processes (measured)
+
+Matching one person against one job needs nothing from anyone else, so the work splits cleanly. `shortlist/workers.py` runs it on several worker processes of one machine, and the benchmark compares worker counts (`--workers 1,2,4,8,16`). One worker is the product as it runs today.
+
+**100,000 people, cloud machine with 16 cores:**
+
+| Work | 1 worker | 2 | 4 | 8 | 16 |
+|---|---|---|---|---|---|
+| **One new job**, 30,047 people in its profession, split between workers | 7.1 s | 4.1 s | 2.6 s | 1.65 s | **1.17 s (6.0×)** |
+| **All 13 open jobs rebuilt** (a settings change), one job per worker | 78 s | 43 s | 24 s | 14 s | **8.7 s (9.0×)** |
+| Every rule for all 100,016 people, profession index off | 22.5 s | 14.6 s | 8.6 s | 5.6 s | 4.1 s (5.6×) |
+
+At 20,000 people the same machine goes from 1.44 s to 0.22 s for one job (6.5×) and from 15.4 s to 1.8 s for all 13 (8.5×). The laptop, with four fast and four slow cores and other apps running, goes from 0.78 s to 0.30 s on four workers (2.6×).
+
+- **The lists are identical.** A test compares every card and every total from 2, 3 and 5 workers with the one-process list, and the benchmark repeats the check on every run above. Workers change speed, never an answer.
+- **Whole jobs scale better than one split job** (9× against 6× on sixteen). When one job's people are split, one process still receives the rows, adds the totals and orders 30,000 of them. When each worker builds a whole list, it finishes the list itself. That is why the service design below splits by job and profession.
+- **Each worker costs memory.** The operating system reports about 2.5 GB per worker at 100,000 people. That figure includes memory shared with the loaded process; how much stays shared was not measured.
 - **What this is not.** It is one machine. There is no queue, network or database here, so it measures the matching step of the service design below, not the service.
-- **What it suggests at 100,000** (estimate, from the measured ratio): a new job in about 2 s on four workers instead of 5.0 s. Each worker costs memory, about 350 MB at 20,000 people.
 - **What measuring found.** The first run was slower with workers than without. Formatting a date through the C library is about four times slower inside a forked process on macOS; dates are now formatted in plain code, which also makes output independent of the machine's language settings.
 
-**Estimates, not measured.** A thousand open jobs in one profession would make a candidate update re-check about a thousand pairs: roughly 0.2 s. Rebuilding a thousand lists of 30,000 after a settings change: about 80 minutes of one core, divisible across workers (measured above at 2.4× on four). **Cost:** with no model the only running cost is one modest machine. A model reader, if the client wanted one, is paid once per document read (on arrival, and again only if it changes), never per match; answers are saved and replayed.
+**Estimates, not measured.** A thousand open jobs in one profession would make a candidate update re-check about a thousand pairs: roughly 0.2 s. Rebuilding a thousand lists of 30,000 after a settings change: about 80 minutes of one core, divisible across workers (measured above at 9× on sixteen). **Cost:** with no model the only running cost is one modest machine. A model reader, if the client wanted one, is paid once per document read (on arrival, and again only if it changes), never per match; answers are saved and replayed.
 
 **Validation with the client:** replay a real day of events at production volume against a copy of their data, record event-to-shortlist time at the median and 95th percentile, and watch memory over a week. The benchmark script is that harness with synthetic adapters in place of real ones.
 

@@ -50,7 +50,7 @@ Only questions the data cannot answer, where the answer changes a result. [CLIEN
 | Settings profiles (default, vendor feed only, strict pay) and per-division weights | Implemented |
 | Checker, scenario base, rewording sweep, worked example kept in step with the tool | Implemented; data **synthetic** |
 | Scale benchmark | Implemented on **synthetic** data: speed and memory only |
-| Worker processes on one machine (`shortlist/workers.py`) | Implemented and measured in the benchmark; the product runs on one process by default. Queue, database and several machines are designed, not built |
+| Worker processes on one machine (`shortlist/workers.py`) | Implemented and measured in the benchmark, on a laptop and on a 16-core cloud machine; the product runs on one process by default. Queue, database and several machines are designed, not built |
 | Destinations: JSON, CSV, notifications | **Simulated**: local files, nothing sent |
 | Language-model reader behind a guard | Built, **off, never run against a real model** |
 | Database, queue, workers, live connections, sign-in | Designed, not built ([ARCHITECTURE.md](ARCHITECTURE.md#as-a-running-service-designed-not-built)) |

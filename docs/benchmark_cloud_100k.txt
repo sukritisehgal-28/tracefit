@@ -1,0 +1,37 @@
+Run on a temporary Google Cloud machine (n2-standard-32 with one thread per core: 16 physical cores, 125 GB memory,
+Intel Xeon 2.8 GHz, Ubuntu 24.04), created for this run and deleted afterwards. Nothing else was running on it.
+
+SYNTHETIC benchmark: 100,000 generated candidates + the supplied sample = 100,016 people
+machine: Linux-7.0.0-1017-gcp-x86_64-with-glibc2.39, Python 3.12.3, in memory
+
+LOAD (one-off; after this, changes are applied one at a time)
+  adapters: translate source records          4.66 s
+  read text, link, resolve                   78.29 s   (1,206 people/s end to end)
+  evidence items 460,064; dated facts 1,654,770
+  memory after load 1,658 MB; the largest shortlist holds 30.3 MB of rows, all 13 together 352.8 MB; at the end 2,551 MB; peak 2,859 MB
+
+EVENTS AND READS (13 open jobs by the end)
+  what                                                                          median       min       p95       max  runs   people
+  shortlist for a job already open (VMS-901)                                     7.27s     7.27s     7.27s     7.27s     1   30,047
+  shortlist for a job already open (VMS-902)                                     2.81s     2.81s     2.81s     2.81s     1   11,953
+  NEW JOB arrives -> ranked shortlist (11 jobs, one at a time)                   6.03s     5.57s     6.64s     6.64s    11   30,047
+  first screenful of a list (25 people)                                          4.8ms     4.8ms     4.9ms    45.2ms   200   30,047
+  last screenful of the same list                                                3.8ms     3.8ms     4.0ms     8.3ms   200   30,047
+  one person opened: every rule, with evidence                                   1.1ms     0.9ms     1.3ms     2.5ms   500   30,047
+  CANDIDATE UPDATE -> their row replaced in every open job (13 open)             0.5ms     0.3ms     8.2ms    10.9ms   200       13
+  a list put back in order on its first read after an update                   313.7ms   310.8ms   315.9ms   315.9ms     5   30,047
+  a recruiter moves a weight or a filter: the whole list re-scored, first screenful served    50.8ms    26.7ms   117.8ms   117.8ms     8   30,047
+  one job with the profession index off: every rule for every person            21.64s    21.64s    21.64s    21.64s     1  100,016
+
+  one person against one job, all 14 rules: 216 microseconds on average across all professions
+  a screenful of 25 people is 36,746 bytes; one explanation is about 17,599 bytes
+  200 updates moved 813 results between tiers
+
+WORKERS (processes on this one machine, 16 cores; every list checked identical to the one-process list)
+  workers     one new job (30,047 people)     all 13 open jobs rebuilt     every rule, all 100,016 people  largest worker
+  1                           7.06s  1.0x                 78.01s  1.0x                       22.54s  1.0x    this process
+  2                           4.13s  1.7x                 43.36s  1.8x                       14.63s  1.5x        2,513 MB
+  4                           2.61s  2.7x                 23.90s  3.3x                        8.64s  2.6x        2,533 MB
+  8                           1.65s  4.3x                 14.02s  5.6x                        5.64s  4.0x        2,562 MB
+  16                          1.17s  6.0x                  8.66s  9.0x                        4.05s  5.6x        2,569 MB
+  written to out/b100000.json
