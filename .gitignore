@@ -5,3 +5,4 @@ out/
 .claude/
 *.tmp
 notes/
+.venv-model/
