@@ -11,12 +11,16 @@ What it does
      each: new jobs arriving, then candidate updates.
   4. Times what a recruiter's page asks for: one screenful of a list, a screenful deep
      in the list, and one person's full explanation.
+  5. With --workers 1,2,4: builds the same lists on 1, 2 and 4 worker processes of this
+     machine (shortlist/workers.py), checks the lists are identical, and times each.
 
 What it does and does not show
   * It measures speed and memory of this code on this machine. Those numbers are MEASURED.
   * It says nothing about match quality: the synthetic people are template text.
   * It runs in one process with everything in memory. Network, database and source-API
     time are not included; those would be ESTIMATES and are discussed in docs/ARCHITECTURE.md.
+  * The worker figures are several processes on ONE machine sharing the loaded data. They
+    measure how far the matching step speeds up when split; they are not a distributed system.
 """
 from __future__ import annotations
 
@@ -43,6 +47,7 @@ from shortlist.model import Batch, Event  # noqa: E402
 from shortlist.pipeline import Live, cards_payload, detail_payload  # noqa: E402
 from shortlist.sources import Loader, load_source  # noqa: E402
 from shortlist.timeutil import parse_when  # noqa: E402
+from shortlist.workers import Workers  # noqa: E402
 
 PLACES = [("Spokane", "WA", "Washington"), ("Seattle", "WA", "Washington"), ("Portland", "OR", "Oregon"),
           ("Boise", "ID", "Idaho"), ("Columbus", "OH", "Ohio"), ("Dayton", "OH", "Ohio"), ("Denver", "CO", "Colorado"),
@@ -176,6 +181,7 @@ def main() -> None:
     ap.add_argument("--updates", type=int, default=200, help="number of synthetic candidate updates delivered as events")
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--out", default="out/benchmark.json")
+    ap.add_argument("--workers", default="1", help="worker counts to compare, for example 1,2,4 (1 = this process alone)")
     opts = ap.parse_args()
     rng = random.Random(opts.seed)
 
@@ -301,6 +307,42 @@ def main() -> None:
     per_pair_us = t_everyone / max(everyone.stats["evaluated"], 1) * 1e6
     del everyone
 
+    # 7. the same lists built on several worker processes of this machine. One worker is this process alone.
+    #    Each figure includes handing out the work, getting the rows back, putting the list together and ranking it.
+    counts = sorted({max(1, int(x)) for x in opts.workers.split(",") if x.strip()})
+    scaling = []
+    if counts != [1]:
+        jobs_open = [world.jobs[k] for k in live.open_jobs()]
+        everyone_job = copy.copy(job)
+        look = lambda sl: [(m.person, m.tier, m.score, m.low, m.high) for m in sl.ranked()]      # noqa: E731
+        reference = None
+
+        def med(fn, runs):
+            return timed(fn, runs)[1]
+
+        for n in counts:
+            if n == 1:
+                one = lambda: Shortlist(world, job, cfg, compact_rows=True)                        # noqa: E731
+                many = lambda: [Shortlist(world, j, cfg, compact_rows=True).ranked() for j in jobs_open]   # noqa: E731
+                whole = lambda: Shortlist(world, job, cfg, pool=list(world.people.values()), compact_rows=True).ranked()   # noqa: E731
+                reference = look(one())
+                row = {"workers": 1, "one_job_s": med(lambda: one().ranked(), 5), "all_jobs_s": med(many, 3), "everyone_s": med(whole, 2),
+                       "identical": True, "largest_worker_mb": None}
+            else:
+                cfg_all = copy.deepcopy(cfg)
+                cfg_all.setdefault("matching", {})["block_on_profession"] = False               # every rule for every person
+                with Workers(world, cfg, n) as ws:
+                    same = look(ws.shortlist(job)) == reference
+                    row = {"workers": n, "one_job_s": med(lambda: ws.shortlist(job).ranked(), 5),
+                           "all_jobs_s": med(lambda: [sl.ranked() for sl in ws.shortlists(jobs_open).values()], 3), "identical": same}
+                with Workers(world, cfg_all, n) as ws:
+                    row["everyone_s"] = med(lambda: ws.shortlist(everyone_job).ranked(), 2)
+                kids = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
+                row["largest_worker_mb"] = kids / (1024 * 1024) if sys.platform == "darwin" else kids / 1024
+            assert row["identical"], f"{n} workers gave a different list"
+            scaling.append(row)
+        scaling_meta = {"one_job_people": len(reference), "jobs": len(jobs_open), "everyone_people": n_people, "cores": os.cpu_count()}
+
     report = {
         "label": "SYNTHETIC benchmark. Speed and memory are measured; match quality is not assessed.",
         "machine": {"platform": platform.platform(), "processor": platform.processor() or platform.machine(),
@@ -314,6 +356,9 @@ def main() -> None:
         "page_bytes": size, "memory_after_load_mb": mem_loaded, "largest_shortlist_mb": mem_per_list, "all_shortlists_mb": sum(footprints),
         "memory_at_end_mb": now_mb(), "peak_memory_mb": peak_mb(),
     }
+    if scaling:
+        report["workers"] = {"note": "Worker processes on one machine, forked from the loaded process. Measured. Not a distributed deployment.",
+                             **scaling_meta, "rows": scaling}
     out = ROOT / opts.out
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
@@ -334,6 +379,15 @@ def main() -> None:
     print(f"\n  one person against one job, all {len(cfg['rules']) + len(cfg['gates'])} rules: {per_pair_us:,.0f} microseconds on average across all professions")
     print(f"  a screenful of 25 people is {size.get('page', 0):,} bytes; one explanation is about {size.get('detail', 0):,} bytes")
     print(f"  {opts.updates} updates moved {moved} results between tiers")
+    if scaling:
+        base = scaling[0]
+        x = lambda r, k: f"{unit(r[k]).strip():>9} {base[k] / r[k]:4.1f}x"                        # noqa: E731
+        print(f"\nWORKERS (processes on this one machine, {scaling_meta['cores']} cores; every list checked identical to the one-process list)")
+        print(f"  {'workers':<8} {'one new job (' + format(scaling_meta['one_job_people'], ',') + ' people)':>30} "
+              f"{'all ' + str(scaling_meta['jobs']) + ' open jobs rebuilt':>28} {'every rule, all ' + format(scaling_meta['everyone_people'], ',') + ' people':>34} {'largest worker':>15}")
+        for r in scaling:
+            mem = "this process" if r["largest_worker_mb"] is None else f"{r['largest_worker_mb']:,.0f} MB"
+            print(f"  {r['workers']:<8} {x(r, 'one_job_s'):>30} {x(r, 'all_jobs_s'):>28} {x(r, 'everyone_s'):>34} {mem:>15}")
     print(f"  written to {opts.out}")
 
 

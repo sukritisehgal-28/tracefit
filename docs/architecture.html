@@ -99,7 +99,7 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
     <span><b>5</b> sources, <b>3</b> destinations</span>
     <span><b>10</b> fit rules, <b>4</b> permission rules</span>
     <span><b>6</b> quality dimensions</span>
-    <span><b>184</b> tests, <b>102</b> scenarios</span>
+    <span><b>187</b> tests, <b>102</b> scenarios</span>
     <span>timed at <b>20,000</b> and <b>100,000</b> synthetic people</span>
   </div>
   <div class="key">
@@ -296,18 +296,18 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
   <div class="tablewrap"><table>
     <thead><tr><th>What happens</th><th>Work that is redone</th><th>Grows with</th><th>20,000 people</th><th>100,000 people</th></tr></thead>
     <tbody>
-      <tr><td class="name">A job arrives</td><td>Resolve the job, then run all 14 rules for everyone in its profession. Done once.</td><td>People in that profession</td><td class="num">0.74 s</td><td class="num">5.0 s</td></tr>
+      <tr><td class="name">A job arrives</td><td>Resolve the job, then run all 14 rules for everyone in its profession. Done once.</td><td>People in that profession</td><td class="num">0.63 s</td><td class="num">5.0 s</td></tr>
       <tr><td class="name">A candidate changes</td><td>Re-read their text, re-resolve them, re-check them against open jobs, replace their one row in each list.</td><td>Open jobs in their profession</td><td class="num">0.2 ms</td><td class="num">1.6 ms</td></tr>
       <tr><td class="name">A job's requirements change</td><td>Rebuild that job's list, compare with the old one, report only the people who moved.</td><td>People in that profession</td><td class="num" colspan="2">as a new job</td></tr>
       <tr><td class="name">A job closes</td><td>Withdraw its list.</td><td>Nothing</td><td class="num" colspan="2">not timed</td></tr>
-      <tr><td class="name">A recruiter opens a list</td><td>Read one screenful (10 on the page; timed at 25).</td><td>The rows shown</td><td class="num">2.3 ms</td><td class="num">3.5 ms</td></tr>
-      <tr><td class="name">A recruiter moves a weight or a filter</td><td>Re-score one list from stored dimensions, serve the first screenful. No text is re-read.</td><td>The rows in that list</td><td class="num">2.7 ms</td><td class="num">6.5 ms</td></tr>
+      <tr><td class="name">A recruiter opens a list</td><td>Read one screenful (10 on the page; timed at 25).</td><td>The rows shown</td><td class="num">2.6 ms</td><td class="num">3.5 ms</td></tr>
+      <tr><td class="name">A recruiter moves a weight or a filter</td><td>Re-score one list from stored dimensions, serve the first screenful. No text is re-read.</td><td>The rows in that list</td><td class="num">8.1 ms</td><td class="num">6.5 ms *</td></tr>
       <tr><td class="name">A recruiter opens a person</td><td>Rebuild one explanation, with only the evidence it cites.</td><td>One person, one job</td><td class="num">0.5 ms</td><td class="num">0.9 ms</td></tr>
-      <tr><td class="name">Settings change</td><td>Rebuild every open list. <span class="plan">Today this is a restart.</span></td><td>Open jobs × their professions</td><td class="num" colspan="2">not measured</td></tr>
+      <tr><td class="name">Settings change</td><td>Rebuild every open list. <span class="plan">Today this is a restart.</span></td><td>Open jobs × their professions</td><td class="num">8.3 s for 13 jobs; 3.5 s on four workers</td><td class="num">not measured</td></tr>
       <tr><td class="name">The date changes</td><td>Freshness, years of experience and start dates all move with the date. <span class="plan">Today the reference date is fixed in settings.</span></td><td>Open jobs × their professions</td><td class="num" colspan="2">not built</td></tr>
     </tbody>
   </table></div>
-  <p class="note">Before the 100,000 run the laptop had about 5 GB of swap in use by other apps, so its worst cases include waiting on the disk. The 20,000 run peaks at 355 MB and is the cleaner measurement.</p>
+  <p class="note">Before the 100,000 run the laptop had about 5 GB of swap in use by other apps, so its worst cases include waiting on the disk. The 20,000 run stays under 460 MB, worker runs included, and is the cleaner measurement. * The 100,000 run predates the single list per job; this figure is higher now.</p>
   <p>The one-event path gives the same rows, totals and change messages as rebuilding everything from scratch. That is tested on the sample and on all 102 scenarios.</p>
 </section>
 <section>
@@ -370,7 +370,7 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
       <tr><td class="name">Events</td><td>A list replayed in time order</td><td><span class="plan">A queue</span> that keeps each person's and each job's events in order</td><td><code>Live.ingest(event)</code></td></tr>
       <tr><td class="name">Facts</td><td>In memory. A restart re-reads every source</td><td><span class="plan">Two tables, only added to.</span> Text is read once per document, not once per start</td><td><code>World.apply(batch)</code></td></tr>
       <tr><td class="name">Rows</td><td>In memory, for every open job</td><td><span class="plan">One table keyed by job and person</span>, with a stored sort key. Only lists being viewed are in memory</td><td><code>Shortlist.page</code>, <code>Shortlist.patch</code></td></tr>
-      <tr><td class="name">Workers</td><td>One process</td><td><span class="plan">Several, split by profession.</span> A list is independent per job, and per person within a job</td><td><code>Shortlist</code> build</td></tr>
+      <tr><td class="name">Workers</td><td>One process by default. Worker processes on one machine are built and measured: 2.6× faster on four</td><td><span class="plan">Several machines, split by profession.</span> A list is independent per job, and per person within a job</td><td><code>workers.py</code>, <code>Shortlist</code> build</td></tr>
       <tr><td class="name">Notifications</td><td>Written to a local file</td><td><span class="plan">An outbox table and a relay</span> that retries and carries a key so a destination can ignore repeats</td><td><code>sinks/</code></td></tr>
       <tr><td class="name">Clock</td><td>A fixed reference date in settings</td><td><span class="plan">A nightly "day changed" event</span> that rebuilds open lists</td><td><code>World(as_of=…)</code></td></tr>
       <tr><td class="name">Access</td><td>No sign-in</td><td><span class="plan">Sign-in, roles, and a log</span> of who changed a setting or published a list</td><td>Server</td></tr>
@@ -400,9 +400,13 @@ footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line)
       <tr><td>Rows for 1,000 open jobs in one profession of 30,000</td><td class="num">30 million</td><td>Arithmetic. A table, not memory</td></tr>
       <tr><td>A candidate update with 1,000 open jobs in their profession</td><td class="num">about 0.2 s</td><td>Estimate from the cost per pair</td></tr>
       <tr><td>Rebuilding 1,000 open lists after a settings change</td><td class="num">about 80 min of one core</td><td>Estimate. Divides across workers</td></tr>
+      <tr><td>One new job (6,126 people) on 1, 2 and 4 worker processes</td><td class="num">0.78 s, 0.50 s, 0.30 s</td><td>Measured at 20,000 people, one machine. Lists identical</td></tr>
+      <tr><td>All 13 open jobs rebuilt on 1, 2 and 4 worker processes</td><td class="num">8.3 s, 5.2 s, 3.5 s</td><td>Measured at 20,000 people, one machine</td></tr>
+      <tr><td>Memory of each worker process</td><td class="num">351 MB</td><td>Measured at 20,000 people</td></tr>
+      <tr><td>A new job at 100,000 people on four workers</td><td class="num">about 2 s</td><td>Estimate from the measured 2.6×</td></tr>
     </tbody>
   </table></div>
-  <p>A new job is the expensive event, at about 0.15 ms per person in its profession. It happens once per job and off the page's path. Splitting it across workers should shorten it in proportion; that is not measured.</p>
+  <p>A new job is the expensive event, at about 0.15 ms per person in its profession. It happens once per job and off the page's path. Split between four worker processes on one machine it takes 0.30 s instead of 0.78 s at 20,000 people, with an identical list. That is measured; across several machines it is not.</p>
 </section>
 
 <section>

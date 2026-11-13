@@ -348,10 +348,9 @@ class Shortlist:
         self.ctx = Ctx(world, dcfg, cfg["requirement_changes"]["policy"])
         # Profession is the one rule an index can answer. Above a configured population, people in other
         # professions are counted and set aside; any one of them can still be explained on request.
-        blocked = bool(pool is None and mcfg.get("block_on_profession") and job.profession
-                       and len(world.people) >= mcfg.get("block_min_population", 1000))
+        blocked = False
         if pool is None:
-            pool = list((world.by_profession.get(job.profession, {}) if blocked else world.people).values())
+            pool, blocked = self.candidates(world, job, cfg)
         if compact_rows is None:
             compact_rows = len(pool) > mcfg.get("keep_detail_below", 2000)
         self.stats = {"people": len(world.people), "excluded_by_profession": 0, "evaluated": 0, "blocked": blocked, "compact": compact_rows,
@@ -376,6 +375,14 @@ class Shortlist:
                 gc.enable()
         self._sizes(world)
         self.dirty = True
+
+    @staticmethod
+    def candidates(world, job, cfg: dict) -> tuple[list, bool]:
+        """The people a job's list is built from, and whether other professions were set aside by the index."""
+        mcfg = cfg.get("matching", {})
+        blocked = bool(mcfg.get("block_on_profession") and job.profession
+                       and len(world.people) >= mcfg.get("block_min_population", 1000))
+        return list((world.by_profession.get(job.profession, {}) if blocked else world.people).values()), blocked
 
     # ---------------------------------------------------------------- totals
     def _count(self, m: Match, n: int) -> None:
@@ -525,8 +532,10 @@ def result_dict(world, r: Result) -> dict:
 def card_dict(world, m: Match, override: tuple | None = None) -> dict:
     """What one row of a list shows. Works on a compact row: no rule-by-rule detail is needed.
     `override` is (score, low, high, tier) under a recruiter's own weights."""
+    from .resume import background
     p = world.people[m.person]
     who = person_dict(world, p)
+    bg = background(world, p)                 # read once for the card: what else they list, their links, what is missing
     standout = " · ".join(m.standout)
     marks = list(m.outcomes)
     for kind, i, _, _ in m.briefs:
@@ -542,10 +551,10 @@ def card_dict(world, m: Match, override: tuple | None = None) -> dict:
         "action": {"status": m.action["status"], "label": m.action["label"], "owner": m.action["owner"]},
         "flags": list(m.flags), "band": m.band, "band_size": m.band_size, "identical": m.identical, "decided_by": m.decided_by,
         "standout": standout[:1].upper() + standout[1:], "typical": m.typical,
-        "headline": who["headline"], "home": who["home"], "also": _also(world, p),
-        "ref": who["ref"], "namesakes": who["namesakes"], "links": _links(world, p),
+        "headline": who["headline"], "home": who["home"], "also": _also(bg),
+        "ref": who["ref"], "namesakes": who["namesakes"], "links": _links(bg),
         # for people level on every rule: what is missing that would separate them, and whether their documents differ
-        "apart": open_details(world, world.jobs[m.job], p) if m.identical > 1 else None,
+        "apart": open_details(world, world.jobs[m.job], p, bg) if m.identical > 1 else None,
         "docs": documents_key(world, p) if m.identical > 1 else None,
     }
     if override:
@@ -562,12 +571,15 @@ def _key_dict(world, key):
             "at": ev.observed_at.isoformat() if ev else None, "date_only": ev.date_only if ev else True}
 
 
-def open_details(world, job, p) -> list:
+def open_details(world, job, p, bg: dict | None = None) -> list:
     """What is not on file for this person and would tell them apart from someone level with them: each a
     question a recruiter can ask. Nothing here changes a score, a tier or the order."""
-    from .resume import background
     out = []
-    if p.fact("home") is None and not background(world, p)["header"].get("home"):
+    if p.fact("home") is None:
+        if bg is None:
+            from .resume import background
+            bg = background(world, p)
+    if p.fact("home") is None and not bg["header"].get("home"):
         out.append({"key": "home", "text": "where they live"})
     degrees = [f.value["year"] for f in p.keyed("education").values() if isinstance(f.value, dict) and f.value.get("year")]
     spans = [f.value for f in p.keyed("experience").values() if isinstance(f.value, dict) and f.value.get("years_documented")]
@@ -593,9 +605,8 @@ def documents_key(world, p) -> int | None:
     return zlib.crc32("\n".join(texts).encode("utf-8")) if texts else None
 
 
-def _links(world, p) -> list:
-    from .resume import background
-    return [x["url"] for x in background(world, p)["links"]][:3]
+def _links(bg: dict) -> list:
+    return [x["url"] for x in bg["links"]][:3]
 
 
 def found_for(world, m: Match, filters) -> list:
@@ -616,10 +627,9 @@ def found_for(world, m: Match, filters) -> list:
     return out
 
 
-def _also(world, p) -> list:
+def _also(bg: dict) -> list:
     """Skills on the person's résumés that no rule checks, so the card can say what else they have done."""
-    from .resume import background
-    return [s["text"] for s in background(world, p)["skills"] if not s["checked"]]
+    return [s["text"] for s in bg["skills"] if not s["checked"]]
 
 
 def match_dict(world, m: Match) -> dict:

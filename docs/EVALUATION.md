@@ -28,7 +28,7 @@ In each case a matcher that trusts structured fields and keywords gives a confid
 
 ## Experiments
 
-Run everything with `python3 -m unittest discover -s tests`: 184 tests.
+Run everything with `python3 -m unittest discover -s tests`: 187 tests.
 
 1. **Three client profiles on the same data** (the bonus: comparing configurations). Home-health job at 18:00:
 
@@ -51,6 +51,7 @@ Run everything with `python3 -m unittest discover -s tests`: 184 tests.
 10. **The checker** (`python3 -m shortlist audit`) is clean on all 176 results in the sample, both overlays, all scenarios and with the lying model on; twelve planted mistakes are each caught by their own check.
 11. **A recruiter's own criteria** (`python3 tests/test_own_criteria.py`): 37 typed phrases and 22 institutions against synthetic résumés in layouts the sample does not use. Writing it found that the first version matched letters, not words ("art" matched "start"); it now matches whole words whatever their case, accents, hyphens or plural. Five cases are listed as known limits: a different word, an abbreviation or initials are not found.
 12. **Size.** Compact rows give exactly the list, totals and explanations of full ones; pages add up to the list; the first response is the same size for 1 person as for 300. Measuring at size found two defects sixteen people could not show: loading grew with the square of the records (now linear), and half of shortlist time was memory clean-up (now paused). Timings are in [ARCHITECTURE.md](ARCHITECTURE.md#scale-latency-and-cost).
+13. **Worker processes.** Lists built on 2, 3 and 5 worker processes are identical to the one-process list, card for card and total for total. At 20,000 synthetic people a new job takes 0.78 s on one worker and 0.30 s on four. The first run was slower with workers: one date-formatting call was four times slower in a forked process, now replaced. One machine only; no queue or database is involved.
 
 ## Limitations
 

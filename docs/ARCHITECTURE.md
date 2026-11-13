@@ -137,21 +137,38 @@ Each piece of work is tied to what changed, not to the size of the database:
 
 A shortlist is one compact row per person per job (tier, score, dimensions, next action, the line on the card); the full explanation is rebuilt when someone opens that person, and a test checks it cannot differ. The page asks for 10 people at a time, then the next 10 (the benchmark times a screenful of 25). A destination gets the top 200 per job and the totals.
 
-**Measured** on synthetic people, one process, in memory, on an 8 GB laptop. Before the 100,000 run the laptop had about 5 GB of swap in use by other apps, so its worst cases include waiting on the disk; the 20,000 run peaks at 355 MB and is the cleaner measurement.
+**Measured** on synthetic people, one process, in memory, on an 8 GB laptop. Before the 100,000 run the laptop had about 5 GB of swap in use by other apps, so its worst cases include waiting on the disk; the 20,000 run stays under 460 MB, worker runs included, and is the cleaner measurement. The 20,000 column was re-measured after the page moved to one list per job; the 100,000 column was not, so its two page figures are marked.
 
 | | 20,000 people | 100,000 people |
 |---|---|---|
-| One-off load: translate, read, link, resolve | 9.1 s | 52 s |
+| One-off load: translate, read, link, resolve | 8.5 s | 52 s |
 | People in the job's profession | 6,126 | 30,047 |
-| **New job → ranked shortlist** (median of 11) | **0.74 s** | **5.0 s** (3.8 to 6.5) |
+| **New job → ranked shortlist** (median of 11) | **0.63 s** | **5.0 s** (3.8 to 6.5) |
 | **Candidate update → row replaced in 13 open jobs** (median of 200) | **0.2 ms** | **1.6 ms** (p95 9.8) |
-| A recruiter moves a weight or filter: list re-scored, first screenful | 2.7 ms | 6.5 ms |
-| A screenful of 25 / one person opened | 2.3 ms / 0.5 ms | 3.5 ms / 0.9 ms |
+| A recruiter moves a weight or filter: list re-scored, first screenful | 8.1 ms | 6.5 ms (before the single list; higher now) |
+| A screenful of 25 / one person opened | 2.6 ms / 0.5 ms | 3.5 ms / 0.9 ms (before the single list) |
 | Rows held for all 13 open jobs | 79 MB | 354 MB |
 
 One person against one job, all rules and dimensions, costs 130 to 190 microseconds. Full output: [benchmark_20k.txt](benchmark_20k.txt), [benchmark_100k.txt](benchmark_100k.txt). Reproduce with `python3 bench/benchmark.py --n 100000`.
 
-**Estimates, not measured.** A thousand open jobs in one profession would make a candidate update re-check about a thousand pairs: roughly 0.2 s. Rebuilding a thousand lists of 30,000 after a settings change: about 80 minutes of one core, divisible across workers. **Cost:** with no model the only running cost is one modest machine. A model reader, if the client wanted one, is paid once per document read (on arrival, and again only if it changes), never per match; answers are saved and replayed.
+### Worker processes (measured at 20,000 people)
+
+Matching one person against one job needs nothing from anyone else, so the work splits cleanly. `shortlist/workers.py` runs it on several worker processes of one machine, and the benchmark compares 1, 2 and 4 (`--workers 1,2,4`). One worker is the product as it runs today.
+
+| Work | 1 worker | 2 workers | 4 workers |
+|---|---|---|---|
+| **One new job**, 6,126 people in its profession, split between workers | 0.78 s | 0.50 s (1.6×) | **0.30 s (2.6×)** |
+| **All 13 open jobs rebuilt** (a settings change), one job per worker | 8.3 s | 5.2 s (1.6×) | **3.5 s (2.4×)** |
+| Every rule for all 20,016 people, profession index off | 2.4 s | 1.4 s (1.7×) | 0.99 s (2.4×) |
+| Memory, largest worker | this process | 351 MB | 351 MB |
+
+- **The lists are identical.** A test compares every card and every total from 2, 3 and 5 workers with the one-process list, and the benchmark repeats the check at 20,000. Workers change speed, never an answer.
+- **Why 2.6× and not 4×.** The laptop has four fast and four slow cores and was running other apps, and one process still receives the rows and orders the list.
+- **What this is not.** It is one machine. There is no queue, network or database here, so it measures the matching step of the service design below, not the service.
+- **What it suggests at 100,000** (estimate, from the measured ratio): a new job in about 2 s on four workers instead of 5.0 s. Each worker costs memory, about 350 MB at 20,000 people.
+- **What measuring found.** The first run was slower with workers than without. Formatting a date through the C library is about four times slower inside a forked process on macOS; dates are now formatted in plain code, which also makes output independent of the machine's language settings.
+
+**Estimates, not measured.** A thousand open jobs in one profession would make a candidate update re-check about a thousand pairs: roughly 0.2 s. Rebuilding a thousand lists of 30,000 after a settings change: about 80 minutes of one core, divisible across workers (measured above at 2.4× on four). **Cost:** with no model the only running cost is one modest machine. A model reader, if the client wanted one, is paid once per document read (on arrival, and again only if it changes), never per match; answers are saved and replayed.
 
 **Validation with the client:** replay a real day of events at production volume against a copy of their data, record event-to-shortlist time at the median and 95th percentile, and watch memory over a week. The benchmark script is that harness with synthetic adapters in place of real ones.
 
@@ -169,7 +186,7 @@ flowchart LR
   class CON,Q,DB,OR planned
 ```
 
-Dashed parts are designed, not built. Each plugs into a seam that exists today: an adapter already takes one record at a time, `Live.ingest` takes one event, `World.apply` takes one batch, and `Shortlist.page` and `patch` read and replace one row. Writes and reads meet only in the database, so a page never waits for a shortlist to build. Build order: store evidence and rows; add the queue and one real connector and replay a real day; add sign-in and a change log; split workers only if the replay says a new job takes too long.
+Dashed parts are designed, not built. The worker split is the one part now measured, on one machine (above). Each plugs into a seam that exists today: an adapter already takes one record at a time, `Live.ingest` takes one event, `World.apply` takes one batch, and `Shortlist.page` and `patch` read and replace one row. Writes and reads meet only in the database, so a page never waits for a shortlist to build. Build order: store evidence and rows; add the queue and one real connector and replay a real day; add sign-in and a change log; split workers only if the replay says a new job takes too long.
 
 ## Reading text safely, and an optional model
 

@@ -29,6 +29,7 @@ python3 -m unittest discover -s tests
 | `python3 tests/test_rewording.py` | 124 reworded sentences: a "no" is never read as a "yes" |
 | `python3 tests/test_own_criteria.py` | 37 typed phrases and 22 institutions against synthetic résumés, with the known limits listed |
 | `python3 bench/benchmark.py --n 100000` | The synthetic scale benchmark |
+| `python3 bench/benchmark.py --n 20000 --workers 1,2,4` | The same lists built on 1, 2 and 4 worker processes, checked identical and timed |
 
 Add `--overlay feed_only` or `--overlay strict_pay` to any command to see another client's settings.
 
@@ -54,8 +55,8 @@ Add `--overlay feed_only` or `--overlay strict_pay` to any command to see anothe
 | `shortlist/world.py` | Who is who, what is currently believed, what it replaced. |
 | `shortlist/rules.py`, `dimensions.py`, `matching.py` | The gates, the quality score, tiers, order, next action. |
 | `shortlist/pipeline.py`, `server.py`, `web/` | Replay, the running-service path, the page. |
-| `shortlist/audit.py`, `model_reader.py` | The checker; an optional guarded language-model reader (off). |
-| `tests/`, `bench/` | 184 tests, 102 scenarios, the rewording sweep; the synthetic benchmark. |
+| `shortlist/audit.py`, `model_reader.py`, `workers.py` | The checker; an optional guarded language-model reader (off); list building on several worker processes (used by the benchmark). |
+| `tests/`, `bench/` | 187 tests, 102 scenarios, the rewording sweep; the synthetic benchmark. |
 
 ## What is real and what is simulated
 

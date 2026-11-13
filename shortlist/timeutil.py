@@ -104,10 +104,15 @@ def calendar_years(start: date, end: date) -> float:
     return months / 12 + (end - anchor).days / 365.25
 
 
+# Month names are spelled here, not asked of the C library: the output then never depends on the machine's
+# language settings, and it stays fast in a forked worker process (on macOS, strftime after fork is slow).
+MONTH_ABBR = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+
 def fmt_date(d: date | datetime | None) -> str:
     if d is None:
         return "—"
-    return f"{d.day} {d.strftime('%b')} {d.year}"
+    return f"{d.day} {MONTH_ABBR[d.month - 1]} {d.year}"
 
 
 def fmt_span(years: float) -> str:

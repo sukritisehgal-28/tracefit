@@ -2,25 +2,31 @@ SYNTHETIC benchmark: 20,000 generated candidates + the supplied sample = 20,016 
 machine: macOS-26.3-arm64-arm-64bit-Mach-O, Python 3.13.7, one process, in memory
 
 LOAD (one-off; after this, changes are applied one at a time)
-  adapters: translate source records          0.41 s
-  read text, link, resolve                    8.73 s   (2,191 people/s end to end)
+  adapters: translate source records          0.40 s
+  read text, link, resolve                    8.09 s   (2,357 people/s end to end)
   evidence items 92,214; dated facts 331,916
-  memory after load 339 MB; the largest shortlist holds 6.9 MB of rows, all 13 together 79.3 MB; at the end 288 MB; peak 355 MB
+  memory after load 356 MB; the largest shortlist holds 6.9 MB of rows, all 13 together 78.8 MB; at the end 318 MB; peak 457 MB
 
 EVENTS AND READS (13 open jobs by the end)
   what                                                                          median       min       p95       max  runs   people
-  shortlist for a job already open (VMS-901)                                   839.0ms   839.0ms   839.0ms   839.0ms     1    6,126
-  shortlist for a job already open (VMS-902)                                   279.6ms   279.6ms   279.6ms   279.6ms     1    2,364
-  NEW JOB arrives -> ranked shortlist (11 jobs, one at a time)                 736.5ms   658.7ms   815.1ms   815.1ms    11    6,126
-  first screenful of a list (25 people)                                          2.3ms     2.2ms     2.7ms     5.8ms   200    6,126
-  last screenful of the same list                                                1.8ms     1.8ms     2.0ms     4.5ms   200    6,126
-  one person opened: every rule, with evidence                                   0.5ms     0.4ms     0.8ms     2.3ms   500    6,126
-  CANDIDATE UPDATE -> their row replaced in every open job (13 open)             0.2ms     0.1ms     4.5ms     5.9ms   200       13
-  a list put back in order on its first read after an update                    36.3ms    31.2ms    47.5ms    47.5ms     5    6,126
-  a recruiter moves a weight or a filter: the whole list re-scored, first screenful served     2.7ms     2.6ms     4.1ms     4.1ms     8    6,126
-  one job with the profession index off: every rule for every person             2.56s     2.56s     2.56s     2.56s     1   20,016
+  shortlist for a job already open (VMS-901)                                   776.7ms   776.7ms   776.7ms   776.7ms     1    6,126
+  shortlist for a job already open (VMS-902)                                   270.8ms   270.8ms   270.8ms   270.8ms     1    2,364
+  NEW JOB arrives -> ranked shortlist (11 jobs, one at a time)                 629.8ms   611.5ms   719.4ms   719.4ms    11    6,126
+  first screenful of a list (25 people)                                          2.6ms     2.5ms     2.7ms     9.5ms   200    6,126
+  last screenful of the same list                                                2.0ms     2.0ms     2.1ms     4.0ms   200    6,126
+  one person opened: every rule, with evidence                                   0.5ms     0.4ms     0.7ms     1.4ms   500    6,126
+  CANDIDATE UPDATE -> their row replaced in every open job (13 open)             0.2ms     0.1ms     4.1ms     5.2ms   200       13
+  a list put back in order on its first read after an update                    31.4ms    30.8ms    32.6ms    32.6ms     5    6,126
+  a recruiter moves a weight or a filter: the whole list re-scored, first screenful served     8.1ms     5.1ms    14.4ms    14.4ms     8    6,126
+  one job with the profession index off: every rule for every person             2.47s     2.47s     2.47s     2.47s     1   20,016
 
-  one person against one job, all 14 rules: 128 microseconds on average across all professions
-  a screenful of 25 people is 31,816 bytes; one explanation is about 16,835 bytes
+  one person against one job, all 14 rules: 123 microseconds on average across all professions
+  a screenful of 25 people is 36,139 bytes; one explanation is about 17,136 bytes
   200 updates moved 580 results between tiers
+
+WORKERS (processes on this one machine, 8 cores; every list checked identical to the one-process list)
+  workers      one new job (6,126 people)     all 13 open jobs rebuilt      every rule, all 20,016 people  largest worker
+  1                         777.7ms  1.0x                  8.32s  1.0x                        2.41s  1.0x    this process
+  2                         499.9ms  1.6x                  5.22s  1.6x                        1.42s  1.7x          351 MB
+  4                         298.4ms  2.6x                  3.52s  2.4x                      991.3ms  2.4x          351 MB
   written to out/benchmark_20k.json
