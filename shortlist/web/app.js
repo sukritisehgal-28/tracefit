@@ -233,7 +233,7 @@ function card(m, job, twin, rank) {
   const watch = m.watch.length ? `<div class="why watch"><span class="i" aria-hidden="true">!</span><span>${esc(cap(m.watch.join(" · ")))}</span></div>` : "";
   const good = m.good.length ? `<div class="why">${esc(cap(m.good.join(" · ")))}</div>` : "";
   const range = m.low !== m.high ? ` · ${m.low} to ${m.high}` : "";
-  const score = m.tier === "not_fit" ? "" : `<span class="scorenum" title="${m.low !== m.high ? "The score would fall between these once the open questions are answered" : ""}">${m.reweighted ? "Your weights: " : "Score "}${m.score}${range}</span>`;
+  const score = m.tier === "not_fit" ? "" : `<span class="scorepill${m.reweighted ? " own" : ""}"><small>${m.reweighted ? "Your weights" : "Score"}</small><b>${m.score}</b></span>${m.low !== m.high ? `<span class="scorenum" title="The score would fall between these once the open questions are answered">${m.low} to ${m.high}</span>` : ""}`;
   return `<article class="cand${twin ? " twin" : ""}" data-act="person" data-person="${esc(m.person)}" tabindex="0">
       <div class="avatar" aria-hidden="true">${esc(initials(m))}</div>
       <div>
