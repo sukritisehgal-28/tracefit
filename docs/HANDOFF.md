@@ -69,7 +69,7 @@ A new rule is one function, one registry line and one settings block; the tests 
 
 ## How AI was used and checked
 
-The code, tests and documents were written with Claude Code at my direction. I chose the two-stage, rule-based design and set the requirements that every rule be exercised and every point of a score trace to a quote.
+The code, tests and documents were written with Claude Code at my direction. I chose the two-stage, rule-based design and set the requirements that every rule be exercised and every point of a score trace to a quote. Along with that, I have used Codex in the last to add a checker. 
 
 How it was checked:
 
