@@ -139,4 +139,4 @@ sequenceDiagram
 
 The text reader is pattern-based and is the weakest part: wording unlike the sample's can be left unread or misread. [Evaluation](docs/EVALUATION.md) says what independent review found and what is still open.
 
-More: [Architecture](docs/ARCHITECTURE.md), also as [one illustrated page](docs/architecture.html) (open the file in a browser after cloning; GitHub shows its source) · [Evaluation](docs/EVALUATION.md) · [Handoff](docs/HANDOFF.md), with the [questions for the client](docs/HANDOFF.md#questions-for-the-client) · [Worked example](docs/WORKED_EXAMPLE.md)
+More: [Architecture](docs/ARCHITECTURE.md), also as [an illustrated PDF](docs/architecture.pdf) (its web source is `docs/architecture.html`) · [Evaluation](docs/EVALUATION.md) · [Handoff](docs/HANDOFF.md), with the [questions for the client](docs/HANDOFF.md#questions-for-the-client) · [Worked example](docs/WORKED_EXAMPLE.md)
