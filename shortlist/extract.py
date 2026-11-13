@@ -527,7 +527,7 @@ class Extractor:
         if RESTRICTION_FIELD.search(t) and not any(c.attr in ("dnc_until", "route_via", "owner", "contact_allowed") for c in out[had:]):
             # A restriction field with a value the reader could not place. It blocks contact: a restriction
             # nobody could read must never become "free to reach out".
-            add("contact.unread_restriction", "dnc_until", NO_END)
+            add("contact.do_not_contact", "dnc_until", NO_END)
         if PLACEMENT_NONE.search(t):
             add("contact.placement_none", "placement", {"status": "none", "until": None})
         elif PLACEMENT_CURRENT.search(t):

@@ -99,11 +99,11 @@ approver_roles = ["account_manager"]   # only notes written by these roles count
 # ------------------------------------------------------------------ scoring
 [scoring]
 unknown_credit = 0.5                   # credit (0 to 1) given to an answer that is not known yet; the range shows 0 and 1
-strong_threshold = 80                  # minimum score for the "Strong match" tier
+strong_threshold = 80                  # minimum score, even if every unknown turns out "no", to be a Match and not a Possible match
 tie_margin = 3                         # scores this close are shown as comparable, not ranked apart
 preferred_item_weight = 0.5            # a "preferred" skill counts this much against a "required" one
 start_tolerance_days = 0               # how many days late a start may be and still count
-min_rules_for_strong = 3               # a posting that lets fewer rules than this be checked cannot produce a strong match
+min_rules_for_strong = 3               # a posting that lets fewer rules than this be checked cannot produce a Match
 # Among people who meet every required rule, list those who must not be contacted after everyone a recruiter
 # can act on (reach out, or hand over to the owning recruiter). Fit orders people inside each group.
 # Scores and tiers are not changed by this. Set to false to order by fit alone.
@@ -126,8 +126,8 @@ job = "newest"
 
 # ---------------------------------------------------------------- quality score
 # Two stages. The required rules are gates: a person who fails one is "not a fit", one with an unknown answer
-# "needs an answer", whatever else they offer. Only people who pass every gate are ranked, by a score out of
-# 100 from these six dimensions. Each dimension is computed from rule results already explained on the page,
+# "needs an answer", whatever else they offer. People on the list are ordered by a score out of 100 from these
+# six dimensions; someone a required rule rules out is not scored. Each dimension is computed from rule results already explained on the page,
 # so every point traces to a quote. Weights are relative; a recruiter can change them on the page.
 [dimensions]
 setting = 25          # experience in the job's care setting (documented, claimed, or at a target employer)

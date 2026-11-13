@@ -1,4 +1,4 @@
-# Draft email to the client (not sent)
+# Draft first message to the client
 
 **Subject:** Six questions that change who we recommend
 
@@ -14,7 +14,7 @@ I have built a working matcher on the sample you sent. Before results are relied
 
 4. **Claims without dates.** Does a candidate's own statement such as "three years of home-health work" count toward a minimum when their dated history shows less? *(Only dated history counts; the claim is shown and becomes the question to ask.)*
 
-5. **No-contact requests.** When a candidate asks not to be contacted, does that apply at once, or only once a recruiter updates the record? *(At once. Two candidates in the sample asked while their records still say contact is allowed.)*
+5. **No-contact requests.** When a candidate asks not to be contacted, does that apply at once, or only once a recruiter updates the record? *(At once. Two candidates in the sample asked; one record still says contact is allowed and the other's restriction field is empty.)*
 
 6. **How many people each job needs.** No record states openings or a submission limit. How many does each job need, and how many may be submitted? *(The list is not cut off; it opens on the top ten.)*
 

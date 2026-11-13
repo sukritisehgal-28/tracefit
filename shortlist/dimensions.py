@@ -1,7 +1,7 @@
-"""The quality score: six dimensions for people who pass every required rule.
+"""The quality score: six dimensions that order the people on a job's list.
 
 Stage one, the gates, is the rule engine: a required rule not met means "not a fit", one not known means
-"needs an answer". Stage two ranks only those who pass. Its score is a weighted average of six dimensions,
+"needs an answer". Stage two orders the list; someone ruled out is shown no score. The score is a weighted average of six dimensions,
 each 0 to 100 and each computed from rule results the page already explains, so every point traces to a
 quote. Nothing here reads a source.
 

@@ -94,7 +94,7 @@ def explain(engine: Engine, job_id: str, person_id: str, step: int) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(prog="shortlist", description="Rule-based candidate-job matching for recruiters.")
-    parser.add_argument("command", nargs="?", default="serve", choices=["serve", "replay", "coverage", "explain", "publish", "health", "audit", "worked", "burst"])
+    parser.add_argument("command", nargs="?", default="serve", choices=["serve", "replay", "coverage", "explain", "publish", "health", "audit", "worked", "burst", "baseline"])
     parser.add_argument("args", nargs="*")
     parser.add_argument("--overlay", help="configuration overlay from config/overlays, e.g. feed_only")
     parser.add_argument("--step", type=int, help="replay step (0 = snapshot)")
@@ -116,7 +116,10 @@ def main() -> None:
         from .config import list_overlays
         raise SystemExit(f"{exc}\nSettings profiles available: {', '.join(o['name'] for o in list_overlays())}") from None
     last = len(engine.events)
-    if opts.command == "replay":
+    if opts.command == "baseline":               # a simple field-and-keyword matcher, run for comparison
+        from .baseline import render, run
+        print(render(run(engine)))
+    elif opts.command == "replay":
         replay(engine)
     elif opts.command == "coverage":
         coverage(engine)
