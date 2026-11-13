@@ -19,6 +19,7 @@ Each is a setting in `config/default.toml` or one named choice in the code.
 13. **A broken source, record or date never stops matching.** It is worked around and listed.
 14. **Names have a source.** Stated, else the top of the résumé, else an email that clearly looks like a name, else the record id, and the page says which. The twelve profiles in our own system have no name field and their emails are `r01@…`, so they show as "Candidate R01".
 15. **A destination gets the top 200 per job and the totals.**
+16. **No candidate text leaves the client's systems by default.** The language-model reviewer and checker run only when the OpenAI profile is chosen with a key; otherwise matching uses the rules alone.
 
 ## Questions for the client
 
