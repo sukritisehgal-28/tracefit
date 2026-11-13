@@ -255,14 +255,15 @@ function card(m, job, twin, rank) {
 // The cards of one list, with two kinds of divider: people who must not be contacted (listed last among the
 // matches), and runs of people whose result is the same on every rule.
 // The line above a run of people who are level on every rule: say so, say whether their documents are even
-// the same words, and name what is missing for all of them that would tell them apart. Nothing is invented.
+// the same words, and name what is missing for all of them that would tell them apart. Nothing is invented,
+// and they stay separate people: each has its own record.
 function sameAs(list, i) {
   const run = [];
   for (let k = i; k < list.length && list[k].same === list[i].same; k++) run.push(list[k]);
   const m = list[i], sameDocs = m.docs != null && run.every((x) => x.docs === m.docs);
   const ask = (m.apart || []).filter((d) => run.every((x) => (x.apart || []).some((y) => y.key === d.key))).map((d) => esc(d.text));
   return `<div class="sameas"><b>${num(m.identical)} people have the same result on every rule</b>${sameDocs ? ", and their documents are word for word the same" : ""}.
-      Nothing on file tells them apart, so their order is arbitrary${sameDocs ? " and they may be one person imported more than once" : ""}.
+      Nothing on file tells them apart, so their order is arbitrary.
       ${ask.length ? `<span class="ask">To tell them apart, ask each for: ${ask.join(" · ")}.</span>` : ""}</div>`;
 }
 

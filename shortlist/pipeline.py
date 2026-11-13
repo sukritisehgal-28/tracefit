@@ -162,9 +162,9 @@ def job_summary(world, job, cfg: dict, sl: Shortlist | None) -> dict:
 
 
 def same_documents(world) -> list:
-    """People whose résumé or profile is word for word the same as someone else's. It may be a template, or one
-    person imported more than once: the tool keeps them apart (it joins people only on an explicit reference or
-    an email) and says so, so a recruiter does not contact one person several times."""
+    """People whose résumé or profile is word for word the same as someone else's. They stay separate people:
+    the tool joins records only on an explicit reference or an email. The note states the fact and the reason,
+    so the choice is visible and a client can overrule it by supplying a link."""
     stamp = (len(world.people), len(world.evidence))
     cached = world.__dict__.get("_same_documents")
     if cached and cached[0] == stamp:
@@ -186,8 +186,8 @@ def same_documents(world) -> list:
         named = ", ".join(refs[:4]) + (f" and {len(refs) - 4} more" if len(refs) > 4 else "")
         extra = f" For {len(twins)} of them ({named}) every document is identical." if len(twins) > 1 else ""
         out.append(Issue("info", "all sources", f"{len(g)} people",         # a fixed size, however many people share the text
-                         f"{len(g)} people have a résumé or profile that is word for word the same.{extra} They are kept as separate "
-                         "people because no reference or email links them. Confirm they are different people before contacting each."))
+                         f"{len(g)} people have a résumé or profile that is word for word the same.{extra} They are treated as separate "
+                         "people: each has its own record and email, and no reference links them."))
     if len(groups) > 5:
         out.append(Issue("info", "all sources", f"{len(groups) - 5} more groups", "More groups of people share one résumé or profile text."))
     world.__dict__["_same_documents"] = (stamp, out)

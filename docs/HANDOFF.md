@@ -5,7 +5,7 @@
 Each is a setting in `config/default.toml` or one named choice in the code.
 
 1. **The clock is fixed** at 7 November 2026. Nothing reads the system clock.
-2. **Identity is conservative.** Records join only on an explicit reference or an identical email; never a similar name, a name guessed from an email or résumé, or a shared mailbox like `info@`. The twelve profiles with identical text are twelve people. Two people with the same name stay two people, and the page shows which record each is.
+2. **Identity is conservative.** Records join only on an explicit reference or an identical email; never a similar name, a name guessed from an email or résumé, or a shared mailbox like `info@`. **The twelve profiles in our own system (R01–R12) are twelve candidates**, separate from C1–C4: each has its own id and email, no file links them to an ATS candidate (where the sources do mean the same person they say so, as the client database and the 18:10 update do), and their statements differ from one another. They share one background, so they are the similarly qualified case; R01–R03 are level on everything and the page says so. A reference or shared email from the client would merge any that turn out to be copies, with no code change. Two people with the same name stay two people, and the page shows which record each is.
 3. **Newest wins by default**, per fact, until the client sets source precedence. The older statement stays visible as replaced.
 4. **A bare claim does not override dated history.** "Three years" against a résumé showing 18 months is flagged and costs evidence points.
 5. **An account manager's note is a requirement change**: used, flagged on every result that depends on it, until the feed agrees.
@@ -35,7 +35,7 @@ Only questions the data cannot answer, where the answer changes a result. [CLIEN
 | 7 | Is approved pay a ceiling? Is a start date fixed? | R06 asks $50 over; Alex and R07 can start a week late; `J1-NOTE-02` | Pay lowers the score; a late start rules out and raises a question | Strict pay removes R06; a week's tolerance brings Alex and R07 back |
 | 8 | For the ED job, who approves a doctor on the "other boards" route, and is one-day cover acceptable? | `J2-NOTE-01` | Met and flagged | Without approval the ED job has no match to submit today |
 | 9 | How many people does each job need, and how many may be submitted? | No openings or limit anywhere | Nothing is cut off | The page could say "contact the top 2" and stop once that many are submitted |
-| 10 | Are the twelve near-identical profiles real, separate people? | R01–R12 share one profile text word for word; R01–R03 differ only by id and email | Twelve people, kept apart, flagged under data problems; level people grouped with what to ask each | "10 matches" may be two or three |
+| 10 | Does your own system ever hold a second copy of an ATS candidate without a reference to it? | R01–R12 share one profile text; R01–R03 differ only by id and email | No: twelve separate candidates (assumption 2); level people grouped with what to ask each | "10 matches" may be two or three |
 | 11 | Can we see past submissions and placements? | Weights are hand-set | Reasoned defaults | Weights calibrated per division on real outcomes |
 | 12 | May candidate text leave your systems, for example to a language-model provider? | The optional model reader | Off | It could read the phrasings the rules miss |
 

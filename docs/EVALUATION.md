@@ -14,7 +14,7 @@ In each case a matcher that trusts structured fields and keywords gives a confid
 | Casey is "placed", but a message says the assignment is Monday to Wednesday and offers both weekend shifts | Excludes Casey | **Match** for the ED job, by the other-boards route, through recruiter R3 |
 | Drew has the preferred board, declined both dates, asked for no contact; an older field says contact allowed | Ranks Drew first | **Not a fit** for these dates and **do not contact**; the stale field shown as replaced |
 | R01, R02, R03 differ only by id and email | Orders them by accident, or invents a difference | Grouped; order marked arbitrary; the page says their documents are the same words and what to ask to tell them apart |
-| Twelve profiles share one profile text | Twelve independent candidates | Kept as twelve (no email or reference links them) and reported once under data problems, to confirm before contacting each |
+| Twelve profiles share one profile text, each with its own id and email | Merges them on similar text, or ranks them by accident | Twelve separate candidates, joined to nobody (no reference or email links them); the shared text is stated once under data problems |
 | R04 says three years; the profile shows 18 months | Believes one | Passes on the note's one-year minimum but loses 30 evidence points, so ranks below R01; the claim becomes the question to ask |
 | R05 says they have not used Homecare Homebase; the profile lists it | Counts it | Uses the later denial; skills drop |
 | R11 asks for no contact; the restriction field is empty | Contactable | **Do not contact** until 15 Jan 2027, listed last |
