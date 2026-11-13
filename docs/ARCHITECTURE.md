@@ -170,7 +170,7 @@ A false yes puts someone on a shortlist they should not be on, so the reader is 
 
 This is still the weakest part, and it is pattern-based. An independent review of the finished tool found about forty sentences outside the sample's wording that were read as a yes, such as "held a Washington license until 2023" and "my colleague handles OASIS". Those are fixed and kept as tests ([EVALUATION.md](EVALUATION.md), experiment 8), but others will exist. Job postings are read by fewer patterns than candidate text: a requirement sentence the reader cannot use is shown on the job as unread, and one it half reads may lose a detail. Real data should start with a review of what is left unread.
 
-A language model can be switched on as a **second reader** (off by default, never run against a real model). Its proposals count only if ordinary code agrees that the quote is word for word in one sentence, says the thing claimed, and holds no doubt. It can never lift a no-contact request.
+A language model can be switched on as a **second reader** (off by default; run once with `gpt-4o` on the sample, where it changed no result). Its proposals count only if ordinary code agrees that the quote is word for word in one sentence, says the thing claimed, and holds no doubt. It can never lift a no-contact request.
 
 ## The checker
 
