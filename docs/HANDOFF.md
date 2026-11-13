@@ -53,7 +53,7 @@ Only questions the data cannot answer, where the answer changes a result. [CLIEN
 | Scale benchmark | Implemented on **synthetic** data: speed and memory only |
 | Worker processes on one machine (`shortlist/workers.py`) | Implemented and measured in the benchmark, on a laptop and on a 16-core cloud machine; the product runs on one process |
 | Destinations: JSON, CSV, notifications | **Simulated**: local files, nothing sent |
-| Language-model reader behind a guard | Built, **off, never run against a real model** |
+| Language-model reader behind a guard | Built, off by default; run once with `gpt-4o`, answers saved, no result changed |
 | Database, queue, several machines, live connections, sign-in | Designed, not built ([ARCHITECTURE.md](ARCHITECTURE.md#as-a-running-service-designed-not-built)) |
 
 ## Onboarding another client

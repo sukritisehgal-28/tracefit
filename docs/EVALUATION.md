@@ -49,6 +49,16 @@ The middle column is **run, not assumed**: `python3 -m shortlist baseline` is a 
 11. **A recruiter's own criteria**: 37 typed phrases and 22 institutions; five known limits are listed (a different word, an abbreviation, initials).
 12. **Size and workers.** Compact rows give exactly the list and explanations of full ones; lists built on 2, 3 and 5 worker processes are identical to the one-process list. Timings are in [ARCHITECTURE.md](ARCHITECTURE.md#scale-latency-and-cost).
 
+## A language model as a second reader (run once, measured)
+
+`python3 tests/model_run.py --live` asked an OpenAI model (`gpt-4o`) about all 213 candidate documents and test sentences, once; its answers are saved in `recorded/model_reads.json`, so `python3 tests/model_run.py` repeats the report with no key. Every proposal still had to pass the guard.
+
+- **Supplied data:** it proposed 17 facts; 14 matched what the rules had already read, the guard refused 3, and **no result changed** (0 of 176).
+- **Reworded sentences:** no "no", doubt or passing mention was read as a yes with it on; 11 of 11 contact requests caught; plain yes sentences read stayed at 28 of 30.
+- **The known misreadings** ("except December 5", "my earliest start is December 15", "less than two years") were not fixed: the model either agreed with the rules or proposed nothing the guard accepted.
+
+So on this data the model is safe but adds nothing. It is left off by default; the case for it would rest on real data with wording the sample does not have.
+
 ## What independent review found
 
 Before submitting, three review passes were run against the finished tool by AI sessions that had not seen it built.

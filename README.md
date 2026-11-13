@@ -135,7 +135,7 @@ sequenceDiagram
 | Recruiter weights, presets, filters and typed criteria (a phrase, a school); source precedence; résumé background and links | Implemented |
 | Working at size: a screenful at a time, explanations on demand, events applied one at a time | Implemented; speed measured on **synthetic** data |
 | Destinations (JSON, CSV, notifications) | **Simulated**: local files only |
-| Language-model reader | Built behind a guard, **off, never run against a real model**; tested only with made-up stand-ins |
+| Language-model reader | Built behind a guard and **off by default**. Run once with `gpt-4o` on the sample and test sentences; saved answers replay with `python3 tests/model_run.py`. It changed no result |
 | Database, queue, several machines, live connections, logins | Designed, not built |
 | Credential checks | Not done: every license and certificate is shown as reported |
 
