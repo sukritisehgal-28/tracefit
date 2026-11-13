@@ -7,7 +7,7 @@
 // screenful at a time from /api/cards; one person's explanation arrives from /api/detail when opened.
 // So the page behaves the same for sixteen people or a hundred thousand.
 
-const S = { step: 0, overlay: "", data: null, job: null, filter: "best", details: false, person: null,
+const S = { step: 0, overlay: document.currentScript.dataset.overlay || "", data: null, job: null, filter: "best", details: false, person: null,
             openRules: new Set(), showNA: false, compare: new Map(), comparing: false, pop: null, page: "jobs",
             toasts: [], published: null,
             lists: {},          // group -> { items, total } for the job on screen

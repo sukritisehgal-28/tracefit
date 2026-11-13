@@ -146,7 +146,7 @@ class Person:
 
 
 class Job:
-    __slots__ = ("key", "ids", "titles", "meta", "reqs", "evidence_ids", "note_ids", "profession", "division", "first_seen")
+    __slots__ = ("key", "ids", "titles", "meta", "reqs", "evidence_ids", "note_ids", "profession", "division", "first_seen", "unclear")
 
     def __init__(self, key: str):
         self.key = key
@@ -159,6 +159,7 @@ class Job:
         self.profession = None
         self.division = None
         self.first_seen: datetime | None = None
+        self.unclear: list = []
 
     def req(self, attr: str, key: str = "") -> Requirement | None:
         return self.reqs.get((attr, key))
@@ -475,9 +476,12 @@ class World:
             return self._markers("experience", key, claims)
         dated = [c for c in pos if c.value.get("start")]
         claimed = sorted((c for c in pos if c.value.get("years_claimed") is not None), key=lambda c: c.observed_at, reverse=True)
-        mentions = [c for c in pos if not c.value.get("start") and c.value.get("years_claimed") is None]
+        bounded = sorted((c for c in pos if "years_min" in c.value or "years_max" in c.value), key=lambda c: c.observed_at, reverse=True)
+        mentions = [c for c in pos if not c.value.get("start") and c.value.get("years_claimed") is None and c not in bounded]
         value = {"years_documented": None, "since": None, "precision": None, "ongoing": False,
                  "years_claimed": claimed[0].value["years_claimed"] if claimed else None}
+        if bounded:
+            value.update(bounded[0].value)
         if dated:
             spans = {(self.root(c.evidence_id), c.value["start"], c.value.get("end")) for c in dated}
             intervals = sorted((start, min(end or self.today, self.today)) for _, start, end in spans)
@@ -492,7 +496,7 @@ class World:
             first = min(dated, key=lambda c: c.value["start"])
             value.update(years_documented=years, since=first.value.get("since"),
                          precision=first.value.get("precision"), ongoing=any(c.value.get("end") is None for c in dated))
-        ordered = sorted(dated, key=lambda c: c.observed_at, reverse=True) + claimed + mentions
+        ordered = sorted(dated, key=lambda c: c.observed_at, reverse=True) + claimed + bounded + mentions
         return self._fact("experience", key, "pos", value, ordered, [])
 
     def _placement(self, claims: list[Claim]) -> Fact:
@@ -577,7 +581,9 @@ class World:
         for c in claims:
             grouped.setdefault((c.attr, c.key), []).append(c)
         for (attr, key), group in grouped.items():
-            if attr == "job_id":
+            if attr == "req.unclear":
+                j.unclear.extend(group)
+            elif attr == "job_id":
                 j.ids[key] = str(group[0].value)
             elif attr == "title":
                 for c in sorted(group, key=lambda c: self.source_order.get(self.evidence[c.evidence_id].source, 99), reverse=True):
@@ -639,6 +645,10 @@ class World:
     def issues(self) -> list[Issue]:
         """Every data problem the tool worked around, as of now."""
         out = list(self._global_issues)
+        if self.extractor.model and (self.extractor.model.stats.get("errors") or
+                                    (self.extractor.model.verifier and self.extractor.model.verifier.stats.get("errors"))):
+            out.append(Issue("warning", "model reader", "text review",
+                             "Some documents could not be reviewed. In the OpenAI review profile, unconfirmed parser claims remain questions."))
         for subject in sorted(self._issues):
             out.extend(self._issues[subject])
         known = {canon for canon, _ in self.lex.families.get("profession", ())}

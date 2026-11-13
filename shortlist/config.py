@@ -2,10 +2,37 @@
 from __future__ import annotations
 
 import copy
+import os
+import shlex
 import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def openai_environment(root: Path | str = ROOT) -> dict[str, str]:
+    """OpenAI credentials/settings from the process, falling back to a local .env.
+
+    Only these two variables are read. The file is parsed as data, never executed,
+    and its values are never included in configuration or browser payloads.
+    """
+    names = ("OPENAI_API_KEY", "OPENAI_MODEL")
+    values = {}
+    path = Path(root) / ".env"
+    if path.is_file():
+        for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            line = line.strip().removeprefix("export ")
+            name, sep, value = line.partition("=")
+            if not sep or name.strip() not in names:
+                continue
+            try:
+                parts = shlex.split(value, comments=True)
+            except ValueError:
+                raise ValueError(f".env line {line_no}: quote the value correctly") from None
+            if len(parts) > 1:
+                raise ValueError(f".env line {line_no}: use one value, quoted if it contains spaces")
+            values[name.strip()] = parts[0] if parts else ""
+    return {name: os.environ.get(name, values.get(name, "")).strip() for name in names}
 
 
 def deep_merge(base: dict, extra: dict) -> dict:

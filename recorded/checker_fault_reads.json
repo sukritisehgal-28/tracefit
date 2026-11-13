@@ -1,0 +1,50 @@
+{
+ "3539b32018332afc3d41399588640751410c1a2ab5f390dd49e25c65984a0e15": {
+  "evidence": "synthetic/someone-elses-work",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "OASIS access is reserved for someone else in the department.",
+     "verdict": "unsupported"
+    }
+   ]
+  }
+ },
+ "641305086678c5ebd7864b80402f964cd2a4ca9370bb1ca4d5eb7686c6967d2b": {
+  "evidence": "synthetic/wrong-role-dates",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Outpatient PT 2015 to 2022, home-health PT 2023 to present.",
+     "verdict": "unsupported"
+    }
+   ]
+  }
+ },
+ "65285a432951cca1f11ac0be27099751bfa39d226b9d289df654b1756e130a6b": {
+  "evidence": "synthetic/ignored-exception",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I can cover most dates, except December 5.",
+     "verdict": "unsupported"
+    }
+   ]
+  }
+ }
+}

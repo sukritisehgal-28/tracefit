@@ -130,6 +130,13 @@ def unread_requirements(world, job) -> list[str]:
     return out[:8]
 
 
+def _offered_overlays(root, current) -> list:
+    """The settings profiles the page offers. The OpenAI profile is offered only where a key is set (or it is
+    already in use), so a page without one, such as the hosted demo, never presents rule-only results under its name."""
+    has_key = bool(configuration.openai_environment(root).get("OPENAI_API_KEY"))
+    return [o for o in configuration.list_overlays(root) if o["name"] != "openai" or has_key or current == "openai"]
+
+
 def cards_payload(world, sl: Shortlist, group: str, offset: int = 0, limit: int = PAGE_SIZE,
                   weights: dict | None = None, filters=()) -> dict:
     """One screenful of one list. With the settings' weights and no filters the cost does not depend on how
@@ -346,6 +353,9 @@ class Engine:
             row["not_seen"] = [o for o in row["declared"] if row["counts"][o] == 0]
         reading = [{"id": rid, "what": what, "fired": w.extractor.fired.get(rid, 0)} for rid, what in READING_RULES.items()]
         return {"pairs": pairs, "rules": table, "every_rule_ran": all(row["evaluations"] == pairs for row in table.values()),
+                "model_reader": ({"model": w.extractor.model.model_id, "review_claims": w.extractor.model.review_claims,
+                                  "verifier": dict(w.extractor.model.verifier.stats) if w.extractor.model.verifier else None,
+                                  "stats": dict(w.extractor.model.stats)} if w.extractor.model else None),
                 "reading_rules": reading, "reading_never_fired": [r["id"] for r in reading if not r["fired"]],
                 "unparsed_clauses": len(w.extractor.unparsed), "claims": w.claim_count, "evidence": len(w.evidence),
                 "unrecognised": [{"term": t, "people": n} for t, n in unrecognised(w)[:25]]}
@@ -392,7 +402,7 @@ class Engine:
             "meta": {
                 "reference_date": self.cfg["clock"]["reference_date"], "reference_label": fmt_date(w.today),
                 "as_of": w.as_of.isoformat(), "step": step, "steps": self.steps,
-                "overlay": self.cfg.get("_overlay"), "overlays": configuration.list_overlays(self.root),
+                "overlay": self.cfg.get("_overlay"), "overlays": _offered_overlays(self.root, self.cfg.get("_overlay")),
                 "policy": self.cfg["requirement_changes"]["policy"],
                 "scoring": {k: scoring[k] for k in ("unknown_credit", "strong_threshold", "tie_margin", "tie_breakers")},
                 "sources": [{"name": s["name"], "label": s.get("label", s["name"]), "adapter": s["adapter"], "path": s["path"]} for s in self.cfg["sources"]],

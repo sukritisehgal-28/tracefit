@@ -1,0 +1,11 @@
+label = "OpenAI second reader"
+description = "OpenAI reviews parser claims and reads missing facts; uncertain readings become questions."
+
+[model_reader]
+provider = "openai"
+model = "gpt-4o"
+openai_model = "gpt-4o"
+allow_external_text = true
+review_claims = true
+verify_claims = true
+recorded_path = "out/openai_reads.json"

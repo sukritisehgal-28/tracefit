@@ -1,0 +1,3575 @@
+{
+ "02174efc0dbe579749476ce712397ea4ca5db6c21cd91de76e01f5b3ec40feee": {
+  "evidence": "supplement/C1-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_visits",
+     "kind": "skill",
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "soc_documentation",
+     "kind": "skill",
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "Physical therapist currently working in home health.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "Complete OASIS start-of-care documentation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "homecare_homebase",
+     "kind": "skill",
+     "quote": "Use Homecare Homebase for clinical documentation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "Washington physical-therapy license — active, as reported by the candidate.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Physical therapist currently working in home health.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Evergreen Visiting Care \u0014 Home-health Physical Therapist\nMay 2025\u0013present",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Conduct independent physical-therapy visits in patients' homes.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Conduct independent physical-therapy visits in patients' homes.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "Complete OASIS start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 8,
+     "quote": "Complete OASIS start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 9,
+     "quote": "Use Homecare Homebase for clinical documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 10,
+     "quote": "Washington physical-therapy license \u0014 active, as reported by the candidate.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "0402a5b5b0a5e4ee3e98c3b2ccb28a7c17ff753d1702ebf3d20fd85596e42e8e": {
+  "evidence": "our_system/EV-C1-NEW",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "I cannot start until December 8.",
+     "says": "yes",
+     "value": "2026-12-08"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I cannot start until December 8.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "080ad94deb3451b2526b6c9256272b1021fed1a9898750dfd0fa345bb738830e": {
+  "evidence": "ats/C2-OPS",
+  "kind": "ops_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "do_not_contact",
+     "quote": "candidate requested that opportunities go through R2",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": []
+  }
+ },
+ "0e66fc760bcca567928b0dc53c30bb0cb6632e61dbf176fcd39cca9763468713": {
+  "evidence": "vms/VMS-901",
+  "kind": "job_feed",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "home health",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "start 2026-12-01",
+     "says": "yes",
+     "value": "2026-12-01"
+    },
+    {
+     "key": "",
+     "kind": "weeks",
+     "quote": "13 weeks",
+     "says": "yes",
+     "value": "13"
+    },
+    {
+     "key": "",
+     "kind": "schedule",
+     "quote": "weekdays, 40 hours/week",
+     "says": "yes",
+     "value": "weekdays"
+    },
+    {
+     "key": "Spokane, Washington",
+     "kind": "location",
+     "quote": "Spokane, Washington",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "home_visits",
+     "kind": "skill",
+     "quote": "independent home visits",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "soc_documentation",
+     "kind": "skill",
+     "quote": "start-of-care documentation",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "homecare_homebase",
+     "kind": "skill",
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "home_health",
+     "kind": "minimum_experience",
+     "quote": "Structured minimum experience: 2 years.",
+     "says": "yes",
+     "value": "2.0"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Open physical therapist role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "home health;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "start 2026-12-01;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "13 weeks;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "weekdays, 40 hours/week;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "weekdays, 40 hours/week;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "approved candidate pay USD 2,450/week for 40 hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "Structured minimum experience: 2 years.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 8,
+     "quote": "Description: independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 9,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 10,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 11,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 12,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "0e702c43dbf5b9f13687aa2c5ba645b0aa4a18437661142040d646993b0270ec": {
+  "evidence": "our_system/R12-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "Spokane",
+     "kind": "location",
+     "quote": "Spokane is no longer a location I would consider.",
+     "says": "no",
+     "value": ""
+    }
+   ],
+   "reviews": []
+  }
+ },
+ "0e891d55fc5ca810b6903c0b3a1b037aae9574dc336329fa14f0592084cb46c5": {
+  "evidence": "supplement/C1-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "Physical therapist currently working in home health.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "home_visits",
+     "kind": "skill",
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "soc_documentation",
+     "kind": "skill",
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "Evergreen Visiting Care  Home-health Physical Therapist",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "home_visits",
+     "kind": "skill",
+     "quote": "Conduct independent physical-therapy visits in patients' homes.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "Complete OASIS start-of-care documentation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "soc_documentation",
+     "kind": "skill",
+     "quote": "Complete OASIS start-of-care documentation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "homecare_homebase",
+     "kind": "skill",
+     "quote": "Use Homecare Homebase for clinical documentation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "Washington physical-therapy license  active, as reported by the candidate.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Physical therapist currently working in home health.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Evergreen Visiting Care  Home-health Physical Therapist",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Conduct independent physical-therapy visits in patients' homes.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Conduct independent physical-therapy visits in patients' homes.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "Complete OASIS start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 8,
+     "quote": "Complete OASIS start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 9,
+     "quote": "Use Homecare Homebase for clinical documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 10,
+     "quote": "Washington physical-therapy license  active, as reported by the candidate.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "0f424b27543c23c2e06d728c947386d14bd9335b5a17a225b816ca560fd2aae8": {
+  "evidence": "supplement/J2-NOTE-01",
+  "kind": "job_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "The request is for both December 5 and December 6, 07:00–19:00 in Dayton local time.",
+     "says": "no",
+     "value": "2026-12-05"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "The request is for both December 5 and December 6, 07:00–19:00 in Dayton local time.",
+     "says": "no",
+     "value": "2026-12-06"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "The posting allows consideration of other boards with ATLS, ACLS, PALS and BLS;",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "0fd5533f31dfd9024cc63ed293dfdb9b32f1379613a21eec990bb2a6d34ab841": {
+  "evidence": "supplement/C2-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "outpatient",
+     "kind": "setting",
+     "quote": "Summit University Hospital — Outpatient Physical Therapist",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "orthopedic_rehab",
+     "kind": "skill",
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "I report an active Washington PT license.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Summit University Hospital  Outpatient Physical Therapist",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I work in the hospital's outpatient physical-therapy setting.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I report an active Washington PT license.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Outpatient rehabilitation;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "orthopedic rehabilitation;",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "13d7e14bb236c1eb96df222d19cbe99727bca3fa5bb36f2d34a9ff10f1a871ca": {
+  "evidence": "supplement/C1-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Physical therapist currently working in home health.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Evergreen Visiting Care \u0014 Home-health Physical Therapist\nMay 2025\u0013present",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Conduct independent physical-therapy visits in patients' homes.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Conduct independent physical-therapy visits in patients' homes.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "Complete OASIS start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 8,
+     "quote": "Complete OASIS start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 9,
+     "quote": "Use Homecare Homebase for clinical documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 10,
+     "quote": "Washington physical-therapy license \u0014 active, as reported by the candidate.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "1805d3f231fd576fe7c7203d7105c6f2c639cd697e5a91ecfc96b00d3c772bd7": {
+  "evidence": "client_db/C3-MSG",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "My current assignment is Monday through Wednesday.",
+     "says": "no",
+     "value": "2026-11-09"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "My current assignment is Monday through Wednesday.",
+     "says": "no",
+     "value": "2026-11-10"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "My current assignment is Monday through Wednesday.",
+     "says": "no",
+     "value": "2026-11-11"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "I could cover both December 5 and 6 day shifts in Dayton.",
+     "says": "yes",
+     "value": "2026-12-05"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "I could cover both December 5 and 6 day shifts in Dayton.",
+     "says": "yes",
+     "value": "2026-12-06"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "My current assignment is Monday through Wednesday.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I could cover both December 5 and 6 day shifts in Dayton.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I could cover both December 5 and 6 day shifts in Dayton.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "My minimum is $230/hour.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "1b3aa46e3da9c773fcd0486f062fcdbcb2b53247e498de19c0fd5b421f79dfab": {
+  "evidence": "ats/C1-OPS",
+  "kind": "ops_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": []
+  }
+ },
+ "223b13b939e2db189eec0f9e33a3192fbfa9256b83b9b99b98235755c8a948c8": {
+  "evidence": "supplement/C2-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Summit University Hospital  Outpatient Physical Therapist\n2016present",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I work in the hospital's outpatient physical-therapy setting.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I report an active Washington PT license.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Outpatient rehabilitation;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "orthopedic rehabilitation;",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "269723e35e5007d8742151fe286d764d35593a8acd4befcce691084a925367d2": {
+  "evidence": "vms/VMS-902",
+  "kind": "job_feed",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "emergency_department",
+     "kind": "setting",
+     "quote": "Open emergency-medicine locums physician role; fictional facility in Dayton, Ohio;",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "Dayton, Ohio",
+     "kind": "location",
+     "quote": "fictional facility in Dayton, Ohio;",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "December 5–6, 2026, 07:00–19:00 each day;",
+     "says": "yes",
+     "value": "2026-12-05"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "December 5–6, 2026, 07:00–19:00 each day;",
+     "says": "yes",
+     "value": "2026-12-05"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "December 5–6, 2026, 07:00–19:00 each day;",
+     "says": "yes",
+     "value": "2026-12-06"
+    },
+    {
+     "key": "OH",
+     "kind": "license",
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Open emergency-medicine locums physician role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Open emergency-medicine locums physician role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "approved candidate pay USD 240/hour.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "ABEM/AOBEM preferred.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Other boards considered with ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "28a6bc5826c118a496134796010bfdca6463f845694eb18e50d30546f8a7be64": {
+  "evidence": "vms/VMS-903",
+  "kind": "job_feed",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Outpatient orthopedic rehabilitation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Oregon license required before start.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "2a7c5d5bf47109b9b9fcb38cc910f1a4b359a0e55ffe5d4ba61db939b6edf9a8": {
+  "evidence": "supplement/J1-NOTE-02",
+  "kind": "job_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_health",
+     "kind": "minimum_experience",
+     "quote": "one year of home-health experience is acceptable;",
+     "says": "yes",
+     "value": "1.0"
+    },
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "OASIS is still needed for start-of-care visits;",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "My November 5 note reflects the facility conversation: one year of home-health experience is acceptable;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "OASIS is still needed for start-of-care visits;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Homecare Homebase can be trained.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "2af25358c9ac73978e759d582c7b0ff6a11e49f54883bff03a72621c55eaadb2": {
+  "evidence": "ats/C1-CV",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_visits",
+     "kind": "skill",
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "soc_documentation",
+     "kind": "skill",
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "homecare_homebase",
+     "kind": "skill",
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "Candidate reports active Washington PT license.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Candidate reports active Washington PT license.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "2b4ab5d22dd0c975f4c8616dd6181e8c51d55274d21169810fea86cebf9422cf": {
+  "evidence": "supplement/C2-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "outpatient",
+     "kind": "setting",
+     "quote": "Summit University Hospital  Outpatient Physical Therapist\n2016present",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "orthopedic_rehab",
+     "kind": "skill",
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "I report an active Washington PT license.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Summit University Hospital  Outpatient Physical Therapist\n2016present",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I work in the hospital's outpatient physical-therapy setting.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I report an active Washington PT license.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Outpatient rehabilitation;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "orthopedic rehabilitation;",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "2e59816056c17a39893ea2c66140cebfebf6a501aaa5545f9e67bfa9542680cb": {
+  "evidence": "supplement/R05-NOTE-01",
+  "kind": "recruiter_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "homecare_homebase",
+     "kind": "skill",
+     "quote": "The candidate says they have not used Homecare Homebase",
+     "says": "no",
+     "value": ""
+    },
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "The update also says two years in home health",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": []
+  }
+ },
+ "2f19ce6541764cef9522281aed81ab53f63d7bd55b71c43873987f276cc19663": {
+  "evidence": "supplement/C4-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "emergency_department",
+     "kind": "setting",
+     "quote": "Emergency-department attending — 2017–present.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "abem",
+     "kind": "cert",
+     "quote": "ABEM certification, as reported by the candidate.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "OH",
+     "kind": "license",
+     "quote": "Active Ohio physician license, as reported by the candidate.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "Columbus, Ohio",
+     "kind": "location",
+     "quote": "Home location: Columbus, Ohio.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Drew Sample | Emergency Medicine Physician",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Emergency-medicine residency at Lakeview Medical Center, completed 2017.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Emergency-department attending — 2017–present.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "ABEM certification, as reported by the candidate.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Active Ohio physician license, as reported by the candidate.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Emergency-department practice since completion of residency.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "30af0b090b6452d0aab789af64b46bf43847fd22ed223b4037f6ce9311756962": {
+  "evidence": "our_system/R07-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I can start December 8, not December 1.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "323cf44625e2f9d03566c7d161dc9176cff7e2a6e029f61b21ec582500b78dd3": {
+  "evidence": "client_db/J1-AM",
+  "kind": "job_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_health",
+     "kind": "minimum_experience",
+     "quote": "Facility confirmed one year of home-health experience is acceptable.",
+     "says": "yes",
+     "value": "1.0"
+    },
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "OASIS remains required for start-of-care visits.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "Washington license must be active before start.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Facility confirmed one year of home-health experience is acceptable.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "OASIS remains required for start-of-care visits.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Homecare Homebase is preferred;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Washington license must be active before start.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "323d31ee96d6232a65e3dc1e57ab5060beece0887513322d6afb00344e219229": {
+  "evidence": "supplement/C3-NOTE-02",
+  "kind": "recruiter_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Casey says the current assignment runs Monday through Wednesday and offers the two Dayton day shifts.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "328f1ba62b9b283edf381bd0a135afc60e3d41a5c4a0e7a837f58381f1535153": {
+  "evidence": "ats/J2",
+  "kind": "job_record",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "emergency_department",
+     "kind": "setting",
+     "quote": "Open emergency-medicine locums physician role; fictional facility in Dayton, Ohio;",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "Dayton, Ohio",
+     "kind": "location",
+     "quote": "fictional facility in Dayton, Ohio;",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "December 5–6, 2026, 07:00–19:00 each day;",
+     "says": "yes",
+     "value": "2026-12-05"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "December 5–6, 2026, 07:00–19:00 each day;",
+     "says": "yes",
+     "value": "2026-12-05"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "December 5–6, 2026, 07:00–19:00 each day;",
+     "says": "yes",
+     "value": "2026-12-06"
+    },
+    {
+     "key": "OH",
+     "kind": "license",
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Open emergency-medicine locums physician role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Open emergency-medicine locums physician role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "approved candidate pay USD 240/hour.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "ABEM/AOBEM preferred.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Other boards considered with ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "33031f73a3b12b18b1f85bae9b5ddc31517464637e0f3c32ad0bafa122dfd4b5": {
+  "evidence": "our_system/R01-PREF",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "can start December 1",
+     "says": "yes",
+     "value": "2026-12-01"
+    },
+    {
+     "key": "Spokane",
+     "kind": "location",
+     "quote": "I am interested in Spokane",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "",
+     "kind": "schedule",
+     "quote": "work weekdays for thirteen weeks",
+     "says": "yes",
+     "value": "weekdays"
+    },
+    {
+     "key": "",
+     "kind": "weeks",
+     "quote": "work weekdays for thirteen weeks",
+     "says": "yes",
+     "value": "13"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "36ea79cdc286ef264855666667b58923b6ef36534386f4005d100ef3eaa0f0d4": {
+  "evidence": "our_system/EV-C1-NEW",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I cannot start until December 8.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "38b78288cad4ef07022ac7ee2b15fba12ab6238121bf8555dc754a13f9264e0f": {
+  "evidence": "supplement/C4-NOTE-02",
+  "kind": "recruiter_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "do_not_contact",
+     "quote": "asks for no job contact until January 15",
+     "says": "yes",
+     "value": "2027-01-15"
+    }
+   ],
+   "reviews": []
+  }
+ },
+ "4130b74e7b39d1e53d29261a5ddb203adc0a2c1ae9750f466de2d1e54fe536ed": {
+  "evidence": "vms/VMS-901",
+  "kind": "job_feed",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Open physical therapist role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "home health;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "start 2026-12-01;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "13 weeks;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "weekdays, 40 hours/week;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "weekdays, 40 hours/week;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "approved candidate pay USD 2,450/week for 40 hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "Structured minimum experience: 2 years.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 8,
+     "quote": "Description: independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 9,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 10,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 11,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 12,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 13,
+     "quote": "independent home visits",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 14,
+     "quote": "start-of-care documentation",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "41a6fbd7b46901856dc80de53bcf254133484cbfd2f30ebe791fd97661897903": {
+  "evidence": "supplement/C3-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "emergency_department",
+     "kind": "setting",
+     "quote": "Clinical practice in the emergency-department setting.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "OH",
+     "kind": "license",
+     "quote": "Active Ohio physician license.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "atls",
+     "kind": "cert",
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "acls",
+     "kind": "cert",
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "pals",
+     "kind": "cert",
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "bls",
+     "kind": "cert",
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Emergency-department attending, 2019–present",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Clinical practice in the emergency-department setting.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Family-medicine board certification.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Active Ohio physician license.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "42f9972a1eff3c61da00046e8776cf82feda2d2fa9d39f4be2e2e162fcb703e1": {
+  "evidence": "our_system/R04-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I have three years of home-health work, including OASIS and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I have three years of home-health work, including OASIS and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I have three years of home-health work, including OASIS and Homecare Homebase.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "433075d75553d86770b1a2b20be67186292ea7bc8e68cf7a8d470d11c06019f2": {
+  "evidence": "supplement/J1-NOTE-02",
+  "kind": "job_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "My November 5 note reflects the facility conversation: one year of home-health experience is acceptable;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "OASIS is still needed for start-of-care visits;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Homecare Homebase can be trained.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "44ca77d3be2309625192be1a5fd9a93878ba6df24af605f9678b2a44c4a57526": {
+  "evidence": "our_system/R05-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "I have two years of home-health work and OASIS experience.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "homecare_homebase",
+     "kind": "skill",
+     "quote": "I have not used Homecare Homebase.",
+     "says": "no",
+     "value": ""
+    },
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "I have two years of home-health work and OASIS experience.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I have two years of home-health work and OASIS experience.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I have two years of home-health work and OASIS experience.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "47bb754c6aa2617bc870341c165189c0a1e7354ababcf5ba49cd35ecfdeecf66": {
+  "evidence": "supplement/C1-NOTE-02",
+  "kind": "recruiter_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Alex's latest message mentions Spokane, December 1 and $2,400 for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Alex's latest message mentions Spokane",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Alex's latest message mentions Spokane, December 1",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "4bae2f3d2b28cdbc0953d1fb8d49e608184e9a16f92ad6b6d1a4d40854c97fd1": {
+  "evidence": "client_db/C2-NOTE",
+  "kind": "recruiter_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": []
+  }
+ },
+ "4c96e8de5242924e6c7ddf160a978e14993774a32bdc347a6e6459d6d7449a08": {
+  "evidence": "ats/C2-CV",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Summit University Hospital outpatient PT, 2016 to present.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Orthopedic rehabilitation and sports injury recovery.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Candidate reports active Washington PT license.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "50638068aca659618d7c5e196282658d3dc31dcde6cf891217e3df67f5136254": {
+  "evidence": "ats/J2",
+  "kind": "job_record",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Open emergency-medicine locums physician role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Open emergency-medicine locums physician role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "approved candidate pay USD 240/hour.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "ABEM/AOBEM preferred.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Other boards considered with ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "5914f6516a44e271c15fcb79129c3a00ff215dd5ebe0f07d2f7a6d3059722fc1": {
+  "evidence": "supplement/C4-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Drew Sample | Emergency Medicine Physician",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Emergency-medicine residency at Lakeview Medical Center, completed 2017.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Emergency-department attending — 2017–present.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "ABEM certification, as reported by the candidate.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Active Ohio physician license, as reported by the candidate.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Emergency-department practice since completion of residency.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "5bd38eb1024b58970e758c823e4e11188818c30e7e3bef8ad7af3532d697f82a": {
+  "evidence": "supplement/C1-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Physical therapist currently working in home health.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "My current work includes independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Evergreen Visiting Care \u0014 Home-health Physical Therapist",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Conduct independent physical-therapy visits in patients' homes.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Conduct independent physical-therapy visits in patients' homes.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "Complete OASIS start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 8,
+     "quote": "Complete OASIS start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 9,
+     "quote": "Use Homecare Homebase for clinical documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 10,
+     "quote": "Washington physical-therapy license \u0014 active, as reported by the candidate.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "5d1866409ac0498d426d636dd24ee6d04bd2ef8c87a2f44a54068278f8e899f3": {
+  "evidence": "our_system/R08-PREF",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "Spokane",
+     "kind": "location",
+     "quote": "I am interested in Spokane and need $2,400/week for forty hours.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I am interested in Spokane and need $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I am interested in Spokane and need $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I am interested in Spokane and need $2,400/week for forty hours.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "5d88e91ae136fa63d116aac64882a6cb3bef2665a8d59e4f127b2e59d2aba205": {
+  "evidence": "our_system/R01-PREF",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "I am interested in Spokane, can start December 1, work weekdays for thirteen weeks, and need at least $2,400/week for forty hours.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "629a50d7cf0c073db93b550b50693361155efb4f31f69e4a03b4bccf84036a8f": {
+  "evidence": "ats/C4-CV",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Emergency-medicine residency at Lakeview Medical Center, completed 2017.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Emergency-department attending, 2017 to present.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Candidate reports ABEM certification and active Ohio license.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Candidate reports ABEM certification and active Ohio license.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "649a6f5e437eb37ffe1aae665615b79592ed1db21a407f3da20f13cebffa6719": {
+  "evidence": "our_system/R09-PREF",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "65232ccb4e0231645f4ac91013011a9988d6e0b93c9cc16b40e9288b36bb0060": {
+  "evidence": "client_db/C4-MSG",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "I cannot work December 5",
+     "says": "no",
+     "value": "2026-12-05"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "I cannot work December 5 or 6",
+     "says": "no",
+     "value": "2026-12-06"
+    },
+    {
+     "key": "",
+     "kind": "do_not_contact",
+     "quote": "Please do not contact me about any jobs until January 15, 2027.",
+     "says": "yes",
+     "value": "2027-01-15"
+    }
+   ],
+   "reviews": []
+  }
+ },
+ "6a4c74cdd759f639ef75a23c67672af9540b8f938274c7168773f1d796b51837": {
+  "evidence": "our_system/R08-PREF",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I am interested in Spokane and need $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I am interested in Spokane and need $2,400/week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I am interested in Spokane and need $2,400/week for forty hours.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "70af7e3a8b0f3be311f65d609e202d99f2ca7a41c32aa61c0a6dad71ca7f6aad": {
+  "evidence": "supplement/R04-NOTE-01",
+  "kind": "recruiter_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "three years of home-health work",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": []
+  }
+ },
+ "71067793c8c815e72d5c132830ef30d450d22411a34202ad795f2a6b4bc72152": {
+  "evidence": "ats/C2-CV",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "orthopedic_rehab",
+     "kind": "skill",
+     "quote": "Orthopedic rehabilitation and sports injury recovery.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "outpatient",
+     "kind": "setting",
+     "quote": "Summit University Hospital outpatient PT, 2016 to present.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "Candidate reports active Washington PT license.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Summit University Hospital outpatient PT, 2016 to present.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Orthopedic rehabilitation and sports injury recovery.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Candidate reports active Washington PT license.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "72252855f85b129c96bdad723def957d29e0704e840e6ef7a7eb5028504fd179": {
+  "evidence": "our_system/R04-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "I have three years of home-health work, including OASIS and Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "including OASIS and Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "homecare_homebase",
+     "kind": "skill",
+     "quote": "including OASIS and Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I have three years of home-health work, including OASIS and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I have three years of home-health work, including OASIS and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I have three years of home-health work, including OASIS and Homecare Homebase.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "75ecd84cd9e776641b263e653934ec56d72b1eb5caa4f64b590e7e6907878324": {
+  "evidence": "ats/C3-CV",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Emergency-department attending at Prairie Regional Hospital, 2019 to present.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "7a8df0477cbe2c1463416a706098dbcc81c1bce000fc7016964e3b11c6799f89": {
+  "evidence": "vms/VMS-904",
+  "kind": "job_feed",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "outpatient",
+     "kind": "setting",
+     "quote": "Outpatient orthopedic rehabilitation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "Washington PT license required before start.",
+     "says": "unsure",
+     "value": ""
+    },
+    {
+     "key": "",
+     "kind": "schedule",
+     "quote": "Weekdays.",
+     "says": "yes",
+     "value": "weekdays"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Outpatient orthopedic rehabilitation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Washington PT license required before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Washington PT license required before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "One year of relevant experience preferred.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Weekdays.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "7a9b75dd6a8cce63ca4b362ad07fcd500ea5624bb4cfab272bb09a8cb4c31efe": {
+  "evidence": "ats/C3-OPS",
+  "kind": "ops_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "do_not_contact",
+     "quote": "no authorization for automated candidate outreach recorded",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": []
+  }
+ },
+ "7c5dba5be0d756cc417b82910702132abcf0f1e7b9fac18e8defeb66add8179b": {
+  "evidence": "supplement/C3-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Emergency-department attending, 2019–present",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Clinical practice in the emergency-department setting.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Family-medicine board certification.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Active Ohio physician license.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "7e490670b8462ca4bea3b35c95f000284465eb245022b89c4166711595f26b73": {
+  "evidence": "our_system/R11-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "do_not_contact",
+     "quote": "Please do not contact me about jobs until January 15, 2027.",
+     "says": "yes",
+     "value": "2027-01-15"
+    }
+   ],
+   "reviews": []
+  }
+ },
+ "807dd39041146a93fd0ff8c824edc635e679ca8e1d9b1fc88b8fd01231aabb26": {
+  "evidence": "our_system/R01-BASE",
+  "kind": "profile",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_visits",
+     "kind": "skill",
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "soc_documentation",
+     "kind": "skill",
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "homecare_homebase",
+     "kind": "skill",
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "Home-health physical therapist at fictional Evergreen Visiting Care since May 2025.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "Reports active Washington PT license.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Home-health physical therapist at fictional Evergreen Visiting Care since May 2025.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Reports active Washington PT license.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "81d2d00363d41f417d88b095e8a18d64276dfb7db8c4941a59abe11043ec1ed3": {
+  "evidence": "client_db/C3-MSG",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "My current assignment is Monday through Wednesday.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I could cover both December 5 and 6 day shifts in Dayton.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I could cover both December 5 and 6 day shifts in Dayton.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "My minimum is $230/hour.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "8a54f626f7c66ae99704dede08f118cdd08cb053566b3a0ce2a5f6e68423be7b": {
+  "evidence": "supplement/C2-CV-FULL",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Summit University Hospital  Outpatient Physical Therapist\n2016present",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "My work focuses on outpatient orthopedic rehabilitation and recovery following sports injuries.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I work in the hospital's outpatient physical-therapy setting.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I report an active Washington PT license.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Outpatient rehabilitation;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "orthopedic rehabilitation;",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "8b70dd2b717db8782b82ea667facf4e14d13241b0290970b7c00d52b3754634c": {
+  "evidence": "ats/C4-CV",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "emergency_department",
+     "kind": "setting",
+     "quote": "Emergency-medicine residency at Lakeview Medical Center, completed 2017.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "emergency_department",
+     "kind": "setting",
+     "quote": "Emergency-department attending, 2017 to present.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "abem",
+     "kind": "cert",
+     "quote": "Candidate reports ABEM certification and active Ohio license.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "OH",
+     "kind": "license",
+     "quote": "Candidate reports ABEM certification and active Ohio license.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Emergency-medicine residency at Lakeview Medical Center, completed 2017.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Emergency-department attending, 2017 to present.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Candidate reports ABEM certification and active Ohio license.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Candidate reports ABEM certification and active Ohio license.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "8fb03e44c7bf2d10d1e374a4f30aa63931a0f25a07a5d455c7a727f134d5504d": {
+  "evidence": "ats/J1",
+  "kind": "job_record",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Open physical therapist role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "home health;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "start 2026-12-01;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "13 weeks;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "weekdays, 40 hours/week;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "weekdays, 40 hours/week;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "approved candidate pay USD 2,450/week for 40 hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "Structured minimum experience: 2 years.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 8,
+     "quote": "Description: independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 9,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 10,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 11,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 12,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "94a97f026ec095bd0e9f0ff3d7c66be50e356b5b350ce26db919f593698af163": {
+  "evidence": "ats/J1",
+  "kind": "job_record",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "home health",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "start 2026-12-01",
+     "says": "yes",
+     "value": "2026-12-01"
+    },
+    {
+     "key": "",
+     "kind": "weeks",
+     "quote": "13 weeks",
+     "says": "yes",
+     "value": "13"
+    },
+    {
+     "key": "",
+     "kind": "schedule",
+     "quote": "weekdays, 40 hours/week",
+     "says": "yes",
+     "value": "weekdays"
+    },
+    {
+     "key": "Spokane, Washington",
+     "kind": "location",
+     "quote": "Spokane, Washington",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "WA",
+     "kind": "license",
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "oasis",
+     "kind": "skill",
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "homecare_homebase",
+     "kind": "skill",
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Open physical therapist role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "home health;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "start 2026-12-01;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "13 weeks;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "weekdays, 40 hours/week;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "weekdays, 40 hours/week;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "approved candidate pay USD 2,450/week for 40 hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 7,
+     "quote": "Structured minimum experience: 2 years.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 8,
+     "quote": "Description: independent home visits and start-of-care documentation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 9,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 10,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 11,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 12,
+     "quote": "Requirements: Washington PT license, OASIS, Homecare Homebase.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "951226b95599191142b908070c8fa9e7ce1d03a637d3f72132391d3c9f45ec87": {
+  "evidence": "supplement/C3-NOTE-02",
+  "kind": "recruiter_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "Casey says the current assignment runs Monday through Wednesday",
+     "says": "no",
+     "value": "2026-11-09"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "Casey says the current assignment runs Monday through Wednesday",
+     "says": "no",
+     "value": "2026-11-10"
+    },
+    {
+     "key": "",
+     "kind": "shift",
+     "quote": "Casey says the current assignment runs Monday through Wednesday",
+     "says": "no",
+     "value": "2026-11-11"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Casey says the current assignment runs Monday through Wednesday and offers the two Dayton day shifts.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "995ead3a55ca5a5bc3c1ee6bddcb624e83af015181c7186b05521306cc464db0": {
+  "evidence": "our_system/R10-WORKFLOW",
+  "kind": "ops_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "do_not_contact",
+     "quote": "Contact restriction: Opportunity recommendations must go through recruiter R10.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": []
+  }
+ },
+ "a3409d37a683312cf3befb53c93409ccb5aeb1b17b6d0ed46d7372937e17c359": {
+  "evidence": "ats/C1-CV",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Evergreen Visiting Care, home-health PT, 2025-05 to present: independent home visits, OASIS start-of-care documentation, Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Candidate reports active Washington PT license.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "ab729bbf414fdba3e310079de589686609f7369a5a30d1fe6c48cf66500cd0c0": {
+  "evidence": "client_db/C1-MSG",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I am open to Spokane now.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "ad7701f7fd0d9c56734ff5376e1b95c40b224cdc2cb4035828ded2ef2e2722e3": {
+  "evidence": "vms/VMS-903",
+  "kind": "job_feed",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "outpatient",
+     "kind": "setting",
+     "quote": "Outpatient orthopedic rehabilitation.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "OR",
+     "kind": "license",
+     "quote": "Oregon license required before start.",
+     "says": "unsure",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Outpatient orthopedic rehabilitation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Oregon license required before start.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "b205fc5a5a9cb459e1c2fbf5162e21e0e48f65175568181aae3d8741d7d30695": {
+  "evidence": "client_db/C1-MSG",
+  "kind": "candidate_message",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "Spokane",
+     "kind": "location",
+     "quote": "I am open to Spokane now.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "says": "yes",
+     "value": "2026-12-01"
+    },
+    {
+     "key": "",
+     "kind": "schedule",
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "says": "yes",
+     "value": "weekdays"
+    },
+    {
+     "key": "",
+     "kind": "weeks",
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "says": "yes",
+     "value": "13"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I am open to Spokane now.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "I can start December 1, work weekdays for thirteen weeks, and need at least $2,400 per week for forty hours.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "b35e96806af0d9cacf3bc91c206f1dbfe327536eaa26a02e5a1406f50b14d40d": {
+  "evidence": "our_system/R06-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "My minimum is now $2,500 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My minimum is now $2,500 per week for forty hours.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "b6c1cfcfa963283d42445697ea3d08e4212232ed2292567f20c4f9680fd30a32": {
+  "evidence": "ats/C4-OPS",
+  "kind": "ops_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": []
+  }
+ },
+ "beab0cdd3a47b33da95ad43e49bd4875bf605297a8001cebeb218dd2471de6c5": {
+  "evidence": "our_system/R07-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "I can start December 8, not December 1.",
+     "says": "yes",
+     "value": "2026-12-08"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I can start December 8, not December 1.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "d8abcbfd613031629af12b58ec8defad80d1d7694d17d6438f7a908f6c565fa8": {
+  "evidence": "our_system/R01-BASE",
+  "kind": "profile",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Home-health physical therapist at fictional Evergreen Visiting Care since May 2025.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Independent home visits, OASIS start-of-care documentation and Homecare Homebase.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Reports active Washington PT license.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "da66749e1bb57448a5f154d995e2f537a73f12701949a5e6082c596f670094f1": {
+  "evidence": "supplement/J2-NOTE-01",
+  "kind": "job_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "The posting allows consideration of other boards with ATLS, ACLS, PALS and BLS;",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "dad753eda8809ca49f7318bd9074a09b56c3d85bb0f2a24e6537e6b81d280b49": {
+  "evidence": "supplement/C1-NOTE-02",
+  "kind": "recruiter_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "Spokane",
+     "kind": "location",
+     "quote": "Alex's latest message mentions Spokane",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "Alex's latest message mentions Spokane, December 1",
+     "says": "yes",
+     "value": "2026-12-01"
+    },
+    {
+     "key": "home_health",
+     "kind": "setting",
+     "quote": "The résumé on file describes home-health work",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Alex's latest message mentions Spokane, December 1 and $2,400 for forty hours.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "dbc6e3111be30cea48b593fa59ff81923111af6b7326f5108ba1666379f4e6b1": {
+  "evidence": "our_system/R06-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "My minimum is now $2,500 per week for forty hours.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "My minimum is now $2,500 per week for forty hours.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "e1b2f4e25663ce6e3bd553de0dd95d91c32a299a5a01fd40b121a1cf71e0a096": {
+  "evidence": "our_system/R05-UPDATE",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I have two years of home-health work and OASIS experience.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I have two years of home-health work and OASIS experience.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "e3b980502891c22fc5c20f58c80a4a6d366e87aec029118698978006698b6930": {
+  "evidence": "vms/VMS-902",
+  "kind": "job_feed",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Open emergency-medicine locums physician role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Open emergency-medicine locums physician role;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "approved candidate pay USD 240/hour.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Requires relevant emergency-department experience and Ohio license before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "ABEM/AOBEM preferred.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Other boards considered with ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "e654082c4f522aac7d9219509a5bd3c739457217a5828af7083f9f4525d9d146": {
+  "evidence": "vms/VMS-904",
+  "kind": "job_feed",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Outpatient orthopedic rehabilitation.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Washington PT license required before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Washington PT license required before start.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "One year of relevant experience preferred.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Weekdays.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "e690947bcbf802a6469f56b06775a65ae56daddc31536186623843b57331361e": {
+  "evidence": "our_system/R09-PREF",
+  "kind": "candidate_statement",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "",
+     "kind": "start",
+     "quote": "can start December 1",
+     "says": "yes",
+     "value": "2026-12-01"
+    },
+    {
+     "key": "Spokane",
+     "kind": "location",
+     "quote": "I am interested in Spokane",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "",
+     "kind": "schedule",
+     "quote": "can work weekdays",
+     "says": "yes",
+     "value": "weekdays"
+    },
+    {
+     "key": "",
+     "kind": "weeks",
+     "quote": "forty hours per week for thirteen weeks",
+     "says": "yes",
+     "value": "13"
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "I am interested in Spokane, can start December 1, and can work weekdays, forty hours per week for thirteen weeks.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "e784e0d1cd2a618de4fd68e27946a2c948dabed3007c42cf170069f500774721": {
+  "evidence": "ats/C3-CV",
+  "kind": "resume",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "emergency_department",
+     "kind": "setting",
+     "quote": "Emergency-department attending at Prairie Regional Hospital, 2019 to present.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "OH",
+     "kind": "license",
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "atls",
+     "kind": "cert",
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "acls",
+     "kind": "cert",
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "pals",
+     "kind": "cert",
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "says": "yes",
+     "value": ""
+    },
+    {
+     "key": "bls",
+     "kind": "cert",
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Emergency-department attending at Prairie Regional Hospital, 2019 to present.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 4,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 5,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 6,
+     "quote": "Candidate reports family-medicine board certification, active Ohio license, ATLS, ACLS, PALS and BLS.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "edafe08d6c0350a7545a6ec34f5cb72a063726303ebc4ebb16dd7eb2f2f5fe85": {
+  "evidence": "client_db/J1-AM",
+  "kind": "job_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [],
+   "reviews": [
+    {
+     "claim_id": 0,
+     "quote": "Facility confirmed one year of home-health experience is acceptable.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 1,
+     "quote": "OASIS remains required for start-of-care visits.",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 2,
+     "quote": "Homecare Homebase is preferred;",
+     "verdict": "supported"
+    },
+    {
+     "claim_id": 3,
+     "quote": "Washington license must be active before start.",
+     "verdict": "supported"
+    }
+   ]
+  }
+ },
+ "f6c3b38e6fd8798e2bd4f0e09ddb73d2293ad9434b8d8c9b4ded6e50505093e7": {
+  "evidence": "supplement/C2-NOTE-02",
+  "kind": "recruiter_note",
+  "model": "gpt-4o",
+  "reader_version": "semantic-review-v3",
+  "reading": {
+   "facts": [
+    {
+     "key": "outpatient",
+     "kind": "setting",
+     "quote": "The résumé describes outpatient work.",
+     "says": "yes",
+     "value": ""
+    }
+   ],
+   "reviews": []
+  }
+ }
+}

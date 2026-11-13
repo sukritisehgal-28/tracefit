@@ -1,0 +1,55 @@
+{
+  "supplied_fictional_packet": true,
+  "model": "gpt-4o",
+  "checked": 176,
+  "audit_findings": [],
+  "model_errors": 0,
+  "changed_results": [
+    {
+      "step": 0,
+      "job": "job:VMS-901",
+      "person": "person:our_system:R05",
+      "before": [
+        "strong",
+        81,
+        "ready"
+      ],
+      "after": [
+        "strong",
+        85,
+        "ready"
+      ]
+    },
+    {
+      "step": 1,
+      "job": "job:VMS-901",
+      "person": "person:our_system:R05",
+      "before": [
+        "strong",
+        81,
+        "ready"
+      ],
+      "after": [
+        "strong",
+        85,
+        "ready"
+      ]
+    },
+    {
+      "step": 2,
+      "job": "job:VMS-901",
+      "person": "person:our_system:R05",
+      "before": [
+        "strong",
+        81,
+        "ready"
+      ],
+      "after": [
+        "strong",
+        85,
+        "ready"
+      ]
+    }
+  ],
+  "separate_checker": true
+}

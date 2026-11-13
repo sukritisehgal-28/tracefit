@@ -1,0 +1,127 @@
+{
+  "synthetic": true,
+  "model": "gpt-4o",
+  "cases": 20,
+  "rules_passed": 7,
+  "reviewed_passed": 20,
+  "stats": {
+    "replayed": 20,
+    "confirmed": 5,
+    "proposed": 19,
+    "agreed": 6,
+    "accepted": 8,
+    "disagreed": 1,
+    "corrected": 1,
+    "refused: the quote does not mention it": 2,
+    "questioned": 5,
+    "refused: no": 2
+  },
+  "results": [
+    {
+      "case": "earliest-start",
+      "rules": true,
+      "reviewed": true
+    },
+    {
+      "case": "join-date",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "location-yes",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "location-no",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "schedule-contrast",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "shift-except",
+      "rules": true,
+      "reviewed": true
+    },
+    {
+      "case": "shift-away",
+      "rules": true,
+      "reviewed": true
+    },
+    {
+      "case": "shift-blackout",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "shift-booked",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "colleague",
+      "rules": true,
+      "reviewed": true
+    },
+    {
+      "case": "department",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "excluded-work",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "team-access",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "future-cert",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "notice",
+      "rules": true,
+      "reviewed": true
+    },
+    {
+      "case": "minimum-months",
+      "rules": true,
+      "reviewed": true
+    },
+    {
+      "case": "license-suspension",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "pause-outreach",
+      "rules": false,
+      "reviewed": true
+    },
+    {
+      "case": "welcome-outreach",
+      "rules": true,
+      "reviewed": true
+    },
+    {
+      "case": "instruction-in-document",
+      "rules": false,
+      "reviewed": true
+    }
+  ],
+  "separate_checker": true,
+  "checker_stats": {
+    "asked": 6,
+    "confirmed": 6,
+    "withheld": 0
+  }
+}

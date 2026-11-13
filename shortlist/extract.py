@@ -150,6 +150,7 @@ _YM = rf"(?:{MONTH_RE}\s+)?\d{{4}}(?:-\d{{2}})?"
 RANGE = re.compile(rf"(?P<s>{_YM})\s*(?:to|through|until|–|—|-)\s*(?P<e>present|current|now|{_YM})", re.I)
 SINCE = re.compile(rf"\bsince\s+(?P<s>{_YM})", re.I)
 YEARS_OF = re.compile(rf"\b(?P<n>{NUM_RE})\s+years?\s+(?:of|in)\s+(?P<rest>[^,.;]*)", re.I)
+YEAR_BOUND = re.compile(r"\b(less than|fewer than|under|at most|up to|more than|over|at least)\s*$", re.I)
 LICENSE = re.compile(
     rf"(?P<pre>\bactive\s+)?\b(?P<state>{STATE_RE})\s+(?:(?:PT|physical[- ]therapy|physician|medical|nursing)\s+)?"
     rf"licen[cs]e\b(?P<post>\s*[—–-]\s*active\b)?", re.I)
@@ -161,6 +162,7 @@ _DATE = rf"(?:{MONTH_RE}\s+\d{{1,2}}(?:,\s*\d{{4}})?|\d{{4}}-\d{{2}}-\d{{2}})"
 CORRECTION = re.compile(rf",?\s*\bnot\s+{_DATE}", re.I)          # "December 8, not December 1"
 CANNOT_START = re.compile(rf"\b(?:cannot|can't|can not|unable to)\s+start\s+(?:until|before)\s+(?P<d>{_DATE})", re.I)
 CAN_START = re.compile(rf"\b(?:can|could|able to|available to)\s+start\s+(?:on\s+|from\s+)?(?P<d>{_DATE})", re.I)
+EARLIEST_START = re.compile(rf"\b(?:my\s+)?(?:earliest|first possible)\s+start(?:\s+date)?\s+(?:is\s+)?(?P<d>{_DATE})", re.I)
 AVAILABLE = re.compile(rf"\bavailable\s+(?:from\s+|on\s+|starting\s+)?(?P<d>{_DATE})", re.I)
 SCHEDULE = re.compile(r"\b(weekdays|weekends|nights|evenings)\b", re.I)
 WEEKS = re.compile(rf"\b(?P<n>{NUM_RE})\s+weeks\b", re.I)
@@ -183,6 +185,7 @@ TOPIC_PAY = re.compile(r"\b(?:pay|rate|salary|wage|compensation)\b", re.I)
 _DAYS = (rf"(?P<month>{MONTH_RE})\s+(?P<days>\d{{1,2}}(?:\s*(?:,|and|or|&|–|-|to)\s*\d{{1,2}})*)"
          r"(?:,\s*(?P<year>\d{4}))?")
 SHIFT_NEG = re.compile(r"\b(?:cannot|can't|can not|unable to|not able to|not available to)\s+(?:cover|work|take)\b[^.]*?" + _DAYS, re.I)
+SHIFT_EXCEPTION = re.compile(r"\b(?:except(?:\s+for)?|excluding|apart\s+from|unavailable(?:\s+on)?|away(?:\s+on)?)\s+" + _DAYS, re.I)
 SHIFT_POS = re.compile(r"\b(?:could|can|able to|available to|happy to)\s+(?:cover|work|take)\b[^.]*?" + _DAYS, re.I)
 OCCUPIED = re.compile(rf"\b(?:assignment|placement|contract|schedule)\b[^.]*?\b(?P<a>{WEEKDAY_RE})\s*(?:through|thru|to|–|-)\s*(?P<b>{WEEKDAY_RE})\b", re.I)
 
@@ -221,6 +224,7 @@ NO_AUTOMATION = re.compile(r"\bno authori[sz]ation for automated (?:candidate )?
 # job text
 MIN_EXP = re.compile(rf"\bminimum experience:?\s*(?P<n>{NUM_RE})\s+years?", re.I)
 YEARS_EXP = re.compile(rf"\b(?P<n>{NUM_RE})\s+years?\s+of\s+(?P<what>[\w\s-]*?)\s*experience\b(?:\s+is)?\s*(?P<lvl>preferred|required|acceptable|needed)?", re.I)
+MONTHS_EXP = re.compile(rf"\b(?P<n>{NUM_RE})\s+months?\b", re.I)
 REQ_LIST = re.compile(r"\bRequirements?:", re.I)
 REQUIRED = re.compile(r"\brequire|\bneeded\b|\bmust\b|\bmandatory\b", re.I)
 PREFERRED = re.compile(r"\bprefer|\bcan (?:be )?train", re.I)
@@ -329,6 +333,7 @@ class Extractor:
         is_job = ev.subject.startswith("job:")
         no_reply = bool(NO_REPLY.search(text))
         spans = list(clauses(text))
+        unparsed_start = len(self.unparsed)
         out: list[Claim] = []
         for i, (s, e) in enumerate(spans):
             clause = text[s:e].strip(" \t•")
@@ -338,7 +343,8 @@ class Extractor:
                 if is_job:
                     self._job(ev, clause, found)
                 else:
-                    self._person(ev, clause, nxt, no_reply, found)
+                    self._person(ev, clause, nxt, no_reply, found,
+                                 source_span=(s, spans[i + 1][1]) if i + 1 < len(spans) else None)
             except (ValueError, OverflowError):       # an impossible date or number: left unread, never fatal
                 found = []
             kept = [c for c in found if self._allowed(ev, c)]
@@ -348,8 +354,15 @@ class Extractor:
             if not any(c.polarity != "unclear" for c in kept):
                 self.unparsed.append((ev.id, clause))
             out.extend(kept)
-        if self.model is not None and not is_job:
+        if self.model is not None and (not is_job or self.model.review_claims):
             out = self.model.combine(ev, out, self)
+            # Count what remains unread after review, rather than counting text
+            # the semantic reader has successfully interpreted as still missing.
+            del self.unparsed[unparsed_start:]
+            for s, e in spans:
+                clause = text[s:e].strip(" \t•")
+                if not any(c.polarity != "unclear" and (c.quote in clause or clause in c.quote) for c in out):
+                    self.unparsed.append((ev.id, clause))
         return out
 
     def derive(self, c: Claim) -> list[Claim]:
@@ -381,7 +394,7 @@ class Extractor:
         return out
 
     # ------------------------------------------------------- people: clauses
-    def _person(self, ev: Evidence, t: str, nxt: str, no_reply: bool, out: list) -> None:
+    def _person(self, ev: Evidence, t: str, nxt: str, no_reply: bool, out: list, source_span=None) -> None:
         def add(rule, attr, value, key="", pol="pos"):
             out.append(self._claim(ev, t, rule, attr, key, value, pol))
 
@@ -417,10 +430,16 @@ class Extractor:
         if settings:
             years = YEARS_OF.search(t)
             years_settings = self.lex.find("setting", years.group("rest")) if years else []
-            rng = RANGE.search(t) or SINCE.search(t)
-            if not rng and nxt and len(nxt) <= 40:
-                rng = RANGE.match(nxt) or SINCE.match(nxt)       # "Role title" on one line, dates on the next
-            for pos, k in settings:
+            for index, (pos, k) in enumerate(settings):
+                # Dates belong to this role, not to every setting named elsewhere in the sentence.
+                end = settings[index + 1][0] if index + 1 < len(settings) else len(t)
+                rng = RANGE.search(t, pos, end) or SINCE.search(t, pos, end)
+                on_next_line = False
+                if not rng and len(settings) == 1:
+                    rng = RANGE.search(t) or SINCE.search(t)
+                    if not rng and nxt and len(nxt) <= 40:
+                        rng = RANGE.match(nxt) or SINCE.match(nxt)
+                        on_next_line = bool(rng)
                 if pol == "unanswered":
                     add("exp.unanswered", "experience", None, k, "unanswered")
                 elif pol == "neg" and neg.start() < pos < turn:
@@ -428,7 +447,15 @@ class Extractor:
                 elif unclear or (pol == "neg" and not pos < lead):      # may be the negation's object, or follows a later "but"
                     continue
                 elif k in years_settings:
-                    add("exp.years_claimed", "experience", {"years_claimed": to_number(years.group("n"))}, k)
+                    amount = to_number(years.group("n"))
+                    bound = YEAR_BOUND.search(t[:years.start()])
+                    value = {"years_claimed": amount}
+                    if bound:
+                        word = bound.group(1).lower()
+                        upper = word in ("less than", "fewer than", "under", "at most", "up to")
+                        value = {"years_max" if upper else "years_min": amount,
+                                 "inclusive": word in ("at most", "up to", "at least")}
+                    add("exp.years_claimed", "experience", value, k)
                 elif rng:
                     start, precision, since = parse_start_token(rng.group("s"))
                     end_token = rng.groupdict().get("e")
@@ -437,6 +464,10 @@ class Extractor:
                         end_date, end_precision, _ = parse_start_token(end_token)
                         end = date(end_date.year, 1, 1) if end_precision == "year" else end_date
                     add("exp.dated", "experience", {"start": start, "end": end, "precision": precision, "since": since}, k)
+                    if on_next_line and source_span:
+                        # The citation must contain both the role and its dates,
+                        # rather than asking a checker to trust a title-only quote.
+                        out[-1].quote = ev.text[source_span[0]:source_span[1]].strip(" \t•")
                 else:
                     add("exp.mention", "experience", {}, k)
 
@@ -463,7 +494,7 @@ class Extractor:
                 add("education", "education", {"year": int(year[-1]) if year else None}, kind)
 
         if pol != "unanswered":
-            m = CANNOT_START.search(t) or (None if doubt else CAN_START.search(t) or AVAILABLE.search(t))
+            m = CANNOT_START.search(t) or (None if doubt else CAN_START.search(t) or EARLIEST_START.search(t) or AVAILABLE.search(t))
             if m:
                 add("avail.start", "available_from", parse_date_phrase(m.group("d"), anchor))
             if ev.kind != "resume" and not doubt:
@@ -471,7 +502,7 @@ class Extractor:
                 if m:
                     add("avail.schedule", "schedule", m.group(1).lower())
                 m = WEEKS.search(t)
-                if m:
+                if m and not re.search(r"\bnotice\b", t, re.I):
                     add("avail.weeks", "weeks", int(to_number(m.group("n"))))
                 m = HOURS.search(t)
                 if m:
@@ -489,7 +520,7 @@ class Extractor:
             if not withdrawn and not doubt:
                 for m in LOC_POS.finditer(t):
                     add("location.interest", "location_interest", True, m.group("place"))
-            m = SHIFT_NEG.search(t)
+            m = SHIFT_NEG.search(t) or SHIFT_EXCEPTION.search(t)
             if m:
                 for d in _day_list(m, anchor):
                     add("shift.unavailable", "shift_availability", False, d.isoformat(), "neg")
@@ -574,6 +605,9 @@ class Extractor:
             level = "preferred" if (m.group("lvl") or "").lower() == "preferred" else "required"
             add("job.min_years", "req.min_years", {"years": to_number(m.group("n")), "level": level,
                                                     "setting": self.lex.first("setting", m.group("what") or "")})
+        m = MONTHS_EXP.search(t)
+        if m and re.search(r"\b(?:experience|minimum|floor|take someone|accept)\b", t, re.I):
+            add("job.min_years", "req.min_years", {"years": to_number(m.group("n")) / 12, "level": "required"})
 
         for m in LICENSE.finditer(t):
             add("job.license", "req.license", {"level": "required"}, state_code(m.group("state")))

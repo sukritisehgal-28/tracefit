@@ -26,7 +26,7 @@ The middle column is **run, not assumed**: `python3 -m shortlist baseline` is a 
 
 ## Tests and experiments
 
-`python3 -m unittest discover -s tests` runs 231 tests. The main groups:
+`python3 -m unittest discover -s tests` runs 265 tests, including the semantic-reader and checker regressions. The main groups:
 
 1. **Three client profiles on the same data** (bonus: comparing configurations). Home-health job at 18:00:
 
@@ -49,7 +49,7 @@ The middle column is **run, not assumed**: `python3 -m shortlist baseline` is a 
 11. **A recruiter's own criteria**: 37 typed phrases and 22 institutions; five known limits are listed (a different word, an abbreviation, initials).
 12. **Size and workers.** Compact rows give exactly the list and explanations of full ones; lists built on 2, 3 and 5 worker processes are identical to the one-process list. Timings are in [ARCHITECTURE.md](ARCHITECTURE.md#scale-latency-and-cost).
 
-## A language model as a second reader (run once, measured)
+## Earlier experiment: a language model as an additional reader
 
 `python3 tests/model_run.py --live` asked an OpenAI model (`gpt-4o`) about all 213 candidate documents and test sentences, once; its answers are saved in `recorded/model_reads.json`, so `python3 tests/model_run.py` repeats the report with no key. Every proposal still had to pass the guard.
 
@@ -57,7 +57,27 @@ The middle column is **run, not assumed**: `python3 -m shortlist baseline` is a 
 - **Reworded sentences:** no "no", doubt or passing mention was read as a yes with it on; 11 of 11 contact requests caught; plain yes sentences read stayed at 28 of 30.
 - **The known misreadings** ("except December 5", "my earliest start is December 15", "less than two years") were not fixed: the model either agreed with the rules or proposed nothing the guard accepted.
 
-So on this data the model is safe but adds nothing. It is left off by default; the case for it would rest on real data with wording the sample does not have.
+That experiment used augmentation only: the model proposed facts but did not review the parser's existing assertions. On that run it added nothing. Its saved answers and report remain unchanged as a historical baseline.
+
+## Current reader: semantic review and corrections
+
+The `openai` settings profile now asks the model to review every positive parser assertion against its source text as well as propose missing facts. Reviews identify the exact claim and quote. Missing, malformed or uncertain reviews do not confirm a claim. Guarded corrections may replace a positive parse; an explicit denial or contact restriction cannot be lifted. Unreviewed job requirements remain questions and retain the author's authority and the configured note policy.
+
+The offline reader also fixes date scope across roles, shift exceptions, bounded experience claims ("less than two" is not two), earliest-start phrasing, notice periods mistaken for contract length and minimum experience stated in months.
+
+`python3 bench/reader_eval.py` replays a real `gpt-4o` run on **20 synthetic regression cases**. The reviewed reader passes **20/20**, against **7/20** for the updated offline reader. Cases include new availability and location wording, non-first-hand skills, suspended and future credentials, contact intent and an instruction embedded in a document. Saved readings: `recorded/semantic_reads.json`; results: `docs/reader_evaluation.json`. `--live` repeats uncached requests; `--sample` audits the supplied fictional packet separately.
+
+The supplied-packet run audits all **176 results** with no consistency findings or model errors. Fit tiers and contact/ownership actions are unchanged. R05's score changes from 81 to 85 at each replay step because the model additionally reads the posting's home-visit and start-of-care duties as skills, changing the skills average; R05's later Homecare Homebase denial remains in force. Full changes are listed in `docs/semantic_sample_evaluation.json`. This is an audit of internal consistency plus a comparison against the original reader, not independent ground-truth validation.
+
+These cases were used during development, including prompt revisions, so this is a regression check, not an independent or population accuracy estimate. The original 163-sentence sweep remains a separate offline check. A held-out client dataset and recruiter review are still needed. The model can misunderstand meaning despite exact quotes and a valid schema. It is optional and off by default; the 100,000-candidate benchmark does not measure API ingestion time, cost or model accuracy.
+
+## Separate checker
+
+The OpenAI profile now enables a fresh, separately prompted source-entailment check after extraction and correction. It sees the source and final typed claims, without earlier verdicts. Every positive claim needs a complete supported verdict. An uncertainty, failure or missing verdict withholds that fact and raises a recruiter question. The checker cannot add facts, override a denial or lift a contact restriction. Its counters appear in coverage and failures appear under data problems.
+
+Use `python3 bench/reader_eval.py --checked` or add `--sample` to replay saved checker responses; add `--live` for uncached requests. Checked reports are separate from the earlier reader-only results: `docs/checker_evaluation.json` and `docs/checked_sample_evaluation.json`. This adds one cached API request per document with positive claims. It uses the same model in a separate request, so correlated mistakes remain possible. It does not establish ground truth or detect every omitted fact; uncertain outcomes require recruiter review.
+
+Measured on the saved `gpt-4o` run: the checked reader passes 20/20 synthetic wording cases; all 176 supplied-packet results pass the consistency audit, with fit/contact decisions unchanged. `python3 bench/checker_eval.py` separately replays **three deliberately planted synthetic errors**, all caught: dates assigned to the wrong role, a shift exception treated as availability, and someone else's skill assigned to the candidate. The latter test feeds wrong claims directly to the checker, so it demonstrates a veto independently of what the extractor already caught. These are development/regression cases, not a population accuracy estimate.
 
 ## What independent review found
 
@@ -71,8 +91,8 @@ The lesson is the same each time: the logic holds up, and the reading of free te
 
 ## Limitations
 
-- **The text reader is pattern-based.** It leaves 76 clauses of the sample unread; they stay visible and are counted. On real data it will misread wordings nobody has tried yet. Known and not fixed: a date range in a sentence is given to every care setting in that sentence; "less than two years" is read as two years; an "except" in a shift offer ("most dates, except December 5") is not understood; a note worded unlike the sample's ("they'll take someone with 12 months") is not read as a requirement change.
-- **Job postings are read by fewer patterns than candidate text.** A requirement sentence the reader cannot use is shown on the job as unread; one it half reads may lose a detail.
+- **The offline text reader is pattern-based.** Unread clauses remain visible. The previously listed range-scope, upper-bound, shift-exception and months-of-experience bugs are now regression-tested fixes. New phrasing can still be missed or misread. The optional semantic reviewer reduces this dependence on patterns but is not a guarantee of correct interpretation.
+- **Job postings have a limited typed vocabulary.** Semantic review covers posting and note assertions, and can add grounded requirements within that vocabulary. An unsupported requirement remains a question; requirements outside the vocabulary still need a recruiter.
 - **Judgement calls a client may want differently.** Pay above the approved rate lowers the score but keeps R06 a match (the `strict_pay` profile rules R06 out). A start one week late rules Alex and R07 out and raises a question for the account manager. A claim the records do not support costs R04 thirty evidence points, although it is unsupported, not contradicted. Each is a setting or one line.
 - **Weights and thresholds are reasoned defaults, not calibrated.** The score ranks and explains; it is not a probability of placement.
 - **A typed criterion finds words, not meanings.** "Kids" does not find "pediatric". The card shows the sentence.

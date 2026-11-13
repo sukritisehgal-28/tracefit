@@ -7,3 +7,5 @@ out/
 notes/
 .venv-model/
 .env
+.env.*
+!.env.example

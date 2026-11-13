@@ -8,3 +8,5 @@ docs/*.pdf
 docs/*.png
 docs/architecture.html
 .claude
+.env
+.env.*

@@ -71,11 +71,12 @@ path = "out/outbox.jsonl"
 # this vocabulary, and come from a sentence with no negation or doubt. Where it and the rule reader disagree,
 # the fact becomes a question. It never removes a no-contact request.
 [model_reader]
-provider = "off"                       # off | recorded (replay saved answers, call nothing) | anthropic
+provider = "off"                       # off | recorded (replay saved answers, call nothing) | anthropic | openai
+verify_claims = false                  # the OpenAI profile enables a separate source-entailment check
 model = "claude-opus-5-5"
 effort = "medium"
 # Sending candidate text to a model provider takes it outside the client's systems. The client must agree
-# first (see HANDOFF.md, questions for the client). Until then the anthropic provider refuses to start.
+# first (see HANDOFF.md, questions for the client). Both live providers refuse to start without this setting.
 allow_external_text = false
 recorded_path = "out/model_reads.json"  # every answer the model gives is saved here; later runs replay it
 

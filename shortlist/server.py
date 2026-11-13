@@ -20,6 +20,7 @@ import sys
 import threading
 import time
 import traceback
+from html import escape
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -61,9 +62,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def _params(self):
         url = urlparse(self.path)
-        self.q = {k: v[0] for k, v in parse_qs(url.query).items()}
+        self.q = {k: v[0] for k, v in parse_qs(url.query, keep_blank_values=True).items()}
         step = self.q.get("step", "0")
-        return url.path, int(step) if _digits(step) else 0, (self.q.get("overlay") or None)
+        overlay = self.q.get("overlay", getattr(self.server, "default_overlay", None)) or None
+        return url.path, int(step) if _digits(step) else 0, overlay
 
     def _int(self, name: str, default: int, most: int) -> int:
         value = self.q.get(name, "")
@@ -107,7 +109,11 @@ class Handler(BaseHTTPRequestHandler):
         path, step, overlay = self._params()
         if path in STATIC:
             name, content_type = STATIC[path]
-            self._send(200, (WEB / name).read_bytes(), content_type)
+            body = (WEB / name).read_bytes()
+            if path == "/":
+                initial = escape(overlay or "", quote=True)
+                body = body.replace(b'data-overlay=""', f'data-overlay="{initial}"'.encode("utf-8"))
+            self._send(200, body, content_type)
         elif path.startswith("/api/"):
             try:
                 with _LOCK:
@@ -145,12 +151,21 @@ def _digits(value: str) -> bool:
     return value.isascii() and value.isdigit() and len(value) <= 12
 
 
-def serve(port: int = 8765, host: str = "127.0.0.1") -> None:
+def serve(port: int = 8765, host: str = "127.0.0.1", overlay: str | None = None) -> None:
     """Serve the page. Local by default; a hosted demo passes host 0.0.0.0 and the port its platform gives it."""
+    if overlay:
+        try:
+            cfg = configuration.load(overlay)
+            if cfg.get("model_reader", {}).get("provider") == "openai":
+                from .model_reader import openai_provider
+                openai_provider(dict(cfg["model_reader"], _root=cfg["_root"]))  # check the key without making a request
+        except ValueError as exc:
+            sys.exit(str(exc))
     try:
         server = ThreadingHTTPServer((host, port), Handler)
     except OSError as exc:
         sys.exit(f"Port {port} is not available ({exc.strerror or exc}). Try: python3 -m shortlist --port {port + 1}")
+    server.default_overlay = overlay
     print(f"Tracefit is running at http://{host}:{port}  (Ctrl+C to stop)", flush=True)
     try:
         server.serve_forever()

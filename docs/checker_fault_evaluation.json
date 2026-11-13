@@ -1,0 +1,22 @@
+{
+  "synthetic": true,
+  "planted_misreadings": [
+    {
+      "case": "wrong-role-dates",
+      "caught": true
+    },
+    {
+      "case": "ignored-exception",
+      "caught": true
+    },
+    {
+      "case": "someone-elses-work",
+      "caught": true
+    }
+  ],
+  "stats": {
+    "replayed": 3,
+    "questioned": 3,
+    "withheld": 3
+  }
+}

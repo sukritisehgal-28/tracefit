@@ -34,6 +34,31 @@ The product is Tracefit; its code package and commands are named `shortlist`, af
 
 Add `--overlay feed_only` or `--overlay strict_pay` to a `shortlist` command to see another client's settings.
 
+### Enable the OpenAI second reader
+
+Create an API key in the [OpenAI dashboard](https://platform.openai.com/api-keys), copy `.env.example` to `.env`, and fill in `OPENAI_API_KEY` locally:
+
+```bash
+cp .env.example .env
+chmod 600 .env
+```
+
+Then start the page with the OpenAI settings profile:
+
+```bash
+python3 -m shortlist --overlay openai
+```
+
+The backend reads the key from `.env` or the process environment (environment values take priority), following [OpenAI's authentication guidance](https://developers.openai.com/api/reference/overview#authentication). `.env` files are excluded from Git, Docker builds and Cloud Run uploads. The key never goes to the browser. No extra package is needed.
+
+Selecting this profile sends candidate and job text to OpenAI and uses your API billing. It uses the existing `gpt-4o` model setting; optionally set `OPENAI_MODEL` to override it. The model reviews each parser assertion and proposes missing facts. Unconfirmed assertions become questions; guarded corrections can replace a positive parse. Explicit denials, no-contact requests, source authority and requirement-note policy remain enforced. Refusals and outages leave unreviewed facts as questions rather than silently trusting the pattern reader.
+
+Answers are cached in `out/openai_reads.json` by model, reader version, vocabulary, timestamp, document and parser claims. The page also offers this profile under **Demo → Settings profile**. To run it in text, use `python3 -m shortlist replay --overlay openai`.
+
+The OpenAI profile also enables `verify_claims = true`: a **separate source-entailment check** of the final positive claims, using a fresh request and checker prompt without the extractor's verdicts. It can withhold a fact, but cannot invent a correction or remove a contact restriction. Missing checks, refusals and uncertainty turn the affected result into a question visible to the recruiter. This is a second model check, using the same model by default; shared errors are still possible. It adds an API request per document with positive claims, cached separately. `python3 bench/reader_eval.py --checked` replays the checked synthetic evaluation; add `--sample` for the supplied packet or `--live` to ask about uncached inputs.
+
+`python3 bench/reader_eval.py` replays the saved real-model readings on 20 labelled **synthetic regression cases**: the reviewed reader passes 20, compared with 7 for the pattern reader alone. `--live` repeats the API requests for uncached inputs. These cases helped develop the reader; they are not a blind accuracy test. `--sample` audits the supplied fictional packet. The original 100,000-candidate benchmarks used the offline reader; model ingestion latency and cost at that scale have not been measured.
+
 ## Five-minute demo
 
 1. **Home Health PT.** The banner says the account manager's note is ahead of the vendor feed; **See details** shows both versions and their sources.
@@ -71,8 +96,8 @@ When an event arrives, only what it touches is redone: a new job is matched once
 | Folder | What is in it |
 |---|---|
 | `shortlist/` | The product. `sources/` and `sinks/` hold one adapter per source and destination (matching imports neither); `extract.py` and `resume.py` read text; `world.py` decides who is who; `rules.py`, `dimensions.py` and `matching.py` hold the rules, the score and the list; `pipeline.py` and `server.py` run events and serve `web/`; `audit.py` is the checker; `model_reader.py` is the optional language-model reader; `workers.py` splits work across processes; `baseline.py` is the comparison matcher. |
-| `config/` | Every setting: rules, weights, presets, thresholds, source precedence, freshness, vocabulary. `overlays/` holds two other client profiles. |
-| `tests/` | 231 tests, 110 synthetic scenarios, the rewording sweep, inputs unlike the sample, and `model_run.py`. |
+| `config/` | Every setting: rules, weights, presets, thresholds, source precedence, freshness, vocabulary. `overlays/` holds other client profiles and the optional OpenAI profile. |
+| `tests/` | Automated tests, 110 synthetic scenarios, the rewording sweep, inputs unlike the sample, semantic-reader regressions, and `model_run.py`. |
 | `recorded/` | The language-model reader's saved answers, so its run replays without a key. |
 | `bench/` | The synthetic scale benchmark, run on a laptop and on Google Cloud; outputs in `docs/benchmark_*.txt`. |
 | `docs/` | The written explanation (below), the benchmark outputs, the illustrated architecture (`architecture.pdf`), and a draft first message to the client. |
@@ -86,11 +111,11 @@ When an event arrives, only what it touches is redone: a new job is matched once
 | Reading the supplied sources, rules, score, events, recruiter page, checker | Implemented, on the supplied data |
 | Speed at 20,000 and 100,000 people | Measured on **synthetic** data, on a laptop and on a 16-core Google Cloud machine (a new job at 100,000 people: 7.1 s on one worker, 1.2 s on sixteen) |
 | Destinations (JSON, CSV, notifications) | **Simulated**: local files only |
-| Language-model reader | Off by default. Run once with `gpt-4o` on the sample: it changed no result |
+| Language-model reader | **Off by default**. The OpenAI profile reviews parser claims and reads missing facts. New evaluation: `python3 bench/reader_eval.py`; the earlier augmentation-only experiment is preserved in `tests/model_run.py`. |
 | Database, queue, several machines, live connections, sign-in | Designed, not built |
 | Credential checks | Not done: every license and certificate is shown as reported |
 
-The text reader is pattern-based and is the weakest part: wording unlike the sample's can be left unread or misread. [Evaluation](docs/EVALUATION.md) says what review found and what is still open.
+The offline text reader is pattern-based. The optional OpenAI reader reviews those interpretations and reads unfamiliar phrasing, with uncertainty preserved. Neither path has been calibrated on real client data. [Evaluation](docs/EVALUATION.md) distinguishes the old experiment, the new regression results and remaining limits.
 
 ## Read more
 

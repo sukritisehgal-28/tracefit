@@ -181,6 +181,11 @@ def _judge_experience(exp, min_years) -> str:
         if documented >= min_years:
             return MET
         return UNKNOWN if (claimed is not None and claimed >= min_years) else NOT_MET
+    upper, lower = exp.value.get("years_max"), exp.value.get("years_min")
+    if upper is not None:
+        return NOT_MET if upper < min_years or (upper == min_years and not exp.value.get("inclusive")) else UNKNOWN
+    if lower is not None:
+        return MET if lower >= min_years else UNKNOWN
     if claimed is not None:
         return MET if claimed >= min_years else NOT_MET
     return UNKNOWN
@@ -196,13 +201,17 @@ def _experience_text(ctx: Ctx, setting: str, exp) -> str:
         return f"Says they have no {lab} experience"
     v = exp.value
     parts = []
+    if "years_max" in v or "years_min" in v:
+        upper = "years_max" in v
+        word = ("at most" if v.get("inclusive") else "less than") if upper else ("at least" if v.get("inclusive") else "more than")
+        parts.append(f"Reports {word} {fmt_years(v['years_max' if upper else 'years_min'])} in {lab}")
     if v["years_documented"] is not None:
         span = fmt_span(v["years_documented"])
         if v["precision"] == "year":
             parts.append(f"{lab.capitalize()} since {v['since']}: at least {span}")
         else:
             parts.append(f"{lab.capitalize()} since {v['since']}: {span} as of {fmt_date(ctx.today)}")
-    elif v["years_claimed"] is None:
+    elif v["years_claimed"] is None and not parts:
         parts.append(f"{lab.capitalize()} is mentioned, with no dates")
     if v["years_claimed"] is not None:
         parts.append(f"says {fmt_years(v['years_claimed'])}")
@@ -230,7 +239,8 @@ def r_setting_experience(ctx: Ctx, job, p) -> Result:
     res = _res(ctx, "setting_experience", outcome, needs, _experience_text(ctx, setting, exp), level=level,
                job_refs=[ctx.ref(sclaim)] + ([ctx.ref(primary)] if primary else []), refs=ctx.refs(exp))
     res.measure = {"min_years": min_years, "setting": setting,
-                   **({"documented": exp.value["years_documented"], "claimed": exp.value["years_claimed"]} if exp is not None and exp.state == "pos" else {})}
+                   **({"documented": exp.value["years_documented"], "claimed": exp.value["years_claimed"],
+                       "upper": exp.value.get("years_max"), "lower": exp.value.get("years_min")} if exp is not None and exp.state == "pos" else {})}
     who = _first_name(p)
     others = [ctx.lex.label(k) for k, f in p.keyed("experience").items() if f.state == "pos" and k != setting]
     if exp is None:
@@ -814,6 +824,7 @@ def evaluate(ctx: Ctx, job, p) -> tuple[list[Result], list[Result]]:
     for r in results:
         _unread_update(ctx, job, p, r)
         _same_moment(ctx, p, r)
+        _unreviewed_requirement(ctx, job, r)
     for r in results:
         r.brief = _brief(ctx, job, p, r)
     return results, gates
@@ -847,25 +858,40 @@ def _topics_of(rule: str, job) -> set:
 def _unread_update(ctx: Ctx, job, p, r: Result) -> None:
     """A rule met on older evidence becomes a question when the candidate said something newer about it that
     could not be read. Without this, an older yes would stand although the candidate may have withdrawn it."""
-    if r.outcome != MET or not p.unclear:
+    if r.outcome not in (MET, UNKNOWN) or not p.unclear:
         return
     wanted = _topics_of(r.rule, job)
     relied = [ctx.w.evidence[ref["evidence"]].observed_at for ref in r.refs
               if ref.get("note") != "replaced" and ref["evidence"] in ctx.w.evidence]
-    if not wanted or not relied:
+    if not wanted:
         return
-    newest = max(relied)
+    newest = max(relied) if relied else None
     for c in p.unclear:
-        if c.observed_at <= newest:
+        if r.outcome == UNKNOWN and c.rule != "model.verifier":
+            continue
+        if newest is not None and c.observed_at < newest:
             break
-        if any(t in wanted or any(t.startswith(w) for w in wanted if w.endswith(":")) for t in c.value):
+        if newest is not None and c.observed_at == newest and not c.rule.startswith("model."):
+            continue
+        exact = {f"fact:{attr}:" for attr in RULE_FACTS.get(r.rule, ()) if attr not in ("skill", "license", "cert", "shift_availability", "location_interest")}
+        mapping = {"skill": "skill", "setting": "experience", "license": "license", "cert": "cert", "date": "shift_availability", "place": "location_interest"}
+        for topic in wanted:
+            family, sep, key = topic.partition(":")
+            if sep and family in mapping:
+                exact.add(f"fact:{mapping[family]}:{key}")
+        topics = wanted | exact
+        if any(t in topics or any(t.startswith(w) for w in topics if w.endswith(":")) for t in c.value):
             r.outcome = UNKNOWN
             r.credit, r.low, r.high = float(ctx.scoring["unknown_credit"]), 0.0, 1.0
             r.flags.append("unread_update")
             r.refs.append(ctx.ref(c))
-            r.notes.append(f"A newer message from {_first_name(p)} is about this and could not be read with confidence, "
-                           f"so the older answer is not relied on ({ctx.cite(c)}).")
-            r.questions.append(f"Ask {_first_name(p)} to confirm {r.label.lower()}: their message “{c.quote}” could not be read")
+            if c.rule == "model.verifier":
+                r.notes.append(f"A separate source check did not confirm this interpretation ({ctx.cite(c)}).")
+                r.questions.append(f"Ask {_first_name(p)} to clarify {r.label.lower()}: the source check could not confirm “{c.quote}”")
+            else:
+                r.notes.append(f"A newer message from {_first_name(p)} is about this and could not be read with confidence, "
+                               f"so the older answer is not relied on ({ctx.cite(c)}).")
+                r.questions.append(f"Ask {_first_name(p)} to confirm {r.label.lower()}: their message “{c.quote}” could not be read")
             return
 
 
@@ -873,6 +899,29 @@ def _unread_update(ctx: Ctx, job, p, r: Result) -> None:
 RULE_FACTS = {"skills": ("skill",), "license": ("license",), "certifications": ("cert",), "location": ("location_interest", "pref_states", "travel", "home"),
               "start_date": ("available_from",), "schedule": ("schedule", "weeks", "hours"), "shift_coverage": ("shift_availability", "occupied_days"),
               "pay": ("pay",)}
+
+REQ_FACTS = {"profession": ("req.profession",), "setting_experience": ("req.setting", "req.min_years"),
+             "skills": ("req.skill",), "license": ("req.license",), "certifications": ("req.cert_path",),
+             "start_date": ("req.start",), "schedule": ("req.schedule", "req.weeks", "req.hours"),
+             "shift_coverage": ("req.shifts",), "pay": ("req.pay",)}
+
+
+def _unreviewed_requirement(ctx, job, r):
+    if r.outcome == NOT_MET:
+        return
+    for claim in job.unclear:
+        if claim.version == "unapproved" or (claim.version == "clarification" and ctx.policy == "feed_only"):
+            continue
+        if not any(attr in claim.value for attr in REQ_FACTS.get(r.rule, ())):
+            continue
+        r.outcome = UNKNOWN
+        r.level = "hard" if r.level == "from_job" else r.level
+        r.credit, r.low, r.high = float(ctx.scoring["unknown_credit"]), 0.0, 1.0
+        r.flags.append("unread_update")
+        r.job_refs.append(ctx.ref(claim))
+        r.shows = "The posting's requirement could not be confirmed from its wording"
+        r.questions.append("Ask the account manager to clarify " + r.label.lower())
+        return
 
 
 def _same_moment(ctx: Ctx, p, r: Result) -> None:

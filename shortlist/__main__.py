@@ -110,7 +110,7 @@ def main() -> None:
         return
     if opts.command == "serve":
         from .server import serve
-        serve(opts.port, opts.host)
+        serve(opts.port, opts.host, opts.overlay)
         return
     try:
         engine = Engine(overlay=opts.overlay)
