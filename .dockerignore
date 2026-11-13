@@ -1,0 +1,10 @@
+.git
+notes
+out
+.venv-model
+__pycache__
+*.pyc
+docs/*.pdf
+docs/*.png
+docs/architecture.html
+.claude

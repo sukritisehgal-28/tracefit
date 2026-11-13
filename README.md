@@ -14,6 +14,8 @@ python3 -m shortlist
 
 Then open http://127.0.0.1:8765.
 
+A hosted copy of the same page, for looking without installing: https://tracefit-434887347109.us-central1.run.app (a demo on Cloud Run built from the `Dockerfile`; it holds only the fictional sample data and sends nothing).
+
 The product is Tracefit; its code package and commands are named `shortlist`, after the list of people it builds for each job.
 
 ```bash

@@ -145,12 +145,13 @@ def _digits(value: str) -> bool:
     return value.isascii() and value.isdigit() and len(value) <= 12
 
 
-def serve(port: int = 8765) -> None:
+def serve(port: int = 8765, host: str = "127.0.0.1") -> None:
+    """Serve the page. Local by default; a hosted demo passes host 0.0.0.0 and the port its platform gives it."""
     try:
-        server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+        server = ThreadingHTTPServer((host, port), Handler)
     except OSError as exc:
         sys.exit(f"Port {port} is not available ({exc.strerror or exc}). Try: python3 -m shortlist --port {port + 1}")
-    print(f"Tracefit is running at http://127.0.0.1:{port}  (Ctrl+C to stop)")
+    print(f"Tracefit is running at http://{host}:{port}  (Ctrl+C to stop)", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

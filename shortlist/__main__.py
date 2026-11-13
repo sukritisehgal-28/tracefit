@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 
 from .matching import TIER_LABEL, TIER_ORDER
 from .pipeline import Engine
@@ -98,7 +99,8 @@ def main() -> None:
     parser.add_argument("args", nargs="*")
     parser.add_argument("--overlay", help="configuration overlay from config/overlays, e.g. feed_only")
     parser.add_argument("--step", type=int, help="replay step (0 = snapshot)")
-    parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8765)))
+    parser.add_argument("--host", default="127.0.0.1", help="serve: the address to listen on (0.0.0.0 for a hosted demo)")
     parser.add_argument("--write", action="store_true", help="worked: rewrite docs/WORKED_EXAMPLE.md")
     opts = parser.parse_args()
 
@@ -108,7 +110,7 @@ def main() -> None:
         return
     if opts.command == "serve":
         from .server import serve
-        serve(opts.port)
+        serve(opts.port, opts.host)
         return
     try:
         engine = Engine(overlay=opts.overlay)

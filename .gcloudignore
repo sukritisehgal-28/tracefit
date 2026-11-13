@@ -1,0 +1,8 @@
+.git
+.gitignore
+notes/
+out/
+.venv-model/
+__pycache__/
+*.pyc
+.claude/
