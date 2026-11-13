@@ -26,7 +26,8 @@ def _print_job(jkey, job, matches, limit=None):
     print(f"  {'#':>2} {'name':<14} {'tier':<16} {'score':>5} {'range':>9}  next action")
     for i, m in enumerate(matches[:limit] if limit else matches, start=1):
         tie = f"  = {m.identical} identical" if m.identical > 1 else ""
-        print(f"  {i:>2} {m.name:<14} {TIER_LABEL[m.tier]:<16} {m.score:>5} {f'{m.low}–{m.high}':>9}  {m.action['label']}{tie}")
+        score, span = ("—", "") if m.tier == "not_fit" else (m.score, f"{m.low}–{m.high}")      # ruled out: not ranked, no score
+        print(f"  {i:>2} {m.name:<14} {TIER_LABEL[m.tier]:<16} {score:>5} {span:>9}  {m.action['label']}{tie}")
     if limit and len(matches) > limit:
         print(f"     … and {len(matches) - limit:,} more")
 
@@ -74,7 +75,8 @@ def explain(engine: Engine, job_id: str, person_id: str, step: int) -> None:
     jkey = next(k for k in w.jobs if k.endswith(":" + job_id) or job_id in w.jobs[k].ids.values())
     row = next(x for x in engine.shortlist(step, jkey).ranked() if x.person.endswith(":" + person_id))
     m = engine.explain(step, jkey, row.person)
-    print(f"{m.name} for {jkey.split(':', 1)[1]}: {TIER_LABEL[m.tier]}, score {m.score} (range {m.low}–{m.high})")
+    print(f"{m.name} for {jkey.split(':', 1)[1]}: {TIER_LABEL[m.tier]}"
+          + ("" if m.tier == "not_fit" else f", score {m.score} (range {m.low}–{m.high})"))
     print(f"Next action: {m.action['label']}")
     for r in m.results + m.gates:
         print(f"\n {MARK[r.outcome]} {r.label} [{r.level}] — {r.outcome}")

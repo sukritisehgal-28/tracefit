@@ -343,3 +343,44 @@ class PeopleLevelOnEverything(unittest.TestCase):
         self.assertTrue(notes[0]["message"].startswith("12 people"))
         self.assertIn("For 4 of them", notes[0]["message"])           # R01, R02, R03 and R10
         self.assertEqual(notes[0]["severity"], "info")
+
+
+class PeopleWhoAreRuledOut(unittest.TestCase):
+    """Someone a required rule rules out, or who must not be contacted, is not ranked and not questioned."""
+
+    def test_a_physical_therapist_is_asked_nothing_about_the_physician_job(self):
+        m = match(engine(), 0, "VMS-902", "R01")
+        self.assertEqual(m.tier, "not_fit")
+        self.assertEqual([q for r in m.results + m.gates for q in r.questions], [])
+
+    def test_the_question_on_the_rule_that_failed_is_kept(self):
+        m = match(engine(), 0, "VMS-901", "R07")                 # can start a week late: the facility is the one to ask
+        self.assertTrue(any("account manager" in q for q in rule(m, "start_date").questions))
+        self.assertEqual([q for r in m.results if r.rule != "start_date" for q in r.questions], [])
+
+    def test_someone_who_asked_for_no_contact_is_asked_nothing(self):
+        for job, who in (("VMS-901", "C4"), ("VMS-902", "C4"), ("VMS-901", "R11")):
+            m = match(engine(), 0, job, who)
+            self.assertEqual(m.action["status"], "blocked")
+            self.assertFalse([q for r in m.results + m.gates for q in r.questions if q.startswith("Ask " + m.name.split()[0])])
+
+    def test_a_no_contact_request_that_outlasts_the_start_says_so(self):
+        gate = rule(match(engine(), 0, "VMS-901", "R11"), "contact_permission")
+        self.assertTrue(any("lasts past this job's start (1 Dec 2026)" in n for n in gate.notes))
+
+    def test_no_score_is_sent_for_someone_ruled_out(self):
+        sent = next(s for s in engine().payload(0)["shortlists"] if s["job"] == "VMS-902")
+        by = {m["person"].split(":")[-1]: m for m in sent["matches"]}
+        self.assertEqual(by["C3"]["score"], 94)
+        self.assertIsNone(by["R01"]["score"])
+        self.assertFalse(any("license" in q for m in sent["matches"] if m["tier"] == "Not a fit" for q in m["open_questions"]))
+
+    def test_people_with_different_scores_are_not_called_identical(self):
+        rows = {m.person.split(":")[-1]: m for m in engine().matches(0)["job:VMS-902"][0]}
+        self.assertNotEqual(rows["R10"].score, rows["C2"].score)
+        self.assertEqual((rows["R10"].identical, rows["C2"].identical), (1, 1))
+
+    def test_the_licence_question_uses_the_right_article(self):
+        qs = [q for who in ("C2", "C3") for q in match(engine(), 0, "VMS-901", who).questions] + \
+             [q for r in match(engine(), 0, "VMS-903", "R01").results for q in r.questions]
+        self.assertFalse(any(" a Oregon" in q or " a Ohio" in q for q in qs))

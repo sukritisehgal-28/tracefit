@@ -95,6 +95,11 @@ def _gate(ctx: Ctx, gate: str, outcome: str, shows: str, **kw) -> Result:
     return Result(gate, ctx.gates_cfg[gate]["label"], "gate", 0.0, outcome, None, None, None, "", shows, **kw)
 
 
+def _a(word: str) -> str:
+    """The word with its article: "a Washington", "an Oregon"."""
+    return ("an " if word[:1].lower() in "aeiou" else "a ") + word
+
+
 def _first_name(p) -> str:
     return p.name if p.name_basis == "id" else p.name.split()[0]
 
@@ -351,12 +356,12 @@ def r_license(ctx: Ctx, job, p) -> Result:
         needs.append(f"{name} license, active before the start")
         if fact is not None and fact.state == "pos":
             outcomes.append(MET)
-            shows.append(f"Reports {'an active' if fact.value.get('active') else 'a'} {name} license")
+            shows.append(f"Reports {'an active ' + name if fact.value.get('active') else _a(name)} license")
             refs.extend(ctx.refs(fact))
         else:
             outcomes.append(UNKNOWN)
             shows.append(f"No {name} license on record" + (f" (reports: {', '.join(held)})" if held else ""))
-            questions.append(f"Ask {who} whether they hold a {name} license, or can before the start")
+            questions.append(f"Ask {who} whether they hold {_a(name)} license, or can before the start")
     outcome = UNKNOWN if UNKNOWN in outcomes else MET
     res = _res(ctx, "license", outcome, "; ".join(needs), "; ".join(shows), job_refs=job_refs, refs=refs, questions=questions)
     if outcome == MET:
@@ -409,8 +414,12 @@ def _certifications(ctx: Ctx, job, p) -> Result:
         missing = [k for k in aclaim.value["all_of"] if k not in held]
         if boards and not missing:
             used = boards + list(aclaim.value["all_of"])
+            # Met, but the preferred board is not held. It counts as a preferred item that is missing, by the
+            # same weight a preferred skill has, so someone with the preferred board scores higher.
+            part = 1.0 / (1.0 + float(ctx.scoring.get("preferred_item_weight", 0.5))) if pclaim else 1.0
             res = _res(ctx, "certifications", MET, "; ".join(needs),
                        "Reports " + ctx.lex.label(boards[0]) + " with " + ", ".join(ctx.lex.label(k) for k in aclaim.value["all_of"]),
+                       credit=part, low=part, high=part,
                        job_refs=job_refs, refs=[r for k in used for r in ctx.refs(held[k])][:6])
             res.flags += ["alternative_route", "unverified"]
             res.notes.append("Qualifies by the other-boards route, not the preferred board certification.")
@@ -663,11 +672,25 @@ def g_job_open(ctx: Ctx, job, p, results) -> Result:
     return _gate(ctx, "job_open", BLOCKED, f"The job is {job.status}: nobody is recommended for it", refs=ctx.refs(fact))
 
 
+def _job_begins(ctx: Ctx, job):
+    """The day the job starts: its start date, or its first shift. None when the posting gives neither."""
+    start = ctx.primary(job.req("req.start"))[0]
+    if start is not None:
+        return start.value
+    shifts = ctx.primary(job.req("req.shifts"))[0]
+    if shifts is not None and shifts.value:
+        return min(datetime.fromisoformat(s["start"]).date() for s in shifts.value)
+    return None
+
+
 def g_contact_permission(ctx: Ctx, job, p, results) -> Result:
     dnc, allowed, none = p.fact("dnc_until"), p.fact("contact_allowed"), p.fact("restriction_none")
     if dnc is not None and dnc.value > ctx.today:
         until = "with no end date given" if dnc.value.year == 9999 else f"until {fmt_date(dnc.value)}"
         res = _gate(ctx, "contact_permission", BLOCKED, f"Asked not to be contacted about jobs {until}", refs=ctx.refs(dnc))
+        begins = _job_begins(ctx, job)
+        if begins is not None and dnc.value > begins:
+            res.notes.append(f"The request lasts past this job's start ({fmt_date(begins)}), so the person cannot be approached for it.")
         if allowed is not None and allowed.value and allowed.observed_at < dnc.observed_at:
             res.flags.append("replaced")
             res.notes.append(f"An older field still says contact is allowed ({ctx.cite(allowed.claims[0])}). The candidate's later request is used.")
@@ -709,7 +732,7 @@ def g_requirement_source(ctx: Ctx, job, p, results) -> Result:
     if pending:
         return _gate(ctx, "requirement_source", CLEAR, "Uses the vendor feed as it stands. A pending note would change: " + ", ".join(r.label.lower() for r in pending),
                      questions=["Ask the account manager to have the vendor feed updated: a facility clarification would change results for this job"])
-    return _gate(ctx, "requirement_source", CLEAR, "Uses requirements the vendor feed and the notes agree on")
+    return _gate(ctx, "requirement_source", CLEAR, "Nothing in this result depends on a requirement the feed and a note state differently")
 
 
 # ------------------------------------------------------------------ registry

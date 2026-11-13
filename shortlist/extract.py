@@ -117,6 +117,27 @@ MAY = re.compile(r"\bmay\b")                        # lower case only, so the mo
 # Used for experience, skills and credentials only, so "interested in Spokane" still reads as a place.
 AMBITION = re.compile(r"\b(?:interested\s+in|wants?\s+to|would\s+like\s+to|looking\s+to|moving\s+into|"
                       r"hope\s+to|aim\s+to|keen\s+to)\b", re.I)
+# Not first-hand. A clause can name a skill, a setting or a credential without the person doing it: they
+# watched, studied or heard of it, or someone else does it. Like ambition, it yields no yes for experience,
+# skills or credentials, and is left unread: a question for the recruiter.
+SECOND_HAND = re.compile(
+    r"\bin\s+theory\b|\btheoretical(?:ly)?\b|\bexposure\b|\bexposed\s+to\b"
+    r"|\b(?:webinar|seminar|workshop|lecture|tutorial|coursework)s?\b|\bcourses?\s+(?:on|in|about)\b"
+    r"|\b(?:took|taking|attended|attending|completed)\s+(?:an?\s+|the\s+)?(?:[\w-]+\s+){0,3}(?:course|class|module)\b"
+    r"|\b(?:read|reading|heard|hearing|know|knew)\s+(?:about|of)\b|\baware(?:ness)?\b"
+    r"|\b(?:basic|limited|minimal|some|passing|general)\s+(?:understanding|knowledge|familiarity|awareness)\b|\bintroductory\b"
+    r"|\bshadow(?:ed|ing)?\b|\bobserv(?:ed|ing|ation|er)\b|\breferr(?:ed|ing|als?)\b|\bas\s+a\s+student\b|\brotations?\b", re.I)
+SOMEONE_ELSE = re.compile(
+    r"\b(?:my|our|the|a)\s+(?:colleagues?|co-?workers?|team(?:mates?)?|manager|supervisor|staff|aides?|assistants?|partner|"
+    r"wife|husband|friend|sister|brother|mother|father|students?)\b"
+    r"|\b(?:aides?|assistants?|staff|students?|others|people)\s+who\b"
+    r"|\bsupervis(?:e|es|ed|ing)\s+(?:the\s+)?(?:aides?|assistants?|staff|students?|others|people)\b", re.I)
+# A credential once held, or on its way, is not a credential held now: "held a Washington license until 2023",
+# "license application submitted", "eligible by reciprocity". Read for licenses and certificates only.
+NOT_NOW = re.compile(
+    r"\b(?:formerly|previously|used\s+to)\b|(?<!have\s)(?<!has\s)(?<!ve\s)\bheld\b"
+    r"|\b(?:eligible|eligibility|application|awaiting|booked|reciprocity)\b|\bunder\s+review\b", re.I)
+ENDED = re.compile(r"\b(?:until|through|thru)\s+(?P<y>(?:19|20)\d{2})\b", re.I)
 NEGATED = re.compile(
     r"\b(?:have|has|had)\s+(?:not|never)\s+(?:used|worked|done|performed|practi[cs]ed)\b"
     r"|\bnever\s+(?:used|worked|done)\b|\bno\s+experience\s+(?:with|in|of)\b|\bnot\s+familiar\s+with\b", re.I)
@@ -221,11 +242,20 @@ def clauses(text: str):
 
 
 def doubt_in(t: str) -> tuple[bool, bool]:
-    """(doubt, ambition) in one clause, after the negations the reader understands are taken out.
-    Used by the rule reader, by the guard on the model reader, and by the checker."""
+    """(doubt, not first-hand) in one clause, after the negations the reader understands are taken out.
+    The second is ambition ("interested in home health") or a passing mention ("shadowed", "my colleague
+    handles it"). Used by the rule reader, by the guard on the model reader, and by the checker."""
     rest = _placed(t)
     doubt = bool(NEGATION.search(rest) or UNSURE.search(rest) or MAY.search(rest) or rest.rstrip().endswith("?"))
-    return doubt, bool(AMBITION.search(rest))
+    return doubt, bool(AMBITION.search(rest) or SECOND_HAND.search(rest) or SOMEONE_ELSE.search(rest))
+
+
+def not_held_now(t: str, anchor: date) -> bool:
+    """A clause about a credential held in the past or still on its way."""
+    if NOT_NOW.search(t):
+        return True
+    m = ENDED.search(t)
+    return bool(m and int(m.group("y")) < anchor.year)
 
 
 def _placed(t: str) -> str:
@@ -343,10 +373,12 @@ class Extractor:
         doubt, ambition = doubt_in(t)
         doubt = doubt and pol != "unanswered"
         unclear = doubt or (ambition and pol != "unanswered")   # ambition counts for experience, skills and credentials
-        if unclear and ev.author == "candidate":
+        past = pol == "pos" and not_held_now(t, anchor)         # a credential once held or on its way: not held now
+        if (unclear or past) and ev.author == "candidate":
             topics = self._topics(t, anchor)
-            if not doubt:                                       # ambition alone: only experience, skills, credentials
-                topics = tuple(x for x in topics if x.startswith(("skill:", "setting:", "cert:", "license:")))
+            if not doubt:                                       # not first-hand: only experience, skills, credentials
+                about = ("skill:", "setting:", "cert:", "license:") if unclear else ("cert:", "license:")
+                topics = tuple(x for x in topics if x.startswith(about))
             if topics:
                 # Not a fact: a sign that the candidate said something newer about these topics that could
                 # not be read. A rule met on older evidence becomes a question instead (rules.evaluate).
@@ -390,11 +422,11 @@ class Extractor:
                 add("skill.mention", "skill", True, k)
 
         if pol == "pos" and not unclear:
-            for k in self.lex.find("cert", t):
+            for k in () if past else self.lex.find("cert", t):
                 add("cert.listed", "cert", True, k)
-            for m in BOARD.finditer(t):
+            for m in () if past else BOARD.finditer(t):
                 add("cert.board", "cert", True, "board:" + _slug(m.group("spec")))
-            for m in LICENSE.finditer(t):
+            for m in () if past else LICENSE.finditer(t):
                 add("license.reported", "license", {"active": bool(m.group("pre") or m.group("post"))}, state_code(m.group("state")))
             m = EDUCATION.search(t)
             if m:

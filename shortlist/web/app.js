@@ -39,7 +39,7 @@ const OUT = {
 const TIER_ICON = { strong: "✓", possible: "○", clarify: "?", not_fit: "✕" };
 const FLAG = {
   provisional: "relies on a note not yet in the feed", pending_clarification: "a pending note would change this",
-  disputed: "conflicting claim", unread_update: "a newer message could not be read", same_moment: "two statements at the same moment disagree", replaced: "newer statement used", stale: "old information", alternative_route: "other-boards route",
+  disputed: "a claim the records do not support", unread_update: "a newer message could not be read", same_moment: "two statements at the same moment disagree", replaced: "newer statement used", stale: "old information", alternative_route: "other-boards route",
 };
 const KIND = {
   structured_record: "record", resume: "résumé", profile: "imported profile", candidate_message: "candidate message",
@@ -343,7 +343,7 @@ function flowView(job) {
       <div class="flow">
         <div class="fnode"><b>${num(st.people)}</b><span>people on file</span>${aside}</div>
         <div class="farrow" aria-hidden="true"></div>
-        <div class="fnode win"><b>${num(g.best)}</b><span>on this list</span><small>${num(pass)} pass every required rule${job.need_answer ? ` · ${num(job.need_answer)} need an answer` : ""}</small></div>
+        <div class="fnode win"><b>${num(g.best)}</b><span>on this list</span><small>${num(pass)} pass${pass === 1 ? "es" : ""} every required rule${job.need_answer ? ` · ${num(job.need_answer)} need${job.need_answer === 1 ? "s" : ""} an answer` : ""}</small></div>
         ${out ? '<div class="farrow off" aria-hidden="true"></div>' + out : ""}
       </div>
       ${S.process ? `<div class="decided"><ul class="points">${points}</ul><figure class="web">${weightsWeb(job)}</figure></div>` + processView(job) : ""}

@@ -46,7 +46,7 @@ For everyone on the list. Six dimensions, 0 to 100, weighted as configured for t
 | Job is open | ✓ clear: The job is open | ✓ clear: The job is open | ✓ clear: The job is open | ✓ clear: The job is open |
 | Contact permission | ✓ clear: No contact restriction is on record | ✓ clear: No contact restriction is on record | ✓ clear: No contact restriction is on record | ✓ clear: No contact restriction is on record |
 | Recruiter ownership | ✓ clear: No owner is on record | ✓ clear: No owner is on record | ✓ clear: No owner is on record | → owner: Opportunities go through recruiter R2 |
-| Requirement source | ! confirm: This result relies on a note the vendor fee… | ! confirm: This result relies on a note the vendor fee… | ! confirm: This result relies on a note the vendor fee… | ✓ clear: Uses requirements the vendor feed and the n… |
+| Requirement source | ! confirm: This result relies on a note the vendor fee… | ! confirm: This result relies on a note the vendor fee… | ! confirm: This result relies on a note the vendor fee… | ✓ clear: Nothing in this result depends on a require… |
 | **Next action** | **A recruiter may reach out** | **A recruiter may reach out** | **A recruiter may reach out** | **Send to recruiter R2, who owns this relationship** |
 
 ## What the recruiter takes away

@@ -88,6 +88,27 @@ class Match:
     key: tuple | None = None         # (evidence id, quote) behind the dimension that adds most to the score
 
 
+def _soft_words(soft: list) -> str:
+    """What a preferred rule leaves open, in words: lower where it is not met, not yet known where it is unknown."""
+    lower = [r.label.lower() for r in soft if r.outcome == NOT_MET]
+    open_ = [r.label.lower() for r in soft if r.outcome == UNKNOWN]
+    return ("; lower on " + ", ".join(lower) if lower else "") + ("; not yet known: " + ", ".join(open_) if open_ else "")
+
+
+def _moot_questions(tier: str, action: dict, results: list[Result], gates: list[Result]) -> None:
+    """Drop the questions nobody should be asking. Someone who must not be contacted is asked nothing; a
+    closed job raises nothing; and for someone a required rule rules out, only that rule's question matters
+    (asking a physician about a therapist's license helps nobody)."""
+    status = action["status"]
+    for r in results + gates:
+        if status == "closed":
+            r.questions = []
+        elif status == "blocked":
+            r.questions = [q for q in r.questions if q.startswith(JOB_LEVEL_QUESTIONS)]
+        elif tier == "not_fit" and not (r.level == "hard" and r.outcome == NOT_MET):
+            r.questions = []
+
+
 def _action(tier: str, results: list[Result], gates: list[Result], name: str) -> dict:
     g = {x.rule: x for x in gates}
     failed = [r for r in results if r.level == "hard" and r.outcome == NOT_MET]
@@ -147,10 +168,10 @@ def match_one(ctx: Ctx, job, p) -> Match:
         summary = "Not yet known: " + ", ".join(r.label.lower() for r in unknown)
     elif low >= ctx.scoring["strong_threshold"]:
         tier = "strong"
-        summary = "Meets every required rule" + ("; lower on " + ", ".join(r.label.lower() for r in soft) if soft else "")
+        summary = "Meets every required rule" + _soft_words(soft)
     else:
         tier = "possible"
-        summary = "Meets every required rule; open or lower on " + ", ".join(r.label.lower() for r in soft)
+        summary = "Meets every required rule" + _soft_words(soft)
     checked = [r for r in results if r.outcome != NA]
     if tier == "strong" and len(checked) < int(ctx.scoring.get("min_rules_for_strong", 3)):
         # A posting that says almost nothing cannot make anyone a strong match.
@@ -160,9 +181,11 @@ def match_one(ctx: Ctx, job, p) -> Match:
     if "provisional" in flags:
         summary += ". Relies on a note not yet in the vendor feed"
     action = _action(tier, results, gates, p.name)
+    _moot_questions(tier, action, results, gates)
     questions = list(dict.fromkeys([q for r in results for q in r.questions] + [q for g in gates for q in g.questions]))
+    # Two people are "level" only when every rule, every gate and every dimension came out the same.
     signature = tuple((r.rule, r.outcome, tuple(sorted(r.flags)), None if r.credit is None else round(r.credit, 4))
-                      for r in results) + tuple((g.rule, g.outcome) for g in gates)
+                      for r in results) + tuple((g.rule, g.outcome) for g in gates) + (dimensions.compact(dims),)
     profession = next((r for r in results if r.rule == "profession"), None)
     heard = p.last_candidate_contact
     return Match(job.key, p.key, p.name, tier, score, low, high, results, gates, action, summary, questions, flags, signature,
@@ -260,14 +283,14 @@ def rank(matches: list[Match], scoring: dict) -> None:
         if above.score != m.score:
             m.decided_by = f"The person above scores higher ({above.score} v {m.score}), within the {margin}-point margin."
             continue
-        m.decided_by = "Nothing separates this person from the one above: the evidence is the same, so the order is arbitrary."
+        m.decided_by = "Nothing separates this person from the one above: the score and every tie-breaker are level, so the order is arbitrary."
         for b, va, vm in zip(breakers, breaker_values(above), breaker_values(m)):
             if va != vm:
                 m.decided_by = BREAKER_LABEL.get(b, b)
                 break
     for m, below in zip(matches, matches[1:]):          # the first of two people nothing separates says so too
         if not m.decided_by and m.band is not None and below.band == m.band and below.decided_by.startswith("Nothing separates"):
-            m.decided_by = "Nothing separates this person from the one below: the evidence is the same, so the order is arbitrary."
+            m.decided_by = "Nothing separates this person from the one below: the score and every tie-breaker are level, so the order is arbitrary."
 
 
 def _passes(world, m: Match, filters, today) -> bool:

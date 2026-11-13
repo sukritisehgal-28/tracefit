@@ -47,8 +47,18 @@ def _title(job, key: str) -> str:
     return job.titles[0] if job.titles else key
 
 
+TALLY = {"strong": ("match", "matches"), "possible": ("possible match", "possible matches"),
+         "clarify": ("needs an answer", "need an answer"), "not_fit": ("not a fit", "not a fit")}
+
+
 def _tally(tiers: dict) -> str:
-    return ", ".join(f"{tiers[t]} {TIER_LABEL[t].lower()}" for t in TIER_ORDER if tiers[t])
+    """The count in each tier, in words: "10 matches, 2 need an answer, 4 not a fit"."""
+    return ", ".join(f"{tiers[t]} {TALLY[t][tiers[t] != 1]}" for t in TIER_ORDER if tiers[t])
+
+
+def _tier_score(m) -> str:
+    """"Match (93)", or "Not a fit" alone: someone a required rule rules out is not ranked, so no score is shown."""
+    return TIER_LABEL[m.tier] if m.tier == "not_fit" else f"{TIER_LABEL[m.tier]} ({m.score})"
 
 
 def _job_added(key: str, job, sl: Shortlist, cause: list, reopened: bool = False) -> dict:
@@ -66,7 +76,7 @@ def _job_closed(key: str, job, cause: list) -> dict:
 def _person_added(key: str, job, m, cause: list) -> dict:
     return {"kind": "person_added", "job": key, "title": _title(job, key), "person": m.person, "name": m.name, "cause": cause,
             "tier": m.tier, "not_met": [], "rules": [],
-            "text": f"{m.name} is new for {_number(key)}: {TIER_LABEL[m.tier]} ({m.score})."}
+            "text": f"{m.name} is new for {_number(key)}: {_tier_score(m)}."}
 
 
 def _moved(before, after) -> bool:
@@ -80,8 +90,7 @@ def _match_changed(key: str, job, before, after, cause: list) -> dict:
         for rb, r in zip(before.results + before.gates, after.results + after.gates) if rb.outcome != r.outcome]
     return {"kind": "match_changed", "job": key, "title": _title(job, key), "person": after.person, "name": after.name,
             "cause": cause, "rules": rules, "tier": after.tier, "not_met": [r.rule for r in after.results if r.outcome == NOT_MET],
-            "text": f"{after.name} for {_number(key)} ({_title(job, key)}): {TIER_LABEL[before.tier]} ({before.score}) → "
-                    f"{TIER_LABEL[after.tier]} ({after.score})."}
+            "text": f"{after.name} for {_number(key)} ({_title(job, key)}): {_tier_score(before)} → {_tier_score(after)}."}
 
 
 # ------------------------------------------------------------- page payloads
@@ -395,8 +404,10 @@ class Engine:
             shortlists.append({
                 "job": _number(key), "title": _title(job, key), "status": job.status,
                 "people_checked": sl.stats["evaluated"], "people_listed": len(sent), "counts": dict(sl.stats["tiers"]),
-                "matches": [{"person": _number(m.person), "name": m.name, "tier": TIER_LABEL[m.tier], "score": m.score,
-                             "score_low": m.low, "score_high": m.high, "next_action": m.action["label"],
+                "matches": [{"person": _number(m.person), "name": m.name, "tier": TIER_LABEL[m.tier],
+                             "score": None if m.tier == "not_fit" else m.score,
+                             "score_low": None if m.tier == "not_fit" else m.low,
+                             "score_high": None if m.tier == "not_fit" else m.high, "next_action": m.action["label"],
                              "action_status": m.action["status"], "summary": m.summary, "open_questions": m.questions}
                             for m in sent],
             })

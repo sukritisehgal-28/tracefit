@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from helpers import engine, match
+from helpers import engine, match, rule
 from scenario_base import HH, HH_CV, J, MSG, build, cand
 from shortlist import config
 from shortlist.dimensions import ORDER, score, weights_of
@@ -43,9 +43,18 @@ class Dimensions(unittest.TestCase):
         self.assertEqual(dims(short.matches(0)["job:" + J][0][0])["depth"], 50)
 
     def test_a_dimension_the_job_says_nothing_about_is_left_out(self):
-        m = match(engine(), 0, "VMS-902", "C3")                  # the ED job lists no skills
+        m = match(engine(), 1, "VMS-904", "C2")                  # the outpatient job names no skill or certificate
         self.assertIsNone(dims(m)["skills"])
-        self.assertEqual(m.score, 100)
+        self.assertEqual(m.score, 96)
+
+    def test_the_preferred_board_scores_above_the_other_boards_route(self):
+        # The ED job prefers ABEM or AOBEM and accepts other boards with four certificates. Casey qualifies by
+        # the second route, so the rule is met but earns less than Drew's preferred board would.
+        casey, drew = match(engine(), 0, "VMS-902", "C3"), match(engine(), 0, "VMS-902", "C4")
+        self.assertEqual((rule(casey, "certifications").outcome, rule(drew, "certifications").outcome), ("met", "met"))
+        self.assertLess(rule(casey, "certifications").credit, rule(drew, "certifications").credit)
+        self.assertEqual((dims(casey)["skills"], dims(drew)["skills"]), (67, 100))
+        self.assertEqual((casey.tier, casey.score), ("strong", 94))
 
     def test_a_target_employer_counts_as_full_setting_experience(self):
         # Experience with no dates scores 70 on setting; the same experience at an employer the client names scores 100.

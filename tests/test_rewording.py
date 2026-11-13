@@ -119,6 +119,28 @@ FACTS = {
     ),
 }
 
+# Sentences that name the thing without the person doing or holding it now: they watched, studied or heard of
+# it; someone else does it; they once held it; it is on its way. None may be read as a yes. These came from an
+# independent reviewer's probes: every one was read as a yes before the reader was changed.
+NOT_FIRST_HAND = {
+    "uses OASIS": ["Familiar with OASIS in theory.", "My colleague handles OASIS.", "Completed a one-day OASIS webinar.",
+                   "Limited exposure to OASIS.", "I have read about OASIS.", "Our aides do the OASIS paperwork.",
+                   "I took a course on OASIS.", "I have heard of OASIS.", "Basic understanding of OASIS."],
+    "home-health experience": ["Shadowed a home health PT for a week.", "Referred patients to home health agencies.",
+                               "I supervise aides who do home visits in home health.", "My wife works in home health.",
+                               "I observed home health visits as a student.", "Some exposure to home health during a rotation."],
+    "Washington license": ["Held a Washington PT license until 2023.", "Washington PT license application submitted.",
+                           "Formerly held a Washington license.", "I used to hold a Washington license.",
+                           "Eligible for a Washington license by reciprocity.", "Washington license under review.",
+                           "Awaiting my Washington license."],
+    "ACLS": ["ACLS course booked.", "Held ACLS until 2022.", "My colleague is ACLS certified."],
+}
+# The same words in a sentence that does say yes must still be read.
+STILL_READ = [("Washington license", "Washington license valid through 2027."),
+              ("Washington license", "I have held a Washington license since 2022."),
+              ("uses OASIS", "Over the course of three years I completed OASIS documentation daily."),
+              ("home-health experience", "Home health PT on a world-class team, 2023 to present.")]
+
 # Every one of these asks not to be contacted. Each must be read as a restriction.
 DO_NOT_CONTACT = [
     "Please do not contact me about any jobs until January 15, 2027.",
@@ -165,6 +187,15 @@ class Rewording(unittest.TestCase):
                 with self.subTest(fact=fact, sentence=s):
                     self.assertFalse(is_yes(test, s))
 
+    def test_a_passing_mention_is_never_read_as_a_yes(self):
+        for fact, sentences in NOT_FIRST_HAND.items():
+            for s in sentences:
+                with self.subTest(fact=fact, sentence=s):
+                    self.assertFalse(is_yes(FACTS[fact][0], s))
+        for fact, s in STILL_READ:
+            with self.subTest(fact=fact, sentence=s):
+                self.assertTrue(is_yes(FACTS[fact][0], s))
+
     def test_a_request_not_to_be_contacted_is_never_missed(self):
         for s in DO_NOT_CONTACT:
             with self.subTest(sentence=s):
@@ -202,6 +233,12 @@ def report() -> int:
                 wrong = is_yes(test, s)
                 bad += wrong
                 print(f"   {'FALSE YES' if wrong else 'safe     '}  ({label}) {s}")
+    print("\nNot first-hand (watched, studied, someone else, once held, on its way):")
+    for fact, sentences in NOT_FIRST_HAND.items():
+        for s in sentences:
+            wrong = is_yes(FACTS[fact][0], s)
+            bad += wrong
+            print(f"   {'FALSE YES' if wrong else 'safe     '}  ({fact}) {s}")
     missed = [s for s in DO_NOT_CONTACT if not blocks(s)]
     bad += len(missed)
     print(f"\nDo not contact: {len(DO_NOT_CONTACT) - len(missed)} of {len(DO_NOT_CONTACT)} read as a restriction")

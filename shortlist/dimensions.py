@@ -28,7 +28,7 @@ LABELS = {"setting": "Setting", "skills": "Skills", "depth": "Depth", "evidence"
 DEFAULT_WEIGHTS = {"setting": 25, "skills": 20, "depth": 15, "evidence": 15, "readiness": 15, "pay": 10}
 PENALTY = {"disputed": 30, "unread_update": 30, "same_moment": 30, "stale": 15}
 MEANS = {"setting": "Dated experience in the job's care setting",
-         "skills": "Every skill and tool the job asks for",
+         "skills": "Every skill, tool and preferred certificate the job asks for",
          "depth": "Documented years at twice the minimum",
          "evidence": "Nothing contradicts or outdates the facts used",
          "readiness": "Start, schedule and shifts met, and a recent reply",
@@ -80,9 +80,14 @@ def compute(ctx, job, p, results) -> dict:
             v, why = (100.0, 100.0, 100.0), f"Worked at a target employer: {hit}"
     out["setting"] = (*v, why, _first_ref(r)) if v else None
 
-    # skills
-    r = by.get("skills")
-    out["skills"] = None if r is None or r.outcome == NA else (100 * r.credit, 100 * r.low, 100 * r.high, r.shows, _first_ref(r))
+    # skills, and the board or certificates the job names: both are what the job asks the person to bring
+    parts = [r for r in (by.get("skills"), by.get("certifications")) if r is not None and r.outcome != NA]
+    if parts:
+        n = len(parts)
+        out["skills"] = (100 * sum(r.credit for r in parts) / n, 100 * sum(r.low for r in parts) / n, 100 * sum(r.high for r in parts) / n,
+                         "; ".join(r.shows for r in parts if r.shows), next((_first_ref(r) for r in parts if _first_ref(r)), None))
+    else:
+        out["skills"] = None
 
     # depth
     r = by.get("setting_experience")
