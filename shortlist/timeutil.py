@@ -61,11 +61,13 @@ def next_month_day(month: int, day: int, anchor: date) -> date:
 
 
 def parse_date_phrase(text: str, anchor: date) -> date:
-    """'2026-12-01', 'December 1' or 'January 15, 2027'."""
+    """'2026-12-01', 'December 1', 'January 15, 2027', 'Jan. 15, 2027' or '15 January 2027'."""
     text = text.strip()
     if text[:4].isdigit() and "-" in text:
         return date.fromisoformat(text[:10])
-    parts = text.replace(",", " ").split()
+    parts = text.replace(",", " ").replace(".", " ").split()
+    if parts[0].isdigit():                                    # day first: "15 January 2027"
+        parts[0], parts[1] = parts[1], parts[0]
     month, day = month_of(parts[0]), int(parts[1])
     if len(parts) > 2 and parts[2].isdigit():
         return date(int(parts[2]), month, day)

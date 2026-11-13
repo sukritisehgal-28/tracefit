@@ -28,7 +28,8 @@ def load(raw: dict, L: Loader) -> None:
         if wf.get("placement"):
             L.claim(rec, "placement", {"status": "placed", "until": None}, quote=f"workflow.placement = {wf['placement']}")
         if wf.get("contact_restriction"):
-            L.evidence(f"{pid}-WORKFLOW", "ops_note", subj, exported, "operations", f"{L.label} workflow note {pid}", text=wf["contact_restriction"])
+            L.evidence(f"{pid}-WORKFLOW", "ops_note", subj, exported, "operations", f"{L.label} workflow note {pid}",
+                       text=f"Contact restriction: {wf['contact_restriction']}")
         for e in p.get("evidence") or []:
             is_profile = e.get("kind") == "profile"
             L.evidence(e["id"], "profile" if is_profile else "candidate_statement", subj, e.get("observed_at"), "candidate",

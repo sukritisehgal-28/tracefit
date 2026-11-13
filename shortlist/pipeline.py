@@ -222,10 +222,10 @@ class Engine:
         self.load_issues: list[Issue] = [i for b in self.batches for i in b.issues]
         self.events, seen = [], set()
         for e in sorted((e for b in self.batches for e in b.events), key=lambda e: e.at):     # replayed in time order
-            if e.id in seen:
+            if (e.source, e.id) in seen:
                 self.load_issues.append(Issue("info", e.source, f"event {e.id}", "This event arrived more than once. It was applied once."))
                 continue
-            seen.add(e.id)
+            seen.add((e.source, e.id))
             self.events.append(e)
         self.snapshot_at = parse_when(self.cfg["clock"]["snapshot_at"])[0]
         self._worlds: dict[int, World] = {}
@@ -434,7 +434,7 @@ class Live:
         self.cfg = cfg
         self.world = World(cfg, batches, as_of)
         self.lists: dict[str, Shortlist] = {}
-        self.applied: set[str] = set()                  # event ids already applied; a repeat changes nothing
+        self.applied: set[tuple] = set()                # (source, event id) already applied; a repeat changes nothing
         if freeze:
             # The loaded data lives as long as the service does. Telling the collector so stops it
             # re-scanning millions of long-lived objects every time a shortlist is built.
@@ -456,9 +456,9 @@ class Live:
     def ingest(self, event) -> list[dict]:
         """Apply one event and return what changed, in the same form Engine.changes() gives."""
         w = self.world
-        if event.id in self.applied:
+        if (event.source, event.id) in self.applied:
             return []
-        self.applied.add(event.id)
+        self.applied.add((event.source, event.id))
         for key in self.open_jobs():                    # every open job has a shortlist before anything changes
             self.shortlist(key)
         cause = [ev.id for ev in event.batch.evidence]

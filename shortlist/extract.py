@@ -190,11 +190,20 @@ _REACH = (r"(?:contact\w*|reach(?:ing)?\s+out|call\w*|e-?mail\w*|messag\w*|texts
 DNC_ANY = re.compile(rf"\b{_STOP}\b[^.;]*?\b{_REACH}", re.I)
 NOT_LOOKING = re.compile(r"\bnot\s+(?:looking|available|interested)\s+(?:for|in)\s+(?:any\s+|new\s+)?(?:work|jobs?|roles?|"
                          r"opportunities|assignments?|positions?)\b", re.I)
-OPT_OUT = re.compile(r"\b(?:remove\s+me\s+from|unsubscribe|opt\s+out|take\s+me\s+off)\b", re.I)
+OPT_OUT = re.compile(r"\b(?:remove\s+me\s+from|unsubscribe|opt(?:ed|s|ing)?\s+out|take\s+me\s+off)\b", re.I)
 WELCOME = re.compile(r"\b(?:hesitate|feel\s+free)\b", re.I)      # "don't hesitate to call me" invites contact
-UNTIL = re.compile(rf"\b(?:until|till|before)\s+(?P<d>{MONTH_RE}\s+\d{{1,2}}(?:,\s*\d{{4}})?)", re.I)
+# A date as people and systems write it: 2027-01-15, January 15, 2027, Jan. 15, 15 January 2027.
+_ANY_DATE = rf"(?:\d{{4}}-\d{{2}}-\d{{2}}|{MONTH_RE}\.?\s+\d{{1,2}}(?:,?\s*\d{{4}})?|\d{{1,2}}\s+{MONTH_RE}\.?(?:,?\s*\d{{4}})?)"
+UNTIL = re.compile(rf"\b(?:until|till|before)\s+(?P<d>{_ANY_DATE})", re.I)
 NO_END = date(9999, 12, 31)                                       # a request with no end date
-DNC = re.compile(rf"\b(?:do not|don't|no(?:\s+\w+)?)\s+contact\b[^.]*?\buntil\s+(?P<d>{MONTH_RE}\s+\d{{1,2}}(?:,\s*\d{{4}})?)", re.I)
+DNC = re.compile(rf"\b(?:do not|don't|no(?:\s+\w+)?)\s+contact\b[^.]*?\buntil\s+(?P<d>{_ANY_DATE})", re.I)
+# A restriction as staff record it. These words are unambiguous whoever wrote them, unlike "did not call
+# back". "Contact restriction:" is how an adapter passes on a field of that name: any value in it blocks
+# contact, because a restriction nobody could read must never become "free to reach out".
+STAFF_DNC = re.compile(
+    rf"\bdo\s+not\s+contact\b|\bDNC\b|\bno\s+contact\s*(?:[-–—:]|until\s+(?=\d|{MONTH_RE}))|\bopt(?:ed|s|ing)?\s+out\b"
+    r"|\bstop\s+contacting\b|\bnot\s+to\s+be\s+contacted\b", re.I)
+RESTRICTION_FIELD = re.compile(r"^Contact restriction:\s*(?!(?:none|n/?a|no|null|-)?\s*\.?$)\S", re.I)
 ROUTE = re.compile(r"\b(?:go|goes|going|routed?)\s+through\s+(?:recruiter\s+)?(?P<r>R\d+)\b", re.I)
 OWNER = re.compile(r"\bAssigned\s+recruiter\s+(?P<a>R\d+)\b|\b(?P<b>R\d+)\s+owns\b", re.I)
 UNASSIGNED = re.compile(r"\bUnassigned\b", re.I)
@@ -226,13 +235,16 @@ ALL_SHIFTS = re.compile(r"\b(?:request|need|coverage) is for both\b", re.I)
 
 _SENTENCE_GAP = re.compile(r"(?<=[.!?;])\s+")
 _LINE = re.compile(r"[^\n]+")
+_ABBREVIATION = re.compile(r"\b(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec|St|Dr|Mr|Mrs|Ms|approx|vs|e\.g|i\.e)\.$", re.I)
 
 
 def clauses(text: str):
     """Spans of the clauses in a text: each line, split at sentence ends and semicolons."""
     for line in _LINE.finditer(text):
-        start = line.start()
-        for gap in _SENTENCE_GAP.finditer(line.group()):
+        start, body = line.start(), line.group()
+        for gap in _SENTENCE_GAP.finditer(body):
+            if _ABBREVIATION.search(body[max(0, gap.start() - 8):gap.start()]):      # "Jan. 15", "St. Mary's", "e.g. OASIS": not a sentence end
+                continue
             end = line.start() + gap.start()
             if text[start:end].strip():
                 yield start, end
@@ -317,10 +329,13 @@ class Extractor:
             clause = text[s:e].strip(" \t•")
             nxt = text[spans[i + 1][0]:spans[i + 1][1]].strip(" \t•") if i + 1 < len(spans) else ""
             found: list[Claim] = []
-            if is_job:
-                self._job(ev, clause, found)
-            else:
-                self._person(ev, clause, nxt, no_reply, found)
+            try:
+                if is_job:
+                    self._job(ev, clause, found)
+                else:
+                    self._person(ev, clause, nxt, no_reply, found)
+            except (ValueError, OverflowError):       # an impossible date or number: left unread, never fatal
+                found = []
             kept = [c for c in found if self._allowed(ev, c)]
             for c in kept:
                 if c.polarity != "unclear":
@@ -476,10 +491,12 @@ class Extractor:
                 add("avail.occupied_days", "occupied_days", list(range(a, b + 1)) if a <= b else list(range(a, 7)) + list(range(0, b + 1)))
 
         # contact, ownership and placement
+        had = len(out)
         m = DNC.search(t)
         if m:
             add("contact.do_not_contact", "dnc_until", parse_date_phrase(m.group("d"), anchor))
-        elif ev.author == "candidate" and not WELCOME.search(t) and (DNC_ANY.search(t) or NOT_LOOKING.search(t) or OPT_OUT.search(t)):
+        elif not WELCOME.search(t) and (STAFF_DNC.search(t) or (
+                ev.author == "candidate" and (DNC_ANY.search(t) or NOT_LOOKING.search(t) or OPT_OUT.search(t)))):
             until = UNTIL.search(t)
             add("contact.do_not_contact", "dnc_until", parse_date_phrase(until.group("d"), anchor) if until else NO_END)
         for m in ROUTE.finditer(t):
@@ -494,6 +511,10 @@ class Extractor:
             add("contact.allowed_field", "contact_allowed", m.group(1).lower() == "true")
         if NO_RESTRICTION.search(t):
             add("contact.no_restriction", "restriction_none", True)
+        if RESTRICTION_FIELD.search(t) and not any(c.attr in ("dnc_until", "route_via", "owner", "contact_allowed") for c in out[had:]):
+            # A restriction field with a value the reader could not place. It blocks contact: a restriction
+            # nobody could read must never become "free to reach out".
+            add("contact.unread_restriction", "dnc_until", NO_END)
         if PLACEMENT_NONE.search(t):
             add("contact.placement_none", "placement", {"status": "none", "until": None})
         elif PLACEMENT_CURRENT.search(t):

@@ -695,6 +695,8 @@ def g_contact_permission(ctx: Ctx, job, p, results) -> Result:
             res.flags.append("replaced")
             res.notes.append(f"An older field still says contact is allowed ({ctx.cite(allowed.claims[0])}). The candidate's later request is used.")
             res.refs.extend(ctx.ref(c, "replaced") for c in allowed.claims)
+    elif allowed is not None and allowed.value is False:
+        res = _gate(ctx, "contact_permission", BLOCKED, "The record says contact is not allowed", refs=ctx.refs(allowed))
     elif allowed is not None and allowed.value:
         res = _gate(ctx, "contact_permission", CLEAR, "The record says contact is allowed", refs=ctx.refs(allowed))
     elif dnc is not None:
@@ -757,6 +759,11 @@ GATES = {
 }
 
 
+LEVELS = ("hard", "soft", "from_job")
+POLICIES = ("provisional", "trusted", "feed_only")
+DIMENSION_NAMES = ("setting", "skills", "depth", "evidence", "readiness", "pay")
+
+
 def check_config(cfg: dict) -> None:
     """Fail early if the configuration names a rule the engine does not have, or leaves one out."""
     for section, registry in (("rules", RULES), ("gates", GATES)):
@@ -764,6 +771,38 @@ def check_config(cfg: dict) -> None:
         if configured != known:
             raise ValueError(f"[{section}] in the configuration must list exactly {sorted(known)}; "
                              f"unknown: {sorted(configured - known)}, missing: {sorted(known - configured)}")
+    # A slip in a setting must stop the tool with a clear message. Left unchecked, a mistyped level turns a
+    # required rule off, and a mistyped policy uses a note with no flag.
+    def bad(where, value, want):
+        raise ValueError(f"{where} in the configuration is {value!r}; it must be {want}")
+
+    def number(where, value, low=None, high=None):
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or value != value or abs(value) == float("inf"):
+            bad(where, value, "a number")
+        if (low is not None and value < low) or (high is not None and value > high):
+            bad(where, value, f"between {low} and {high}" if high is not None else f"{low} or more")
+
+    for name, rc in cfg.get("rules", {}).items():
+        if rc.get("level") not in LEVELS:
+            bad(f"[rules.{name}] level", rc.get("level"), "one of " + ", ".join(LEVELS))
+    policy = cfg.get("requirement_changes", {}).get("policy")
+    if policy not in POLICIES:
+        bad("[requirement_changes] policy", policy, "one of " + ", ".join(POLICIES))
+    scoring = cfg.get("scoring", {})
+    number("[scoring] unknown_credit", scoring.get("unknown_credit"), 0, 1)
+    number("[scoring] strong_threshold", scoring.get("strong_threshold"), 0, 100)
+    number("[scoring] tie_margin", scoring.get("tie_margin"), 0)
+    number("[scoring] preferred_item_weight", scoring.get("preferred_item_weight"), 0)
+    number("[scoring] start_tolerance_days", scoring.get("start_tolerance_days", 0), 0)
+    tables = [("[dimensions]", cfg.get("dimensions", {}))]
+    tables += [(f"[divisions.{d}.dimensions]", v["dimensions"]) for d, v in cfg.get("divisions", {}).items() if "dimensions" in v]
+    tables += [(f"[presets.{n}]", v) for n, v in cfg.get("presets", {}).items()]
+    for where, table in tables:
+        weights = {k: v for k, v in table.items() if k in DIMENSION_NAMES}
+        for k, v in weights.items():
+            number(f"{where} {k}", v, 0)
+        if where == "[dimensions]" and weights and not any(weights.values()):
+            bad("[dimensions]", weights, "weights that are not all zero")
 
 
 def evaluate(ctx: Ctx, job, p) -> tuple[list[Result], list[Result]]:

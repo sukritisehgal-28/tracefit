@@ -60,6 +60,13 @@ def _event(L: Loader, e: dict) -> None:
     batch = Batch()
     record = e["record"]
     kind = EVENT_KINDS.get(e.get("eventType"))
+    state = str((record or {}).get("state") or "").strip().lower()
+    if kind is None and state and state != "open" and (record or {}).get("requisitionNumber"):
+        # An event type the tool does not know, whose record says the job is no longer open (closed, filled,
+        # cancelled): applied as an update, because leaving a closed job open puts people forward for it.
+        kind = "job.updated"
+        L.issue("info", f"feed event {e.get('eventId')}",
+                f"The event type {e.get('eventType')!r} is not one the tool knows. Its record says the job is {state}, so it was applied as an update.")
     if kind is None:
         L.issue("warning", f"feed event {e.get('eventId')}",
                 f"The event type {e.get('eventType')!r} is not one the tool knows, so the event was ignored.")
